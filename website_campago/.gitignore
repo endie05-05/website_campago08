@@ -1,0 +1,9 @@
+/node_modules
+/vendor
+.env
+.env.local
+/storage/logs
+.vscode/
+.idea/
+Thumbs.db
+*.sql
