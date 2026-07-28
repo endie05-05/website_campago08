@@ -16,36 +16,50 @@
 <body class="antialiased">
 
     <!-- 1. Navbar -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" aria-label="Navigasi utama">
         <div class="container nav-container">
             <a href="/" class="nav-brand">
                 <div class="nav-logo-placeholder">LOGO</div>
                 Nagari Campago
             </a>
             
-            <ul class="nav-links">
-                <li><a href="#" class="nav-link">Beranda</a></li>
+            <ul class="nav-links" id="primary-navigation">
+                <li><a href="#" class="nav-link active">Beranda</a></li>
                 <li><a href="#profil" class="nav-link">Profil</a></li>
-                <li><a href="#pemerintahan" class="nav-link">Pemerintahan</a></li>
-                <li><a href="#informasi" class="nav-link">Informasi</a></li>
+                <li><a href="#pemerintahan" class="nav-link">Struktur Nagari</a></li>
                 <li><a href="#potensi" class="nav-link">Potensi</a></li>
-                <li><a href="#umkm" class="nav-link">UMKM</a></li>
+                <li><a href="#peta" class="nav-link">Informasi</a></li>
                 <li><a href="#galeri" class="nav-link">Galeri</a></li>
+                <li><a href="/layanan" class="nav-link">Layanan</a></li>
             </ul>
 
             <div class="nav-actions">
-                <button class="search-btn" aria-label="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                
+                <button class="search-btn" type="button" id="searchTrigger" aria-label="Cari di situs" aria-haspopup="dialog" aria-controls="searchOverlay"><span>Cari</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
+                <a href="/login" class="nav-login">Login sebagai Pengelola</a>
             </div>
 
-            <button class="mobile-menu-btn" aria-label="Menu">
+            <button class="mobile-menu-btn" type="button" aria-label="Buka menu navigasi" aria-controls="primary-navigation" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </div>
     </nav>
+
+    <!-- Overlay Pencarian Situs -->
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Pencarian situs">
+        <div class="search-box">
+            <div class="search-box-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari halaman, berita, potensi, UMKM..." autocomplete="off">
+                <button type="button" class="search-close" id="searchClose" aria-label="Tutup pencarian">&times;</button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
 
     <!-- 2. Hero Section -->
     <header class="hero">
@@ -67,40 +81,6 @@
         </div>
     </header>
 
-    <!-- 3. Quick Access -->
-    <section class="quick-access">
-        <div class="container qa-grid animate-on-scroll delay-1">
-            <a href="#profil" class="qa-item">
-                <div class="qa-content">
-                    <svg class="qa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span class="qa-title">Profil Nagari</span>
-                </div>
-                <span class="qa-arrow">→</span>
-            </a>
-            <a href="#peta" class="qa-item">
-                <div class="qa-content">
-                    <svg class="qa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-                    <span class="qa-title">Peta Nagari</span>
-                </div>
-                <span class="qa-arrow">→</span>
-            </a>
-            <a href="#umkm" class="qa-item">
-                <div class="qa-content">
-                    <svg class="qa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                    <span class="qa-title">UMKM Lokal</span>
-                </div>
-                <span class="qa-arrow">→</span>
-            </a>
-            <a href="#berita" class="qa-item">
-                <div class="qa-content">
-                    <svg class="qa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                    <span class="qa-title">Berita Nagari</span>
-                </div>
-                <span class="qa-arrow">→</span>
-            </a>
-        </div>
-    </section>
-
     <!-- 4. Section "Mengenal Campago" -->
     <section id="profil" class="section-padding">
         <div class="container about-grid">
@@ -108,7 +88,7 @@
             <div class="about-content animate-on-scroll delay-1">
                 <span class="small-label">Tentang Nagari</span>
                 <h2 class="section-heading">Mengenal Nagari Campago</h2>
-                <blockquote class="about-desc">
+                <blockquote class="about-desc text-justify">
                     Nagari Campago merupakan salah satu nagari yang berada di Kecamatan V Koto Kampung Dalam, Kabupaten Padang Pariaman, Sumatera Barat. Nagari ini memiliki kehidupan masyarakat yang kuat dengan nilai kebersamaan, budaya Minangkabau, serta potensi pertanian dan ekonomi lokal.
                 </blockquote>
                 <a href="#" class="btn-link">Selengkapnya tentang Campago</a>
@@ -116,8 +96,42 @@
         </div>
     </section>
 
+    <!-- 4.5 Struktur Nagari -->
+    <section id="pemerintahan" class="section-padding bg-cream-light">
+        <div class="container">
+            <div class="potensi-header animate-on-scroll" style="text-align: center; margin: 0 auto 4rem; max-width: 700px;">
+                <span class="small-label" style="justify-content: center; display: flex;">Pemerintahan</span>
+                <h2 class="section-heading">Aparatur Nagari</h2>
+                <p class="potensi-desc text-justify" style="text-align: center;">Mengenal susunan perangkat Nagari Campago yang bertugas melayani masyarakat dan memajukan nagari.</p>
+            </div>
+            
+            <div class="aparatur-grid animate-on-scroll delay-1">
+                <div class="aparatur-card">
+                    <div class="aparatur-img">FOTO</div>
+                    <h3 class="aparatur-name">Nama Wali Nagari</h3>
+                    <div class="aparatur-title">Wali Nagari</div>
+                </div>
+                <div class="aparatur-card">
+                    <div class="aparatur-img">FOTO</div>
+                    <h3 class="aparatur-name">Nama Sekretaris</h3>
+                    <div class="aparatur-title">Sekretaris Nagari</div>
+                </div>
+                <div class="aparatur-card">
+                    <div class="aparatur-img">FOTO</div>
+                    <h3 class="aparatur-name">Nama Kasi</h3>
+                    <div class="aparatur-title">Kasi Pemerintahan</div>
+                </div>
+                <div class="aparatur-card">
+                    <div class="aparatur-img">FOTO</div>
+                    <h3 class="aparatur-name">Nama Kaur</h3>
+                    <div class="aparatur-title">Kaur Keuangan</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 5. Statistik Nagari -->
-    <section class="stats">
+    <section id="statistik" class="stats">
         <div class="container stats-grid">
             <div class="stat-item animate-on-scroll">
                 <div class="stat-number">8</div>
@@ -125,7 +139,7 @@
             </div>
             <div class="stat-item animate-on-scroll delay-1">
                 <div class="stat-number">9,86</div>
-                <div class="stat-label">Luas Wilayah (km²)</div>
+                <div class="stat-label">Luas Wilayah</div>
             </div>
             <div class="stat-item animate-on-scroll delay-2">
                 <div class="stat-number">&mdash;</div>
@@ -143,7 +157,7 @@
         <div class="container">
             <div class="potensi-header animate-on-scroll">
                 <h2 class="section-heading">Jelajahi Potensi Campago</h2>
-                <p class="potensi-desc">Temukan berbagai potensi alam, ekonomi, budaya, dan kehidupan masyarakat Nagari Campago.</p>
+                <p class="potensi-desc text-justify">Temukan berbagai potensi alam, ekonomi, budaya, dan kehidupan masyarakat Nagari Campago.</p>
             </div>
 
             <div class="bento-grid">
@@ -198,7 +212,7 @@
                         <span>24 Juli 2026</span>
                     </div>
                     <h3 class="news-main-title">Gotong Royong Bersama Membersihkan Saluran Irigasi di Korong Pasa</h3>
-                    <p class="news-main-desc">Masyarakat Nagari Campago antusias mengikuti kegiatan gotong royong rutin yang diadakan setiap akhir bulan...</p>
+                    <p class="news-main-desc text-justify">Masyarakat Nagari Campago antusias mengikuti kegiatan gotong royong rutin yang diadakan setiap akhir bulan...</p>
                 </div>
 
                 <div class="news-list animate-on-scroll delay-1">
@@ -231,64 +245,126 @@
     <!-- 8. Peta Digital -->
     <section id="peta" class="section-padding map-section">
         <div class="container map-grid">
+            <input type="checkbox" id="toggle-fasilitas-umum" class="modal-toggle" hidden>
+            <input type="checkbox" id="toggle-umkm" class="modal-toggle" hidden>
             <div class="map-info animate-on-scroll">
                 <h2 class="section-heading">Temukan Campago</h2>
-                <p class="potensi-desc" style="margin-bottom: 2rem;">Jelajahi fasilitas umum, sekolah, tempat ibadah, UMKM, layanan kesehatan, dan lokasi penting lainnya melalui peta digital Nagari Campago.</p>
-                
+                <p class="potensi-desc text-justify" style="margin-bottom: 2rem;">Jelajahi fasilitas umum, sekolah, tempat ibadah, UMKM, layanan kesehatan, dan lokasi penting lainnya melalui peta digital Nagari Campago.</p>
                 <div class="map-filters">
-                    <button class="filter-btn active">Semua</button>
-                    <button class="filter-btn">Fasilitas Umum</button>
-                    <button class="filter-btn">UMKM</button>
-                    <button class="filter-btn">Pendidikan</button>
-                    <button class="filter-btn">Tempat Ibadah</button>
-                    <button class="filter-btn">Kesehatan</button>
+                    <label class="filter-btn" for="toggle-fasilitas-umum">Fasilitas Umum</label>
+                    <label class="filter-btn" for="toggle-umkm">UMKM</label>
                 </div>
-
-                <a href="#" class="btn btn-primary" style="margin-top: 1rem;">Buka Peta Lengkap →</a>
             </div>
             
-            <div class="map-placeholder placeholder-img animate-on-scroll delay-1">
-                Interactive Map Placeholder
-            </div>
-        </div>
-    </section>
-
-    <!-- 9. UMKM Lokal -->
-    <section id="umkm" class="section-padding">
-        <div class="container">
-            <div class="umkm-header animate-on-scroll">
-                <h2 class="section-heading">Produk dari Campago</h2>
-                <p class="potensi-desc">Kenali produk dan usaha lokal yang tumbuh bersama masyarakat Nagari Campago.</p>
+            <div class="map-placeholder placeholder-img animate-on-scroll delay-1" id="mapPlaceholder">
+                Pilih kategori untuk melihat ringkasan lokasi.
             </div>
 
-            <div class="umkm-showcase animate-on-scroll delay-1">
-                <div class="umkm-card">
-                    <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
-                    <span class="umkm-cat">Kuliner</span>
-                    <h3 class="umkm-title">Keripik Singkong Balado</h3>
-                    <div class="umkm-owner">Usaha Ibu Rohani</div>
-                    <div class="umkm-location">Korong Pasa</div>
+            @php
+                $fasilitasUmumList = [
+                    ['icon' => '🏛️', 'nama' => 'Balai Pertemuan Nagari', 'korong' => 'Korong Pasa'],
+                    ['icon' => '🏫', 'nama' => 'SD Negeri 01 Campago', 'korong' => 'Korong Tarok'],
+                    ['icon' => '🛒', 'nama' => 'Pasar Campago', 'korong' => 'Korong Koto'],
+                    ['icon' => '🏥', 'nama' => 'Posyandu Melati', 'korong' => 'Korong Mudik'],
+                    ['icon' => '⚽', 'nama' => 'Lapangan Serbaguna', 'korong' => 'Korong Pasa'],
+                    ['icon' => '🏢', 'nama' => 'Kantor Wali Nagari', 'korong' => 'Korong Koto'],
+                ];
+                $umkmModalList = [
+                    ['kategori' => 'Kuliner', 'judul' => 'Keripik Singkong Balado', 'pemilik' => 'Usaha Ibu Rohani', 'lokasi' => 'Korong Pasa'],
+                    ['kategori' => 'Kerajinan', 'judul' => 'Anyaman Bambu', 'pemilik' => 'Kelompok Tani Harapan', 'lokasi' => 'Korong Tarok'],
+                    ['kategori' => 'Pertanian', 'judul' => 'Beras Organik Campago', 'pemilik' => 'KUD Campago', 'lokasi' => 'Korong Koto'],
+                    ['kategori' => 'Kuliner', 'judul' => 'Kue Sapik Tradisional', 'pemilik' => 'Usaha Mande', 'lokasi' => 'Korong Mudik'],
+                ];
+            @endphp
+
+            <div class="modal-overlay modal-fasilitas-umum">
+                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitle">
+                    <label class="modal-close" for="toggle-fasilitas-umum" aria-label="Tutup informasi">×</label>
+                    <div class="modal-header modal-header-fasum">
+                        <div class="modal-icon-badge">🏘️</div>
+                        <div>
+                            <span class="small-label">Informasi Kategori</span>
+                            <h2 id="categoryTitle">Fasilitas Umum Campago</h2>
+                            <p id="categoryDescription">Kumpulan tempat umum penting seperti balai, sekolah, pasar, dan fasilitas sosial yang mendukung keseharian warga Campago.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-quick-stats">
+                            <div class="modal-quick-stat">
+                                <span class="icon">📍</span>
+                                <div><span class="value">{{ count($fasilitasUmumList) }}</span><span class="label">Lokasi tersebar</span></div>
+                            </div>
+                            <div class="modal-quick-stat">
+                                <span class="icon">🗂️</span>
+                                <div><span class="value">4</span><span class="label">Kategori area utama</span></div>
+                            </div>
+                        </div>
+                        <div class="modal-tags">
+                            <span class="modal-tag">Balai</span>
+                            <span class="modal-tag">Sekolah</span>
+                            <span class="modal-tag">Pasar</span>
+                            <span class="modal-tag">Kantor Pelayanan</span>
+                        </div>
+                        <div class="modal-list">
+                            <h3>Daftar Lokasi</h3>
+                            <div class="location-grid">
+                                @foreach ($fasilitasUmumList as $lokasi)
+                                <div class="location-card">
+                                    <span class="icon">{{ $lokasi['icon'] }}</span>
+                                    <div>
+                                        <div class="name">{{ $lokasi['nama'] }}</div>
+                                        <div class="korong">{{ $lokasi['korong'] }}</div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="umkm-card">
-                    <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
-                    <span class="umkm-cat">Kerajinan</span>
-                    <h3 class="umkm-title">Anyaman Bambu</h3>
-                    <div class="umkm-owner">Kelompok Tani Harapan</div>
-                    <div class="umkm-location">Korong Tarok</div>
-                </div>
-                <div class="umkm-card">
-                    <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
-                    <span class="umkm-cat">Pertanian</span>
-                    <h3 class="umkm-title">Beras Organik Campago</h3>
-                    <div class="umkm-owner">KUD Campago</div>
-                    <div class="umkm-location">Korong Koto</div>
-                </div>
-                <div class="umkm-card">
-                    <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
-                    <span class="umkm-cat">Kuliner</span>
-                    <h3 class="umkm-title">Kue Sapik Tradisional</h3>
-                    <div class="umkm-owner">Usaha Mande</div>
-                    <div class="umkm-location">Korong Mudik</div>
+            </div>
+
+            <div class="modal-overlay modal-umkm">
+                <div class="modal-content modal-content-wide" role="dialog" aria-modal="true" aria-labelledby="categoryTitleUmkm">
+                    <label class="modal-close" for="toggle-umkm" aria-label="Tutup informasi">×</label>
+                    <div class="modal-header modal-header-umkm">
+                        <div class="modal-icon-badge">🛍️</div>
+                        <div>
+                            <span class="small-label">Informasi Kategori</span>
+                            <h2 id="categoryTitleUmkm">UMKM Lokal Campago</h2>
+                            <p id="categoryDescriptionUmkm">Usaha mikro, kecil, dan menengah yang menampung produk lokal khas Campago seperti kuliner, kerajinan, dan pertanian.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-quick-stats">
+                            <div class="modal-quick-stat">
+                                <span class="icon">🏪</span>
+                                <div><span class="value">{{ count($umkmModalList) }}</span><span class="label">Produk unggulan</span></div>
+                            </div>
+                            <div class="modal-quick-stat">
+                                <span class="icon">🗂️</span>
+                                <div><span class="value">3</span><span class="label">Kategori usaha</span></div>
+                            </div>
+                        </div>
+                        <div class="modal-tags">
+                            <span class="modal-tag">Kuliner</span>
+                            <span class="modal-tag">Kerajinan</span>
+                            <span class="modal-tag">Pertanian</span>
+                        </div>
+                        <div class="modal-list">
+                            <h3>Produk dari Campago</h3>
+                            <div class="modal-umkm-grid">
+                                @foreach ($umkmModalList as $produk)
+                                <div class="umkm-card">
+                                    <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
+                                    <span class="umkm-cat">{{ $produk['kategori'] }}</span>
+                                    <h3 class="umkm-title">{{ $produk['judul'] }}</h3>
+                                    <div class="umkm-owner">{{ $produk['pemilik'] }}</div>
+                                    <div class="umkm-location">{{ $produk['lokasi'] }}</div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -330,7 +406,7 @@
                         <li><a href="#profil">Profil</a></li>
                         <li><a href="#pemerintahan">Pemerintahan</a></li>
                         <li><a href="#potensi">Potensi</a></li>
-                        <li><a href="#umkm">UMKM</a></li>
+                        <li><a href="#peta">Informasi</a></li>
                         <li><a href="#berita">Berita</a></li>
                     </ul>
                 </div>
@@ -365,6 +441,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Navbar Scroll Effect
             const navbar = document.getElementById('navbar');
+            const mobileMenuButton = document.querySelector('.mobile-menu-btn');
+            const navLinksMenu = document.querySelector('.nav-links');
+
+            mobileMenuButton.addEventListener('click', () => {
+                const isOpen = navLinksMenu.classList.toggle('is-open');
+                mobileMenuButton.setAttribute('aria-expanded', isOpen);
+                mobileMenuButton.setAttribute('aria-label', isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+            });
+
+            navLinksMenu.addEventListener('click', (event) => {
+                if (event.target.matches('a')) {
+                    navLinksMenu.classList.remove('is-open');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    mobileMenuButton.setAttribute('aria-label', 'Buka menu navigasi');
+                }
+            });
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
                     navbar.classList.add('scrolled');
@@ -374,20 +466,131 @@
             });
 
             // Smooth Scroll for anchor links
+            function smoothScrollToHash(hash) {
+                const targetElement = document.querySelector(hash);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
                     const targetId = this.getAttribute('href');
                     if (targetId === '#') return;
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
+                    smoothScrollToHash(targetId);
                 });
             });
+
+            // Pencarian Situs
+            const searchTrigger = document.getElementById('searchTrigger');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const searchClose = document.getElementById('searchClose');
+
+            const searchIndex = [
+                { title: 'Beranda', desc: 'Halaman utama Website Resmi Nagari Campago', category: 'Halaman', url: '/' },
+                { title: 'Mengenal Nagari Campago', desc: 'Profil dan sekilas tentang Nagari Campago', category: 'Profil', url: '#profil' },
+                { title: 'Aparatur Nagari', desc: 'Struktur perangkat Nagari Campago', category: 'Pemerintahan', url: '#pemerintahan' },
+                { title: 'Wali Nagari', desc: 'Aparatur Nagari - Wali Nagari', category: 'Pemerintahan', url: '#pemerintahan' },
+                { title: 'Sekretaris Nagari', desc: 'Aparatur Nagari - Sekretaris Nagari', category: 'Pemerintahan', url: '#pemerintahan' },
+                { title: 'Kasi Pemerintahan', desc: 'Aparatur Nagari - Kasi Pemerintahan', category: 'Pemerintahan', url: '#pemerintahan' },
+                { title: 'Kaur Keuangan', desc: 'Aparatur Nagari - Kaur Keuangan', category: 'Pemerintahan', url: '#pemerintahan' },
+                { title: 'Statistik Nagari', desc: 'Jumlah korong, luas wilayah, dan penduduk', category: 'Statistik', url: '#statistik' },
+                { title: 'Potensi Nagari', desc: 'Jelajahi potensi alam, ekonomi, budaya, dan wisata', category: 'Potensi', url: '#potensi' },
+                { title: 'Pertanian', desc: 'Potensi Nagari - Hamparan sawah dan ladang', category: 'Potensi', url: '#potensi' },
+                { title: 'Budaya Minangkabau', desc: 'Potensi Nagari - Kesenian dan adat istiadat', category: 'Potensi', url: '#potensi' },
+                { title: 'Wisata & Alam', desc: 'Potensi Nagari - Keindahan alam Nagari Campago', category: 'Potensi', url: '#potensi' },
+                { title: 'Cerita dari Campago', desc: 'Berita dan kegiatan terbaru masyarakat', category: 'Berita', url: '#berita' },
+                { title: 'Gotong Royong Bersama Membersihkan Saluran Irigasi di Korong Pasa', desc: 'Berita - Pemerintahan', category: 'Berita', url: '#berita' },
+                { title: 'Pelatihan Pembuatan Kerajinan Tangan untuk Ibu-ibu PKK', desc: 'Berita terbaru', category: 'Berita', url: '#berita' },
+                { title: 'Penyaluran Bantuan Langsung Tunai (BLT) Tahap III', desc: 'Berita terbaru', category: 'Berita', url: '#berita' },
+                { title: 'Persiapan Menyambut Hari Kemerdekaan RI ke-81', desc: 'Berita terbaru', category: 'Berita', url: '#berita' },
+                { title: 'Peta Digital', desc: 'Fasilitas umum dan UMKM pada peta digital Campago', category: 'Peta', url: '#peta' },
+                { title: 'Produk dari Campago', desc: 'Produk dan usaha lokal UMKM - lihat lewat popup UMKM di Peta Digital', category: 'UMKM', url: '#peta' },
+                { title: 'Keripik Singkong Balado', desc: 'UMKM Kuliner - Usaha Ibu Rohani, Korong Pasa', category: 'UMKM', url: '#peta' },
+                { title: 'Anyaman Bambu', desc: 'UMKM Kerajinan - Kelompok Tani Harapan, Korong Tarok', category: 'UMKM', url: '#peta' },
+                { title: 'Beras Organik Campago', desc: 'UMKM Pertanian - KUD Campago, Korong Koto', category: 'UMKM', url: '#peta' },
+                { title: 'Kue Sapik Tradisional', desc: 'UMKM Kuliner - Usaha Mande, Korong Mudik', category: 'UMKM', url: '#peta' },
+                { title: 'Galeri Budaya', desc: 'Campago Punya Cerita - foto adat dan kehidupan masyarakat', category: 'Galeri', url: '#galeri' },
+                { title: 'Layanan Informasi', desc: 'Layanan dan informasi untuk masyarakat Nagari Campago', category: 'Halaman', url: '/layanan' },
+                { title: 'Login Pengelola', desc: 'Masuk sebagai pengelola website Nagari Campago', category: 'Halaman', url: '/login' }
+            ];
+
+            function openSearch() {
+                searchOverlay.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+                renderSearchResults('');
+                setTimeout(() => searchInput.focus(), 50);
+            }
+
+            function closeSearch() {
+                searchOverlay.classList.remove('is-open');
+                document.body.style.overflow = '';
+                searchInput.value = '';
+            }
+
+            function renderSearchResults(query) {
+                const trimmed = query.trim().toLowerCase();
+                const matches = trimmed === ''
+                    ? searchIndex
+                    : searchIndex.filter(item =>
+                        item.title.toLowerCase().includes(trimmed) ||
+                        item.desc.toLowerCase().includes(trimmed) ||
+                        item.category.toLowerCase().includes(trimmed)
+                    );
+
+                if (matches.length === 0) {
+                    searchResults.innerHTML = '<div class="search-empty">Tidak ada hasil untuk pencarian tersebut.</div>';
+                    return;
+                }
+
+                searchResults.innerHTML = matches.slice(0, 12).map(item => `
+                    <a href="${item.url}" class="search-result-item" data-url="${item.url}">
+                        <span class="search-result-cat">${item.category}</span>
+                        <span class="search-result-title">${item.title}</span>
+                        <span class="search-result-desc">${item.desc}</span>
+                    </a>
+                `).join('');
+            }
+
+            if (searchTrigger) {
+                searchTrigger.addEventListener('click', openSearch);
+                searchClose.addEventListener('click', closeSearch);
+
+                searchOverlay.addEventListener('click', (e) => {
+                    if (e.target === searchOverlay) closeSearch();
+                });
+
+                searchInput.addEventListener('input', (e) => renderSearchResults(e.target.value));
+
+                searchResults.addEventListener('click', (e) => {
+                    const resultLink = e.target.closest('.search-result-item');
+                    if (!resultLink) return;
+                    e.preventDefault();
+                    const url = resultLink.dataset.url;
+                    closeSearch();
+                    if (url.startsWith('#')) {
+                        setTimeout(() => smoothScrollToHash(url), 50);
+                    } else {
+                        window.location.href = url;
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        openSearch();
+                    }
+                    if (e.key === 'Escape' && searchOverlay.classList.contains('is-open')) {
+                        closeSearch();
+                    }
+                });
+            }
 
             // Intersection Observer for animations
             const observerOptions = {
@@ -408,6 +611,43 @@
             document.querySelectorAll('.animate-on-scroll').forEach(el => {
                  el.style.animationName = 'none'; // reset initial
                  observerClean.observe(el);
+            });
+
+            // ScrollSpy for Active Menu Items
+            const sections = document.querySelectorAll('section, header.hero');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const scrollSpyOptions = {
+                root: null,
+                rootMargin: '-40% 0px -60% 0px',
+                threshold: 0
+            };
+
+            const scrollSpyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        let currentId = entry.target.getAttribute('id');
+                        if (entry.target.classList.contains('hero')) {
+                            currentId = ''; // For Beranda (href="#")
+                        }
+                        
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            const href = link.getAttribute('href');
+                            if (currentId === '' && (href === '#' || href === '/')) {
+                                link.classList.add('active');
+                            } else if (currentId && href === `#${currentId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, scrollSpyOptions);
+
+            sections.forEach(sec => {
+                if (sec.id || sec.classList.contains('hero')) {
+                    scrollSpyObserver.observe(sec);
+                }
             });
             
         });
