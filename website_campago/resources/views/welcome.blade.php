@@ -63,7 +63,8 @@
 
     <!-- 2. Hero Section -->
     <header class="hero">
-        <div class="container hero-content animate-on-scroll">
+        <div class="container">
+            <div class="hero-content animate-on-scroll">
             <span class="small-label">Website Resmi</span>
             <h1 class="hero-headline">NAGARI<br>CAMPAGO</h1>
             <h2 class="hero-subheadline">Kecamatan V Koto Kampung Dalam<br>Kabupaten Padang Pariaman</h2>
@@ -72,6 +73,7 @@
             <div class="hero-actions">
                 <a href="#potensi" class="btn btn-primary">Jelajahi Campago</a>
                 <a href="#peta" class="btn-link">Lihat Peta Nagari</a>
+            </div>
             </div>
         </div>
         
@@ -193,8 +195,9 @@
         </div>
     </section>
 
-    <!-- 7. Berita -->
-    <section id="berita" class="section-padding bg-cream-light">
+    <!-- 7 & 8. Informasi (Berita & Peta Digital) -->
+    <section id="informasi">
+        <div class="section-padding bg-cream-light" id="berita">
         <div class="container">
             <div class="news-header animate-on-scroll">
                 <div>
@@ -240,10 +243,10 @@
                 </div>
             </div>
         </div>
-    </section>
+        </div>
 
-    <!-- 8. Peta Digital -->
-    <section id="peta" class="section-padding map-section">
+        <!-- 8. Peta Digital -->
+        <div class="section-padding map-section" id="peta">
         <div class="container map-grid">
             <input type="checkbox" id="toggle-fasilitas-umum" class="modal-toggle" hidden>
             <input type="checkbox" id="toggle-umkm" class="modal-toggle" hidden>
@@ -367,6 +370,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 
