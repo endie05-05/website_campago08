@@ -78,7 +78,14 @@
                         <p class="admin-topbar-desc" id="panelDesc">Ringkasan konten website Nagari Campago.</p>
                     </div>
                 </div>
-                <span class="admin-badge">⚠ Mode UI &mdash; belum ada autentikasi &amp; penyimpanan data</span>
+                <div style="display:flex; align-items:center; gap:1rem;">
+                    <span class="admin-badge">⚠ Mode UI &mdash; penyimpanan data belum terhubung ke database</span>
+                    <span style="font-weight:600; color: var(--color-green-dark, #1f4037);">{{ auth()->user()->name }}</span>
+                    <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="btn-ghost" style="cursor:pointer;">Keluar</button>
+                    </form>
+                </div>
             </header>
 
             <div class="admin-content">

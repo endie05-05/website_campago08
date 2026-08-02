@@ -54,8 +54,8 @@
         <div class="container">
             <div class="service-intro-heading animate-on-scroll">
                 <span class="small-label">Pelayanan Publik</span>
-                <h1 class="section-heading">Layanan &amp; Informasi</h1>
-                <p class="potensi-desc">Pusat informasi terkait layanan administrasi, kependudukan, dan pengaduan bagi masyarakat Nagari Campago.</p>
+                <h1 class="section-heading">Layanan Nagari</h1>
+                <p class="potensi-desc">Pusat layanan administrasi, kependudukan, dan pengaduan bagi masyarakat Nagari Campago. Untuk jam operasional dan kontak kantor, lihat bagian <a href="/#peta" class="btn-link">Informasi</a> di beranda.</p>
             </div>
 
             <div class="service-overview-grid animate-on-scroll delay-1">
@@ -65,9 +65,9 @@
                     <p class="info-desc text-justify">Layanan pembuatan surat pengantar KTP, KK, SKCK, dan keperluan administrasi lainnya.</p>
                 </article>
                 <article class="service-overview-card">
-                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-                    <h2 class="info-title">Jam Layanan</h2>
-                    <p class="info-desc text-justify">Senin–Jumat: 08.00–16.00 WIB. Istirahat 12.00–13.00 WIB. Sabtu dan Minggu libur.</p>
+                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path></svg></div>
+                    <h2 class="info-title">Legalisir Dokumen</h2>
+                    <p class="info-desc text-justify">Legalisir surat dan dokumen kependudukan yang memerlukan pengesahan dari nagari.</p>
                 </article>
                 <article class="service-overview-card">
                     <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"></path><path d="m8.09 9.91 1.27-1.27"></path></svg></div>

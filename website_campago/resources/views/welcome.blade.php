@@ -63,6 +63,10 @@
 
     <!-- 2. Hero Section -->
     <header class="hero">
+        <div class="hero-bg-slider" aria-hidden="true">
+            <img src="{{ asset('images/ngaricampago.jpeg') }}" alt="" class="hero-bg-img">
+            <img src="{{ asset('images/ngaricampago.jpeg') }}" alt="" class="hero-bg-img">
+        </div>
         <div class="container">
             <div class="hero-content animate-on-scroll">
             <span class="small-label">Website Resmi</span>
@@ -134,11 +138,26 @@
 
     <!-- 5. Statistik Nagari -->
     <section id="statistik" class="stats">
+        @php
+            $korongList = [
+                ['icon' => '🛖', 'nama' => 'Korong Pasa', 'deskripsi' => 'Pusat perniagaan dan kegiatan warga Nagari Campago, berdekatan dengan pasar dan balai pertemuan nagari.', 'highlights' => ['Pasar Campago', 'Balai Pertemuan Nagari', 'Lapangan Serbaguna', 'Keripik Singkong Balado']],
+                ['icon' => '🌾', 'nama' => 'Korong Tarok', 'deskripsi' => 'Dikenal dengan hamparan sawah dan aktivitas pertanian yang menjadi mata pencaharian utama warganya.', 'highlights' => ['SD Negeri 01 Campago', 'Anyaman Bambu']],
+                ['icon' => '🏘️', 'nama' => 'Korong Koto', 'deskripsi' => 'Pusat pemerintahan nagari, menjadi lokasi Kantor Wali Nagari sekaligus salah satu titik perdagangan warga.', 'highlights' => ['Kantor Wali Nagari', 'Pasar Campago', 'Beras Organik Campago']],
+                ['icon' => '🌊', 'nama' => 'Korong Mudik', 'deskripsi' => 'Korong yang berada di kawasan hilir dengan layanan kesehatan warga dan usaha kuliner khas Campago.', 'highlights' => ['Posyandu Melati', 'Kue Sapik Tradisional']],
+                ['icon' => '💧', 'nama' => 'Korong Ampang', 'deskripsi' => 'Korong dengan potensi sumber daya air yang mendukung kebutuhan irigasi dan pertanian warga.', 'highlights' => []],
+                ['icon' => '🏛️', 'nama' => 'Korong Balai', 'deskripsi' => 'Menjadi salah satu pusat kegiatan sosial dan musyawarah masyarakat Nagari Campago.', 'highlights' => []],
+                ['icon' => '🌱', 'nama' => 'Korong Sawah', 'deskripsi' => 'Kawasan agraris dengan lahan pertanian yang subur sebagai penopang ekonomi warga.', 'highlights' => []],
+                ['icon' => '⛰️', 'nama' => 'Korong Bukit', 'deskripsi' => 'Berada di kawasan perbukitan dengan pemandangan alam yang menjadi daya tarik tersendiri.', 'highlights' => []],
+            ];
+            $korongBadgeVariants = ['', 'modal-icon-badge-gold', 'modal-icon-badge-sky'];
+        @endphp
+        <input type="checkbox" id="toggle-korong" class="modal-toggle" hidden>
         <div class="container stats-grid">
-            <div class="stat-item animate-on-scroll">
+            <label class="stat-item stat-item-clickable animate-on-scroll" for="toggle-korong">
                 <div class="stat-number">8</div>
                 <div class="stat-label">Korong</div>
-            </div>
+                <span class="stat-item-hint">Lihat daftar</span>
+            </label>
             <div class="stat-item animate-on-scroll delay-1">
                 <div class="stat-number">9,86</div>
                 <div class="stat-label">Luas Wilayah</div>
@@ -147,11 +166,91 @@
                 <div class="stat-number">&mdash;</div>
                 <div class="stat-label">Penduduk</div>
             </div>
-            <div class="stat-item animate-on-scroll delay-3">
-                <div class="stat-number" style="font-size: clamp(1.5rem, 3vw, 2.5rem); margin-top: 1rem;">V Koto Kampung Dalam</div>
-                <div class="stat-label">Kecamatan</div>
+        </div>
+
+        <div class="modal-overlay modal-korong">
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitleKorong">
+                <label class="modal-close" for="toggle-korong" aria-label="Tutup informasi">×</label>
+                <div class="modal-header modal-header-korong">
+                    <div class="modal-icon-badge">📍</div>
+                    <div>
+                        <span class="small-label">Wilayah Administratif</span>
+                        <h2 id="categoryTitleKorong">Korong di Nagari Campago</h2>
+                        <p>Nagari Campago terbagi menjadi 8 korong yang tersebar di seluruh wilayah seluas 9,86 km².</p>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-quick-stats">
+                        <div class="modal-quick-stat">
+                            <span class="icon">📍</span>
+                            <div><span class="value">{{ count($korongList) }}</span><span class="label">Korong</span></div>
+                        </div>
+                        <div class="modal-quick-stat">
+                            <span class="icon">📐</span>
+                            <div><span class="value">9,86 km²</span><span class="label">Luas wilayah</span></div>
+                        </div>
+                    </div>
+                    <div class="modal-list">
+                        <h3>Daftar Korong</h3>
+                        <p class="modal-list-hint">Klik salah satu korong untuk melihat profil lengkapnya.</p>
+                        <div class="location-grid">
+                            @foreach ($korongList as $korong)
+                            <label class="location-card location-card-clickable" for="toggle-korong-detail-{{ $loop->iteration }}">
+                                <span class="icon">{{ $korong['icon'] }}</span>
+                                <div>
+                                    <div class="name">{{ $korong['nama'] }}</div>
+                                    <div class="korong">Nagari Campago</div>
+                                </div>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        @foreach ($korongList as $korong)
+        <div class="korong-detail-toggle">
+            <input type="checkbox" id="toggle-korong-detail-{{ $loop->iteration }}" class="modal-toggle" hidden>
+            <div class="modal-overlay modal-korong-detail">
+                <div class="modal-content">
+                    <label class="modal-close" for="toggle-korong-detail-{{ $loop->iteration }}" aria-label="Tutup informasi">×</label>
+                    <div class="modal-header modal-header-korong">
+                        <div class="modal-icon-badge {{ $korongBadgeVariants[$loop->iteration % 3] }}">{{ $korong['icon'] }}</div>
+                        <div>
+                            <span class="small-label">Profil Korong &middot; {{ $loop->iteration }} / {{ $loop->count }}</span>
+                            <h2>{{ $korong['nama'] }}</h2>
+                            <p>{{ $korong['deskripsi'] }}</p>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-tags">
+                            <span class="modal-tag">Nagari Campago</span>
+                            <span class="modal-tag">Wilayah Administratif</span>
+                        </div>
+                        <div class="modal-list">
+                            <h3>Fasilitas &amp; Potensi Terkait</h3>
+                            @if (count($korong['highlights']))
+                            <div class="korong-highlight-list">
+                                @foreach ($korong['highlights'] as $highlight)
+                                <div class="korong-highlight-item">
+                                    <span class="icon">✦</span>
+                                    <span>{{ $highlight }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                            @else
+                            <div class="korong-empty-state">
+                                <span class="icon">🗂️</span>
+                                <p>Informasi fasilitas &amp; potensi korong ini belum ditambahkan admin.</p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
     </section>
 
     <!-- 6. Potensi Nagari -->
@@ -250,12 +349,14 @@
         <div class="container map-grid">
             <input type="checkbox" id="toggle-fasilitas-umum" class="modal-toggle" hidden>
             <input type="checkbox" id="toggle-umkm" class="modal-toggle" hidden>
+            <input type="checkbox" id="toggle-info-pelayanan" class="modal-toggle" hidden>
             <div class="map-info animate-on-scroll">
                 <h2 class="section-heading">Temukan Campago</h2>
-                <p class="potensi-desc text-justify" style="margin-bottom: 2rem;">Jelajahi fasilitas umum, sekolah, tempat ibadah, UMKM, layanan kesehatan, dan lokasi penting lainnya melalui peta digital Nagari Campago.</p>
+                <p class="potensi-desc text-justify" style="margin-bottom: 2rem;">Jelajahi fasilitas umum, sekolah, tempat ibadah, UMKM, layanan kesehatan, jam operasional, dan lokasi penting lainnya melalui peta digital Nagari Campago.</p>
                 <div class="map-filters">
                     <label class="filter-btn" for="toggle-fasilitas-umum">Fasilitas Umum</label>
                     <label class="filter-btn" for="toggle-umkm">UMKM</label>
+                    <label class="filter-btn" for="toggle-info-pelayanan">Jam &amp; Kontak Pelayanan</label>
                 </div>
             </div>
             
@@ -370,6 +471,80 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $jamOperasional = [
+                    ['icon' => '🕗', 'nama' => 'Senin - Jumat', 'keterangan' => '08.00 - 16.00 WIB'],
+                    ['icon' => '☕', 'nama' => 'Istirahat', 'keterangan' => '12.00 - 13.00 WIB'],
+                    ['icon' => '🚫', 'nama' => 'Sabtu - Minggu', 'keterangan' => 'Libur'],
+                ];
+                $kontakPelayanan = [
+                    ['icon' => '📍', 'nama' => 'Alamat Kantor', 'keterangan' => '[Placeholder Alamat Kantor Wali Nagari]'],
+                    ['icon' => '✉️', 'nama' => 'Email', 'keterangan' => 'info@campago.desa.id'],
+                    ['icon' => '📞', 'nama' => 'Telepon', 'keterangan' => '[Placeholder Nomor Telepon]'],
+                ];
+            @endphp
+
+            <div class="modal-overlay modal-info-pelayanan">
+                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitleInfo">
+                    <label class="modal-close" for="toggle-info-pelayanan" aria-label="Tutup informasi">×</label>
+                    <div class="modal-header modal-header-info">
+                        <div class="modal-icon-badge modal-icon-badge-sky">🕒</div>
+                        <div>
+                            <span class="small-label">Informasi Kategori</span>
+                            <h2 id="categoryTitleInfo">Jam &amp; Kontak Pelayanan</h2>
+                            <p>Informasi jam operasional dan kontak Kantor Wali Nagari Campago untuk keperluan administrasi masyarakat.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-quick-stats">
+                            <div class="modal-quick-stat">
+                                <span class="icon">📅</span>
+                                <div><span class="value">5 Hari</span><span class="label">Hari kerja</span></div>
+                            </div>
+                            <div class="modal-quick-stat">
+                                <span class="icon">🕗</span>
+                                <div><span class="value">08.00–16.00</span><span class="label">Jam operasional</span></div>
+                            </div>
+                        </div>
+                        <div class="modal-tags">
+                            <span class="modal-tag">Senin</span>
+                            <span class="modal-tag">Selasa</span>
+                            <span class="modal-tag">Rabu</span>
+                            <span class="modal-tag">Kamis</span>
+                            <span class="modal-tag">Jumat</span>
+                        </div>
+                        <div class="modal-list">
+                            <h3>Jam Operasional</h3>
+                            <div class="location-grid">
+                                @foreach ($jamOperasional as $jadwal)
+                                <div class="location-card">
+                                    <span class="icon">{{ $jadwal['icon'] }}</span>
+                                    <div>
+                                        <div class="name">{{ $jadwal['nama'] }}</div>
+                                        <div class="korong">{{ $jadwal['keterangan'] }}</div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="modal-list">
+                            <h3>Kontak Kantor Wali Nagari</h3>
+                            <div class="location-grid">
+                                @foreach ($kontakPelayanan as $kontak)
+                                <div class="location-card">
+                                    <span class="icon">{{ $kontak['icon'] }}</span>
+                                    <div>
+                                        <div class="name">{{ $kontak['nama'] }}</div>
+                                        <div class="korong">{{ $kontak['keterangan'] }}</div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         </div>
     </section>
@@ -378,8 +553,8 @@
     <section id="galeri" class="section-padding" style="padding-top: 0;">
         <div class="gallery-hero animate-on-scroll">
             <div class="placeholder-img">CULTURAL IMAGE PLACEHOLDER</div>
+            <div class="gallery-hero-label">Campago Punya Cerita</div>
             <div class="gallery-hero-content">
-                <span class="small-label" style="margin-bottom: 0.5rem;">Campago Punya Cerita</span>
                 <h2 class="gallery-title">Dari adat, budaya, kehidupan masyarakat, hingga berbagai cerita yang terus hidup dari generasi ke generasi.</h2>
                 <a href="#" class="btn-link">Jelajahi Galeri</a>
             </div>

@@ -177,10 +177,17 @@
             <p class="login-subtitle">Silakan login untuk mengelola website Nagari Campago</p>
         </div>
 
-        <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Ini hanya antarmuka (UI) login. Sistem backend keamanan perlu ditambahkan nanti!');">
+        @if ($errors->any())
+        <div class="form-group" style="background: rgba(200, 60, 60, 0.1); border: 1px solid rgba(200, 60, 60, 0.3); border-radius: 10px; padding: 0.85rem 1rem; color: #b02a2a;">
+            {{ $errors->first() }}
+        </div>
+        @endif
+
+        <form action="{{ route('login') }}" method="POST">
+            @csrf
             <div class="form-group">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-input" placeholder="Masukkan username Anda" required>
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" placeholder="Masukkan email Anda" required autofocus>
             </div>
 
             <div class="form-group">
