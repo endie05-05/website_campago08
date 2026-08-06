@@ -79,7 +79,6 @@
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:1rem;">
-                    <span class="admin-badge">⚠ Mode UI &mdash; penyimpanan data belum terhubung ke database</span>
                     <span style="font-weight:600; color: var(--color-green-dark, #1f4037);">{{ auth()->user()->name }}</span>
                     <form action="{{ route('logout') }}" method="POST" style="margin:0;">
                         @csrf
@@ -90,14 +89,20 @@
 
             <div class="admin-content">
 
+                @if (session('success'))
+                <div style="background: rgba(47, 93, 80, 0.12); border: 1px solid rgba(47, 93, 80, 0.3); color: var(--color-green-dark); padding: 0.9rem 1.25rem; border-radius: 10px; margin-bottom: 1.5rem; font-weight: 600;">
+                    ✓ {{ session('success') }}
+                </div>
+                @endif
+
                 <!-- ================= DASHBOARD ================= -->
                 <section class="admin-panel active" id="panel-dashboard">
                     <div class="admin-stat-cards">
-                        <div class="admin-stat-card"><div class="num">4</div><div class="label">Perangkat Aparatur</div></div>
-                        <div class="admin-stat-card"><div class="num">4</div><div class="label">Kartu Potensi</div></div>
-                        <div class="admin-stat-card"><div class="num">4</div><div class="label">Berita Terpublikasi</div></div>
-                        <div class="admin-stat-card"><div class="num">4</div><div class="label">Produk UMKM</div></div>
-                        <div class="admin-stat-card"><div class="num">5</div><div class="label">Foto Galeri</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $officials->count() }}</div><div class="label">Perangkat Aparatur</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $potentials->count() }}</div><div class="label">Kartu Potensi</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $posts->where('status', 'published')->count() }}</div><div class="label">Berita Terpublikasi</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $umkms->count() }}</div><div class="label">Produk UMKM</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $galleryImages->count() }}</div><div class="label">Foto Galeri</div></div>
                     </div>
 
                     <div class="admin-card">
@@ -134,54 +139,41 @@
 
                 <!-- ================= APARATUR ================= -->
                 <section class="admin-panel" id="panel-aparatur">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.aparatur.update') }}" enctype="multipart/form-data">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>Aparatur Nagari</h2><p>Daftar perangkat/struktur Nagari Campago yang tampil di beranda.</p></div>
                             </div>
-                            <div class="form-grid" style="margin-bottom:1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Label Kecil</label>
-                                    <input type="text" class="form-input" name="aparatur_header[label]" value="Pemerintahan">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Judul Bagian</label>
-                                    <input type="text" class="form-input" name="aparatur_header[judul]" value="Aparatur Nagari">
-                                </div>
-                                <div class="form-group full">
-                                    <label class="form-label">Deskripsi Pengantar</label>
-                                    <textarea class="form-textarea" name="aparatur_header[deskripsi]">Mengenal susunan perangkat Nagari Campago yang bertugas melayani masyarakat dan memajukan nagari.</textarea>
-                                </div>
-                            </div>
+
+                            @error('aparatur')
+                                <p style="color:#B3453D; font-weight:600; margin-bottom:1rem;">{{ $message }}</p>
+                            @enderror
+
+                            <div class="removed-ids-container"></div>
 
                             <div class="repeater-list" id="list-aparatur">
-                                @php
-                                    $aparaturDefaults = [
-                                        ['nama' => 'Nama Wali Nagari', 'jabatan' => 'Wali Nagari'],
-                                        ['nama' => 'Nama Sekretaris', 'jabatan' => 'Sekretaris Nagari'],
-                                        ['nama' => 'Nama Kasi', 'jabatan' => 'Kasi Pemerintahan'],
-                                        ['nama' => 'Nama Kaur', 'jabatan' => 'Kaur Keuangan'],
-                                    ];
-                                @endphp
-                                @foreach ($aparaturDefaults as $i => $item)
-                                <div class="repeater-item">
+                                @foreach ($officials as $i => $official)
+                                <div class="repeater-item" data-id="{{ $official->id }}">
                                     <span class="repeater-item-index">Item #{{ $i + 1 }}</span>
                                     <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                                     <div class="form-grid">
+                                        <input type="hidden" name="aparatur[{{ $i }}][id]" value="{{ $official->id }}">
                                         <div class="form-group full">
                                             <label class="form-label">Foto</label>
                                             <div class="form-file">
-                                                <div class="preview-box">👤</div>
-                                                <input type="file" name="aparatur[][foto]" accept="image/*">
+                                                <div class="preview-box" @if($official->photo_path) style="background-image:url('{{ \Illuminate\Support\Facades\Storage::url($official->photo_path) }}'); background-size:cover; background-position:center;" @endif>@unless($official->photo_path)👤@endunless</div>
+                                                <input type="file" name="aparatur[{{ $i }}][foto]" accept="image/*">
                                             </div>
+                                            <span class="form-hint">Biarkan kosong jika tidak ingin mengganti foto.</span>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Nama</label>
-                                            <input type="text" class="form-input" name="aparatur[][nama]" value="{{ $item['nama'] }}">
+                                            <input type="text" class="form-input" name="aparatur[{{ $i }}][nama]" value="{{ $official->name }}" required>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Jabatan</label>
-                                            <input type="text" class="form-input" name="aparatur[][jabatan]" value="{{ $item['jabatan'] }}">
+                                            <input type="text" class="form-input" name="aparatur[{{ $i }}][jabatan]" value="{{ $official->position }}" required>
                                         </div>
                                     </div>
                                 </div>
@@ -203,6 +195,7 @@
                         <span class="repeater-item-index">Item baru</span>
                         <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                         <div class="form-grid">
+                            <input type="hidden" name="aparatur[][id]" value="">
                             <div class="form-group full">
                                 <label class="form-label">Foto</label>
                                 <div class="form-file">
@@ -212,11 +205,11 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Nama</label>
-                                <input type="text" class="form-input" name="aparatur[][nama]" placeholder="Nama perangkat">
+                                <input type="text" class="form-input" name="aparatur[][nama]" placeholder="Nama perangkat" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Jabatan</label>
-                                <input type="text" class="form-input" name="aparatur[][jabatan]" placeholder="Jabatan">
+                                <input type="text" class="form-input" name="aparatur[][jabatan]" placeholder="Jabatan" required>
                             </div>
                         </div>
                     </div>
@@ -224,39 +217,32 @@
 
                 <!-- ================= STATISTIK ================= -->
                 <section class="admin-panel" id="panel-statistik">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.statistik.update') }}">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>Statistik Nagari</h2><p>Angka ringkas yang ditampilkan pada beranda.</p></div>
                             </div>
 
-                            <div class="repeater-list" id="list-statistik">
-                                @php
-                                    $statDefaults = [
-                                        ['angka' => '8', 'label' => 'Korong'],
-                                        ['angka' => '9,86', 'label' => 'Luas Wilayah'],
-                                        ['angka' => '—', 'label' => 'Penduduk'],
-                                        ['angka' => 'V Koto Kampung Dalam', 'label' => 'Kecamatan'],
-                                    ];
-                                @endphp
-                                @foreach ($statDefaults as $i => $item)
-                                <div class="repeater-item">
-                                    <span class="repeater-item-index">Item #{{ $i + 1 }}</span>
-                                    <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label class="form-label">Angka / Nilai</label>
-                                            <input type="text" class="form-input" name="statistik[][angka]" value="{{ $item['angka'] }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Label</label>
-                                            <input type="text" class="form-input" name="statistik[][label]" value="{{ $item['label'] }}">
-                                        </div>
-                                    </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Jumlah Korong</label>
+                                    <input type="text" class="form-input" value="{{ $korongCount }}" disabled>
+                                    <span class="form-hint">Dihitung otomatis dari data Korong, tidak bisa diubah di sini.</span>
                                 </div>
-                                @endforeach
+                                <div class="form-group">
+                                    <label class="form-label">Luas Wilayah (km&sup2;)</label>
+                                    <input type="text" class="form-input" name="area_km2" value="{{ $villageProfile->area_km2 }}" placeholder="Contoh: 9.86">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Jumlah Penduduk</label>
+                                    <input type="number" class="form-input" name="population" value="{{ $villageProfile->population }}" placeholder="Contoh: 12750">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Kecamatan</label>
+                                    <input type="text" class="form-input" name="district" value="{{ $villageProfile->district }}">
+                                </div>
                             </div>
-                            <button type="button" class="btn-add" data-repeater="list-statistik">+ Tambah Statistik</button>
 
                             <div class="admin-card-actions">
                                 <button type="reset" class="btn-ghost">Batalkan</button>
@@ -266,76 +252,61 @@
                     </form>
                 </section>
 
-                <template id="list-statistik-template">
-                    <div class="repeater-item">
-                        <span class="repeater-item-index">Item baru</span>
-                        <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Angka / Nilai</label>
-                                <input type="text" class="form-input" name="statistik[][angka]" placeholder="Contoh: 8">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Label</label>
-                                <input type="text" class="form-input" name="statistik[][label]" placeholder="Contoh: Korong">
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
                 <!-- ================= POTENSI ================= -->
                 <section class="admin-panel" id="panel-potensi">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.potensi.update') }}" enctype="multipart/form-data">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>Potensi Nagari</h2><p>Kartu potensi alam, ekonomi, budaya, dan wisata pada beranda.</p></div>
                             </div>
-                            <div class="form-grid" style="margin-bottom:1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Judul Bagian</label>
-                                    <input type="text" class="form-input" name="potensi_header[judul]" value="Jelajahi Potensi Campago">
-                                </div>
-                                <div class="form-group full">
-                                    <label class="form-label">Deskripsi Pengantar</label>
-                                    <textarea class="form-textarea" name="potensi_header[deskripsi]">Temukan berbagai potensi alam, ekonomi, budaya, dan kehidupan masyarakat Nagari Campago.</textarea>
-                                </div>
-                            </div>
+
+                            @error('potensi')
+                                <p style="color:#B3453D; font-weight:600; margin-bottom:1rem;">{{ $message }}</p>
+                            @enderror
+
+                            <div class="removed-ids-container"></div>
 
                             <div class="repeater-list" id="list-potensi">
                                 @php
-                                    $potensiDefaults = [
-                                        ['judul' => 'Pertanian', 'deskripsi' => 'Hamparan sawah dan ladang yang menjadi sumber kehidupan masyarakat.', 'ukuran' => 'besar'],
-                                        ['judul' => 'UMKM Lokal', 'deskripsi' => 'Kerajinan dan kuliner khas Campago.', 'ukuran' => 'kecil'],
-                                        ['judul' => 'Budaya Minangkabau', 'deskripsi' => 'Kesenian dan adat istiadat yang terus lestari.', 'ukuran' => 'kecil'],
-                                        ['judul' => 'Wisata & Alam', 'deskripsi' => 'Keindahan alam Nagari Campago.', 'ukuran' => 'kecil'],
-                                    ];
+                                    $kategoriPotensi = ['pertanian' => 'Pertanian', 'wisata' => 'Wisata', 'budaya' => 'Budaya', 'kerajinan' => 'Kerajinan/UMKM', 'kuliner' => 'Kuliner', 'lainnya' => 'Lainnya'];
                                 @endphp
-                                @foreach ($potensiDefaults as $i => $item)
-                                <div class="repeater-item">
+                                @foreach ($potentials as $i => $potential)
+                                <div class="repeater-item" data-id="{{ $potential->id }}">
                                     <span class="repeater-item-index">Item #{{ $i + 1 }}</span>
                                     <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                                     <div class="form-grid">
+                                        <input type="hidden" name="potensi[{{ $i }}][id]" value="{{ $potential->id }}">
                                         <div class="form-group full">
                                             <label class="form-label">Gambar</label>
                                             <div class="form-file">
-                                                <div class="preview-box">🌾</div>
-                                                <input type="file" name="potensi[][gambar]" accept="image/*">
+                                                <div class="preview-box" @if($potential->featured_image_path) style="background-image:url('{{ \Illuminate\Support\Facades\Storage::url($potential->featured_image_path) }}'); background-size:cover; background-position:center;" @endif>@unless($potential->featured_image_path)🌾@endunless</div>
+                                                <input type="file" name="potensi[{{ $i }}][gambar]" accept="image/*">
                                             </div>
+                                            <span class="form-hint">Biarkan kosong jika tidak ingin mengganti gambar.</span>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Judul Kartu</label>
-                                            <input type="text" class="form-input" name="potensi[][judul]" value="{{ $item['judul'] }}">
+                                            <input type="text" class="form-input" name="potensi[{{ $i }}][judul]" value="{{ $potential->name }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Kategori</label>
+                                            <select class="form-select" name="potensi[{{ $i }}][kategori]">
+                                                @foreach ($kategoriPotensi as $value => $label)
+                                                    <option value="{{ $value }}" {{ $potential->category === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Ukuran Kartu</label>
-                                            <select class="form-select" name="potensi[][ukuran]">
-                                                <option value="besar" {{ $item['ukuran'] === 'besar' ? 'selected' : '' }}>Besar</option>
-                                                <option value="kecil" {{ $item['ukuran'] === 'kecil' ? 'selected' : '' }}>Kecil</option>
+                                            <select class="form-select" name="potensi[{{ $i }}][ukuran]">
+                                                <option value="besar" {{ $potential->card_size === 'besar' ? 'selected' : '' }}>Besar</option>
+                                                <option value="kecil" {{ $potential->card_size === 'kecil' ? 'selected' : '' }}>Kecil</option>
                                             </select>
                                         </div>
                                         <div class="form-group full">
                                             <label class="form-label">Deskripsi Singkat</label>
-                                            <textarea class="form-textarea" name="potensi[][deskripsi]">{{ $item['deskripsi'] }}</textarea>
+                                            <textarea class="form-textarea" name="potensi[{{ $i }}][deskripsi]">{{ $potential->short_description }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -356,6 +327,7 @@
                         <span class="repeater-item-index">Item baru</span>
                         <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                         <div class="form-grid">
+                            <input type="hidden" name="potensi[][id]" value="">
                             <div class="form-group full">
                                 <label class="form-label">Gambar</label>
                                 <div class="form-file">
@@ -366,6 +338,17 @@
                             <div class="form-group">
                                 <label class="form-label">Judul Kartu</label>
                                 <input type="text" class="form-input" name="potensi[][judul]" placeholder="Judul potensi">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Kategori</label>
+                                <select class="form-select" name="potensi[][kategori]">
+                                    <option value="pertanian">Pertanian</option>
+                                    <option value="wisata">Wisata</option>
+                                    <option value="budaya">Budaya</option>
+                                    <option value="kerajinan" selected>Kerajinan/UMKM</option>
+                                    <option value="kuliner">Kuliner</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Ukuran Kartu</label>
@@ -384,74 +367,61 @@
 
                 <!-- ================= BERITA ================= -->
                 <section class="admin-panel" id="panel-berita">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.berita.update') }}" enctype="multipart/form-data">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>Berita &amp; Kegiatan</h2><p>Berita utama dan daftar berita terbaru pada beranda.</p></div>
                             </div>
-                            <div class="form-grid" style="margin-bottom:1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Judul Bagian</label>
-                                    <input type="text" class="form-input" name="berita_header[judul]" value="Cerita dari Campago">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Deskripsi Pengantar</label>
-                                    <input type="text" class="form-input" name="berita_header[deskripsi]" value="Berita, kegiatan, dan cerita terbaru dari masyarakat Nagari Campago.">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Teks Tautan "Lihat Semua"</label>
-                                    <input type="text" class="form-input" name="berita_header[link_teks]" value="Lihat semua berita">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Tujuan Tautan</label>
-                                    <input type="text" class="form-input" name="berita_header[link_url]" value="#">
-                                </div>
-                            </div>
+
+                            @error('berita')
+                                <p style="color:#B3453D; font-weight:600; margin-bottom:1rem;">{{ $message }}</p>
+                            @enderror
+
+                            <div class="removed-ids-container"></div>
 
                             <div class="repeater-list" id="list-berita">
-                                @php
-                                    $beritaDefaults = [
-                                        ['jenis' => 'utama', 'kategori' => 'Pemerintahan', 'tanggal' => '24 Juli 2026', 'judul' => 'Gotong Royong Bersama Membersihkan Saluran Irigasi di Korong Pasa', 'deskripsi' => 'Masyarakat Nagari Campago antusias mengikuti kegiatan gotong royong rutin yang diadakan setiap akhir bulan...'],
-                                        ['jenis' => 'biasa', 'kategori' => '', 'tanggal' => '20 Juli 2026', 'judul' => 'Pelatihan Pembuatan Kerajinan Tangan untuk Ibu-ibu PKK', 'deskripsi' => ''],
-                                        ['jenis' => 'biasa', 'kategori' => '', 'tanggal' => '15 Juli 2026', 'judul' => 'Penyaluran Bantuan Langsung Tunai (BLT) Tahap III Berjalan Lancar', 'deskripsi' => ''],
-                                        ['jenis' => 'biasa', 'kategori' => '', 'tanggal' => '10 Juli 2026', 'judul' => 'Persiapan Menyambut Hari Kemerdekaan RI ke-81 di Tingkat Nagari', 'deskripsi' => ''],
-                                    ];
-                                @endphp
-                                @foreach ($beritaDefaults as $i => $item)
-                                <div class="repeater-item">
+                                @foreach ($posts as $i => $post)
+                                <div class="repeater-item" data-id="{{ $post->id }}">
                                     <span class="repeater-item-index">Item #{{ $i + 1 }}</span>
                                     <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                                     <div class="form-grid">
+                                        <input type="hidden" name="berita[{{ $i }}][id]" value="{{ $post->id }}">
                                         <div class="form-group full">
                                             <label class="form-label">Gambar Berita</label>
                                             <div class="form-file">
-                                                <div class="preview-box">📰</div>
-                                                <input type="file" name="berita[][gambar]" accept="image/*">
+                                                <div class="preview-box" @if($post->featured_image_path) style="background-image:url('{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}'); background-size:cover; background-position:center;" @endif>@unless($post->featured_image_path)📰@endunless</div>
+                                                <input type="file" name="berita[{{ $i }}][gambar]" accept="image/*">
                                             </div>
+                                            <span class="form-hint">Biarkan kosong jika tidak ingin mengganti gambar.</span>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Jenis Tampilan</label>
-                                            <select class="form-select" name="berita[][jenis]">
-                                                <option value="utama" {{ $item['jenis'] === 'utama' ? 'selected' : '' }}>Berita Utama</option>
-                                                <option value="biasa" {{ $item['jenis'] === 'biasa' ? 'selected' : '' }}>Daftar Berita</option>
+                                            <select class="form-select" name="berita[{{ $i }}][jenis]">
+                                                <option value="utama" {{ $post->is_featured ? 'selected' : '' }}>Berita Utama</option>
+                                                <option value="biasa" {{ ! $post->is_featured ? 'selected' : '' }}>Daftar Berita</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Kategori</label>
-                                            <input type="text" class="form-input" name="berita[][kategori]" value="{{ $item['kategori'] }}" placeholder="Contoh: Pemerintahan">
-                                            <span class="form-hint">Hanya tampil di beranda untuk Berita Utama.</span>
+                                            <select class="form-select" name="berita[{{ $i }}][kategori_id]">
+                                                <option value="">Tanpa kategori</option>
+                                                @foreach ($postCategories as $cat)
+                                                    <option value="{{ $cat->id }}" {{ $post->category_id === $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Tanggal</label>
-                                            <input type="text" class="form-input" name="berita[][tanggal]" value="{{ $item['tanggal'] }}">
+                                            <input type="date" class="form-input" name="berita[{{ $i }}][tanggal]" value="{{ $post->published_at?->format('Y-m-d') }}">
                                         </div>
                                         <div class="form-group full">
                                             <label class="form-label">Judul Berita</label>
-                                            <input type="text" class="form-input" name="berita[][judul]" value="{{ $item['judul'] }}">
+                                            <input type="text" class="form-input" name="berita[{{ $i }}][judul]" value="{{ $post->title }}" required>
                                         </div>
                                         <div class="form-group full">
                                             <label class="form-label">Deskripsi / Ringkasan</label>
-                                            <textarea class="form-textarea" name="berita[][deskripsi]" placeholder="Hanya tampil di beranda untuk Berita Utama">{{ $item['deskripsi'] }}</textarea>
+                                            <textarea class="form-textarea" name="berita[{{ $i }}][deskripsi]">{{ $post->excerpt }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -472,6 +442,7 @@
                         <span class="repeater-item-index">Item baru</span>
                         <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                         <div class="form-grid">
+                            <input type="hidden" name="berita[][id]" value="">
                             <div class="form-group full">
                                 <label class="form-label">Gambar Berita</label>
                                 <div class="form-file">
@@ -488,11 +459,16 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Kategori</label>
-                                <input type="text" class="form-input" name="berita[][kategori]" placeholder="Contoh: Pemerintahan">
+                                <select class="form-select" name="berita[][kategori_id]">
+                                    <option value="">Tanpa kategori</option>
+                                    @foreach ($postCategories as $cat)
+                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Tanggal</label>
-                                <input type="text" class="form-input" name="berita[][tanggal]" placeholder="Contoh: 27 Juli 2026">
+                                <input type="date" class="form-input" name="berita[][tanggal]">
                             </div>
                             <div class="form-group full">
                                 <label class="form-label">Judul Berita</label>
@@ -508,81 +484,42 @@
 
                 <!-- ================= PETA DIGITAL ================= -->
                 <section class="admin-panel" id="panel-peta">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.peta.update') }}">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
-                                <div><h2>Peta Digital</h2><p>Kategori dan daftar lokasi yang tampil pada peta digital beranda.</p></div>
+                                <div><h2>Peta Digital</h2><p>Kategori Fasilitas Umum yang tampil pada peta digital beranda. Untuk kategori UMKM, kelola lewat menu "UMKM Lokal".</p></div>
                             </div>
+
+                            @error('lokasi')
+                                <p style="color:#B3453D; font-weight:600; margin-bottom:1rem;">{{ $message }}</p>
+                            @enderror
+
                             <div class="form-grid" style="margin-bottom:1.5rem;">
+                                <div class="form-group full">
+                                    <label class="form-label">Deskripsi Kategori Fasilitas Umum</label>
+                                    <textarea class="form-textarea" name="deskripsi">{{ $peta['fasum_deskripsi'] }}</textarea>
+                                </div>
                                 <div class="form-group">
-                                    <label class="form-label">Judul Bagian</label>
-                                    <input type="text" class="form-input" name="peta_header[judul]" value="Temukan Campago">
+                                    <label class="form-label">Jumlah Lokasi</label>
+                                    <input type="text" class="form-input" value="{{ $fasilitasUmumList->count() }}" disabled>
+                                    <span class="form-hint">Dihitung otomatis dari daftar lokasi di bawah.</span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Area Utama</label>
+                                    <input type="text" class="form-input" name="area" value="{{ $peta['fasum_area'] }}">
                                 </div>
                                 <div class="form-group full">
-                                    <label class="form-label">Deskripsi Pengantar</label>
-                                    <textarea class="form-textarea" name="peta_header[deskripsi]">Jelajahi fasilitas umum, sekolah, tempat ibadah, UMKM, layanan kesehatan, dan lokasi penting lainnya melalui peta digital Nagari Campago.</textarea>
-                                </div>
-                            </div>
-
-                            <!-- Kategori: Fasilitas Umum -->
-                            <div class="repeater-item" style="margin-bottom:1.5rem;">
-                                <span class="repeater-item-index">Kategori: Fasilitas Umum</span>
-                                <div class="form-grid">
-                                    <div class="form-group full">
-                                        <label class="form-label">Deskripsi Kategori</label>
-                                        <textarea class="form-textarea" name="peta[fasilitas_umum][deskripsi]">Kumpulan tempat umum penting seperti balai, sekolah, pasar, dan fasilitas sosial yang mendukung keseharian warga Campago.</textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Jumlah Lokasi</label>
-                                        <input type="number" class="form-input" name="peta[fasilitas_umum][jumlah]" value="6">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Area Utama</label>
-                                        <input type="text" class="form-input" name="peta[fasilitas_umum][area]" value="Balai, Sekolah, Pasar, Kantor Pelayanan">
-                                    </div>
-                                    <div class="form-group full">
-                                        <label class="form-label">Daftar Lokasi</label>
-                                        <div class="repeater-list" id="list-fasum">
-                                            @foreach (['Balai Pertemuan Nagari - Korong Pasa', 'SD Negeri 01 Campago - Korong Tarok', 'Pasar Campago - Korong Koto', 'Posyandu Melati - Korong Mudik', 'Lapangan Serbaguna - Korong Pasa', 'Kantor Wali Nagari - Korong Koto'] as $lokasi)
-                                            <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
-                                                <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
-                                                <input type="text" class="form-input" name="peta[fasilitas_umum][lokasi][]" value="{{ $lokasi }}">
-                                            </div>
-                                            @endforeach
+                                    <label class="form-label">Daftar Lokasi</label>
+                                    <div class="repeater-list" id="list-fasum">
+                                        @foreach ($fasilitasUmumList as $lokasi)
+                                        <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
+                                            <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
+                                            <input type="text" class="form-input" name="lokasi[]" value="{{ $lokasi->name }}">
                                         </div>
-                                        <button type="button" class="btn-add" data-repeater="list-fasum">+ Tambah Lokasi</button>
+                                        @endforeach
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Kategori: UMKM -->
-                            <div class="repeater-item">
-                                <span class="repeater-item-index">Kategori: UMKM</span>
-                                <div class="form-grid">
-                                    <div class="form-group full">
-                                        <label class="form-label">Deskripsi Kategori</label>
-                                        <textarea class="form-textarea" name="peta[umkm][deskripsi]">Usaha mikro, kecil, dan menengah yang menampung produk lokal khas Campago seperti kuliner, kerajinan, dan pertanian.</textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Jumlah Lokasi</label>
-                                        <input type="number" class="form-input" name="peta[umkm][jumlah]" value="4">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Area Utama</label>
-                                        <input type="text" class="form-input" name="peta[umkm][area]" value="Kuliner, Kerajinan, Pertanian">
-                                    </div>
-                                    <div class="form-group full">
-                                        <label class="form-label">Daftar Lokasi</label>
-                                        <div class="repeater-list" id="list-peta-umkm">
-                                            @foreach (['Keripik Singkong Balado - Korong Pasa', 'Anyaman Bambu - Korong Tarok', 'Beras Organik Campago - Korong Koto', 'Kue Sapik Tradisional - Korong Mudik'] as $lokasi)
-                                            <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
-                                                <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
-                                                <input type="text" class="form-input" name="peta[umkm][lokasi][]" value="{{ $lokasi }}">
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                        <button type="button" class="btn-add" data-repeater="list-peta-umkm">+ Tambah Lokasi</button>
-                                    </div>
+                                    <button type="button" class="btn-add" data-repeater="list-fasum">+ Tambah Lokasi</button>
                                 </div>
                             </div>
 
@@ -597,70 +534,55 @@
                 <template id="list-fasum-template">
                     <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
                         <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
-                        <input type="text" class="form-input" name="peta[fasilitas_umum][lokasi][]" placeholder="Nama lokasi - Korong">
-                    </div>
-                </template>
-                <template id="list-peta-umkm-template">
-                    <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
-                        <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
-                        <input type="text" class="form-input" name="peta[umkm][lokasi][]" placeholder="Nama lokasi - Korong">
+                        <input type="text" class="form-input" name="lokasi[]" placeholder="Nama lokasi - Korong">
                     </div>
                 </template>
 
                 <!-- ================= UMKM ================= -->
                 <section class="admin-panel" id="panel-umkm">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.umkm.update') }}" enctype="multipart/form-data">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>UMKM Lokal</h2><p>Daftar produk dan usaha masyarakat pada beranda.</p></div>
                             </div>
-                            <div class="form-grid" style="margin-bottom:1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Judul Bagian</label>
-                                    <input type="text" class="form-input" name="umkm_header[judul]" value="Produk dari Campago">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Deskripsi Pengantar</label>
-                                    <input type="text" class="form-input" name="umkm_header[deskripsi]" value="Kenali produk dan usaha lokal yang tumbuh bersama masyarakat Nagari Campago.">
-                                </div>
-                            </div>
+
+                            @error('umkm')
+                                <p style="color:#B3453D; font-weight:600; margin-bottom:1rem;">{{ $message }}</p>
+                            @enderror
+
+                            <div class="removed-ids-container"></div>
 
                             <div class="repeater-list" id="list-umkm">
-                                @php
-                                    $umkmDefaults = [
-                                        ['kategori' => 'Kuliner', 'judul' => 'Keripik Singkong Balado', 'pemilik' => 'Usaha Ibu Rohani', 'lokasi' => 'Korong Pasa'],
-                                        ['kategori' => 'Kerajinan', 'judul' => 'Anyaman Bambu', 'pemilik' => 'Kelompok Tani Harapan', 'lokasi' => 'Korong Tarok'],
-                                        ['kategori' => 'Pertanian', 'judul' => 'Beras Organik Campago', 'pemilik' => 'KUD Campago', 'lokasi' => 'Korong Koto'],
-                                        ['kategori' => 'Kuliner', 'judul' => 'Kue Sapik Tradisional', 'pemilik' => 'Usaha Mande', 'lokasi' => 'Korong Mudik'],
-                                    ];
-                                @endphp
-                                @foreach ($umkmDefaults as $i => $item)
-                                <div class="repeater-item">
+                                @foreach ($umkms as $i => $umkm)
+                                <div class="repeater-item" data-id="{{ $umkm->id }}">
                                     <span class="repeater-item-index">Item #{{ $i + 1 }}</span>
                                     <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                                     <div class="form-grid">
+                                        <input type="hidden" name="umkm[{{ $i }}][id]" value="{{ $umkm->id }}">
                                         <div class="form-group full">
                                             <label class="form-label">Gambar Produk</label>
                                             <div class="form-file">
-                                                <div class="preview-box">🛍️</div>
-                                                <input type="file" name="umkm[][gambar]" accept="image/*">
+                                                <div class="preview-box" @if($umkm->featured_image_path) style="background-image:url('{{ \Illuminate\Support\Facades\Storage::url($umkm->featured_image_path) }}'); background-size:cover; background-position:center;" @endif>@unless($umkm->featured_image_path)🛍️@endunless</div>
+                                                <input type="file" name="umkm[{{ $i }}][gambar]" accept="image/*">
                                             </div>
+                                            <span class="form-hint">Biarkan kosong jika tidak ingin mengganti gambar.</span>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Kategori</label>
-                                            <input type="text" class="form-input" name="umkm[][kategori]" value="{{ $item['kategori'] }}">
+                                            <input type="text" class="form-input" name="umkm[{{ $i }}][kategori]" value="{{ $umkm->category }}" required>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Nama Produk / Usaha</label>
-                                            <input type="text" class="form-input" name="umkm[][judul]" value="{{ $item['judul'] }}">
+                                            <input type="text" class="form-input" name="umkm[{{ $i }}][judul]" value="{{ $umkm->name }}" required>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Nama Pemilik</label>
-                                            <input type="text" class="form-input" name="umkm[][pemilik]" value="{{ $item['pemilik'] }}">
+                                            <input type="text" class="form-input" name="umkm[{{ $i }}][pemilik]" value="{{ $umkm->owner_name }}">
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Lokasi</label>
-                                            <input type="text" class="form-input" name="umkm[][lokasi]" value="{{ $item['lokasi'] }}">
+                                            <input type="text" class="form-input" name="umkm[{{ $i }}][lokasi]" value="{{ $umkm->address }}" placeholder="Contoh: Korong Bukik Gonggang">
                                         </div>
                                     </div>
                                 </div>
@@ -681,6 +603,7 @@
                         <span class="repeater-item-index">Item baru</span>
                         <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                         <div class="form-grid">
+                            <input type="hidden" name="umkm[][id]" value="">
                             <div class="form-group full">
                                 <label class="form-label">Gambar Produk</label>
                                 <div class="form-file">
@@ -710,60 +633,41 @@
 
                 <!-- ================= GALERI ================= -->
                 <section class="admin-panel" id="panel-galeri">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.galeri.update') }}" enctype="multipart/form-data">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>Galeri Budaya</h2><p>Foto budaya dan kehidupan masyarakat pada beranda.</p></div>
                             </div>
-                            <div class="form-grid" style="margin-bottom:1.5rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Label Kecil</label>
-                                    <input type="text" class="form-input" name="galeri_header[label]" value="Campago Punya Cerita">
-                                </div>
-                                <div class="form-group full">
-                                    <label class="form-label">Judul / Kutipan Galeri</label>
-                                    <textarea class="form-textarea" name="galeri_header[judul]">Dari adat, budaya, kehidupan masyarakat, hingga berbagai cerita yang terus hidup dari generasi ke generasi.</textarea>
-                                </div>
-                                <div class="form-group full">
-                                    <label class="form-label">Gambar Latar Galeri (Hero)</label>
-                                    <div class="form-file">
-                                        <div class="preview-box">🖼️</div>
-                                        <input type="file" name="galeri_header[gambar]" accept="image/*">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Teks Tautan</label>
-                                    <input type="text" class="form-input" name="galeri_header[link_teks]" value="Jelajahi Galeri">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Tujuan Tautan</label>
-                                    <input type="text" class="form-input" name="galeri_header[link_url]" value="#">
-                                </div>
-                            </div>
+
+                            @error('galeri')
+                                <p style="color:#B3453D; font-weight:600; margin-bottom:1rem;">{{ $message }}</p>
+                            @enderror
+
+                            <div class="removed-ids-container"></div>
 
                             <div class="repeater-list" id="list-galeri">
-                                @php
-                                    $galeriDefaults = ['besar', 'sedang', 'tinggi', 'sedang', 'lebar'];
-                                @endphp
-                                @foreach ($galeriDefaults as $i => $ukuran)
-                                <div class="repeater-item">
+                                @foreach ($galleryImages as $i => $image)
+                                <div class="repeater-item" data-id="{{ $image->id }}">
                                     <span class="repeater-item-index">Foto #{{ $i + 1 }}</span>
                                     <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                                     <div class="form-grid">
+                                        <input type="hidden" name="galeri[{{ $i }}][id]" value="{{ $image->id }}">
                                         <div class="form-group full">
                                             <label class="form-label">Foto</label>
                                             <div class="form-file">
-                                                <div class="preview-box">📷</div>
-                                                <input type="file" name="galeri[][gambar]" accept="image/*">
+                                                <div class="preview-box" style="background-image:url('{{ \Illuminate\Support\Facades\Storage::url($image->image_path) }}'); background-size:cover; background-position:center;"></div>
+                                                <input type="file" name="galeri[{{ $i }}][gambar]" accept="image/*">
                                             </div>
+                                            <span class="form-hint">Biarkan kosong jika tidak ingin mengganti foto.</span>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Ukuran Grid</label>
-                                            <select class="form-select" name="galeri[][ukuran]">
-                                                <option value="besar" {{ $ukuran === 'besar' ? 'selected' : '' }}>Besar</option>
-                                                <option value="sedang" {{ $ukuran === 'sedang' ? 'selected' : '' }}>Sedang</option>
-                                                <option value="tinggi" {{ $ukuran === 'tinggi' ? 'selected' : '' }}>Tinggi</option>
-                                                <option value="lebar" {{ $ukuran === 'lebar' ? 'selected' : '' }}>Lebar</option>
+                                            <select class="form-select" name="galeri[{{ $i }}][ukuran]">
+                                                <option value="besar" {{ $image->size === 'besar' ? 'selected' : '' }}>Besar</option>
+                                                <option value="sedang" {{ $image->size === 'sedang' ? 'selected' : '' }}>Sedang</option>
+                                                <option value="tinggi" {{ $image->size === 'tinggi' ? 'selected' : '' }}>Tinggi</option>
+                                                <option value="lebar" {{ $image->size === 'lebar' ? 'selected' : '' }}>Lebar</option>
                                             </select>
                                         </div>
                                     </div>
@@ -785,6 +689,7 @@
                         <span class="repeater-item-index">Foto baru</span>
                         <button type="button" class="repeater-remove" aria-label="Hapus item">&times;</button>
                         <div class="form-grid">
+                            <input type="hidden" name="galeri[][id]" value="">
                             <div class="form-group full">
                                 <label class="form-label">Foto</label>
                                 <div class="form-file">
@@ -807,7 +712,8 @@
 
                 <!-- ================= KONTAK / FOOTER ================= -->
                 <section class="admin-panel" id="panel-kontak">
-                    <form class="admin-form" onsubmit="return handleAdminSubmit(event)">
+                    <form class="admin-form" method="POST" action="{{ route('admin.kontak.update') }}">
+                        @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <div><h2>Footer &amp; Kontak</h2><p>Informasi kontak dan deskripsi singkat yang tampil pada footer website.</p></div>
@@ -815,23 +721,23 @@
                             <div class="form-grid">
                                 <div class="form-group full">
                                     <label class="form-label">Deskripsi Singkat Nagari</label>
-                                    <textarea class="form-textarea" name="kontak[deskripsi]">Kecamatan V Koto Kampung Dalam, Kabupaten Padang Pariaman, Sumatera Barat.</textarea>
+                                    <textarea class="form-textarea" name="deskripsi">{{ $kontak['deskripsi'] }}</textarea>
                                 </div>
                                 <div class="form-group full">
                                     <label class="form-label">Alamat Kantor Wali Nagari</label>
-                                    <textarea class="form-textarea" name="kontak[alamat]">[Placeholder Alamat Kantor Wali Nagari]</textarea>
+                                    <textarea class="form-textarea" name="alamat">{{ $kontak['alamat'] }}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-input" name="kontak[email]" value="info@campago.desa.id">
+                                    <input type="email" class="form-input" name="email" value="{{ $kontak['email'] }}">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Nomor Telepon</label>
-                                    <input type="text" class="form-input" name="kontak[telepon]" value="[Placeholder Nomor Telepon]">
+                                    <input type="text" class="form-input" name="telepon" value="{{ $kontak['telepon'] }}">
                                 </div>
                                 <div class="form-group full">
                                     <label class="form-label">Teks Hak Cipta (Copyright)</label>
-                                    <input type="text" class="form-input" name="kontak[copyright]" value="© 2026 Pemerintah Nagari Campago. All Rights Reserved.">
+                                    <input type="text" class="form-input" name="copyright" value="{{ $kontak['copyright'] }}">
                                 </div>
                             </div>
                             <div class="admin-card-actions">
@@ -883,6 +789,41 @@
 
             menuToggle.addEventListener('click', () => sidebar.classList.toggle('is-open'));
 
+            // Buka tab sesuai parameter ?panel= di URL (dipakai setelah redirect simpan data)
+            const requestedPanel = new URLSearchParams(window.location.search).get('panel');
+            if (requestedPanel) {
+                goToPanel(requestedPanel);
+            }
+
+            // Beberapa repeater (aparatur, potensi, dst) pakai input array bracket "prefix[][x]".
+            // PHP ternyata mengelompokkan input semacam itu berdasarkan urutan kemunculan tiap NAMA
+            // field, bukan per baris -- jadi id/nama/foto milik baris yang sama bisa "tercecer" ke
+            // indeks yang berbeda-beda. Untuk itu tiap baris harus punya indeks eksplisit
+            // ("prefix[0][x]", "prefix[1][x]", dst) yang disegarkan ulang setiap kali baris
+            // ditambah/dihapus.
+            const indexedRepeaters = {
+                'list-aparatur': 'aparatur',
+                'list-potensi': 'potensi',
+                'list-galeri': 'galeri',
+                'list-umkm': 'umkm',
+                'list-berita': 'berita',
+            };
+
+            function reindexRepeaterNames(listId) {
+                const prefix = indexedRepeaters[listId];
+                const list = document.getElementById(listId);
+                if (!prefix || !list) return;
+                list.querySelectorAll(':scope > .repeater-item').forEach((item, idx) => {
+                    item.querySelectorAll(`[name^="${prefix}["]`).forEach(input => {
+                        const match = input.name.match(new RegExp(`^${prefix}\\[[^\\]]*\\]\\[(\\w+)\\]$`));
+                        if (match) {
+                            input.name = `${prefix}[${idx}][${match[1]}]`;
+                        }
+                    });
+                });
+            }
+            Object.keys(indexedRepeaters).forEach(reindexRepeaterNames);
+
             // Repeater: tambah item baru dari <template>
             document.querySelectorAll('.btn-add[data-repeater]').forEach(addBtn => {
                 addBtn.addEventListener('click', () => {
@@ -894,6 +835,7 @@
                     list.appendChild(fragment);
                     initPreviewBoxes(list);
                     refreshRepeaterIndexes(list);
+                    reindexRepeaterNames(listId);
                 });
             });
 
@@ -903,9 +845,24 @@
                 if (!removeBtn) return;
                 const item = removeBtn.closest('.repeater-item');
                 const list = item.parentElement;
+
+                // Jika item ini sudah tersimpan di database (punya data-id), catat agar dihapus saat form disimpan
+                const savedId = item.dataset.id;
+                if (savedId) {
+                    const form = item.closest('form');
+                    if (form) {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'removed_ids[]';
+                        hiddenInput.value = savedId;
+                        form.querySelector('.removed-ids-container')?.appendChild(hiddenInput) || form.appendChild(hiddenInput);
+                    }
+                }
+
                 item.remove();
                 if (list && list.classList.contains('repeater-list')) {
                     refreshRepeaterIndexes(list);
+                    reindexRepeaterNames(list.id);
                 }
             });
 

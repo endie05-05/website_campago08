@@ -12,7 +12,7 @@ class Post extends Model
     protected $fillable = [
         'category_id', 'author_id',
         'title', 'slug', 'excerpt', 'content',
-        'featured_image_path', 'status',
+        'featured_image_path', 'status', 'is_featured',
         'published_at', 'views',
         'meta_title', 'meta_description',
     ];
@@ -20,6 +20,7 @@ class Post extends Model
     protected $casts = [
         'published_at' => 'datetime',
         'views'        => 'integer',
+        'is_featured'  => 'boolean',
     ];
 
     // Scopes

@@ -62,10 +62,19 @@
     </div>
 
     <!-- 2. Hero Section -->
+    @php
+        // Foto slideshow beranda. Untuk menambah foto: taruh file gambarnya di folder
+        // public/images/, lalu tambahkan nama filenya ke daftar di bawah ini.
+        $heroSlides = [
+            'ngaricampago.jpeg',
+            'kegiatan-1.jpg',
+        ];
+    @endphp
     <header class="hero">
-        <div class="hero-bg-slider" aria-hidden="true">
-            <img src="{{ asset('images/ngaricampago.jpeg') }}" alt="" class="hero-bg-img">
-            <img src="{{ asset('images/ngaricampago.jpeg') }}" alt="" class="hero-bg-img">
+        <div class="hero-bg-slideshow" aria-hidden="true">
+            @foreach ($heroSlides as $i => $slide)
+            <div class="hero-bg-slide @if($i === 0) is-active @endif" style="background-image: url('{{ asset('images/'.$slide) }}')"></div>
+            @endforeach
         </div>
         <div class="container">
             <div class="hero-content animate-on-scroll">
@@ -103,35 +112,69 @@
     </section>
 
     <!-- 4.5 Struktur Nagari -->
-    <section id="pemerintahan" class="section-padding bg-cream-light">
+    <section id="pemerintahan" class="section-padding bg-cream-light org-section">
         <div class="container">
-            <div class="potensi-header animate-on-scroll" style="text-align: center; margin: 0 auto 4rem; max-width: 700px;">
-                <span class="small-label" style="justify-content: center; display: flex;">Pemerintahan</span>
-                <h2 class="section-heading">Aparatur Nagari</h2>
-                <p class="potensi-desc text-justify" style="text-align: center;">Mengenal susunan perangkat Nagari Campago yang bertugas melayani masyarakat dan memajukan nagari.</p>
+            <div class="potensi-header animate-on-scroll org-header" style="text-align: center; margin: 0 auto 0.85rem; max-width: 700px;">
+                <span class="small-label" style="justify-content: center; display: flex; margin-bottom: 0.35rem;">Pemerintahan</span>
+                <h2 class="section-heading" style="font-size: clamp(1.4rem, 2.2vw, 1.9rem); margin-bottom: 0.35rem;">Aparatur Nagari</h2>
+                <p class="potensi-desc" style="text-align: center; font-size: 0.85rem;">Mengenal susunan perangkat Nagari Campago yang bertugas melayani masyarakat dan memajukan nagari.</p>
             </div>
-            
-            <div class="aparatur-grid animate-on-scroll delay-1">
-                <div class="aparatur-card">
-                    <div class="aparatur-img">FOTO</div>
-                    <h3 class="aparatur-name">Nama Wali Nagari</h3>
-                    <div class="aparatur-title">Wali Nagari</div>
-                </div>
-                <div class="aparatur-card">
-                    <div class="aparatur-img">FOTO</div>
-                    <h3 class="aparatur-name">Nama Sekretaris</h3>
-                    <div class="aparatur-title">Sekretaris Nagari</div>
-                </div>
-                <div class="aparatur-card">
-                    <div class="aparatur-img">FOTO</div>
-                    <h3 class="aparatur-name">Nama Kasi</h3>
-                    <div class="aparatur-title">Kasi Pemerintahan</div>
-                </div>
-                <div class="aparatur-card">
-                    <div class="aparatur-img">FOTO</div>
-                    <h3 class="aparatur-name">Nama Kaur</h3>
-                    <div class="aparatur-title">Kaur Keuangan</div>
-                </div>
+
+            @php
+                $posLower = fn ($o) => strtolower($o->position);
+                $waliNagari = $officials->first(fn ($o) => str_contains($posLower($o), 'wali nagari'));
+                $sekretaris = $officials->first(fn ($o) => str_contains($posLower($o), 'sekretaris'));
+                $kasiKaur = $officials->filter(fn ($o) => str_starts_with($posLower($o), 'kasi') || str_starts_with($posLower($o), 'kaur'));
+                $waliKorong = $officials->filter(fn ($o) => str_contains($posLower($o), 'wali korong') || str_contains($posLower($o), 'wali jorong'));
+                $staf = $officials->filter(fn ($o) => str_starts_with($posLower($o), 'staf'));
+
+                $terpetakanIds = collect([$waliNagari, $sekretaris])->filter()->pluck('id')
+                    ->merge($kasiKaur->pluck('id'))
+                    ->merge($waliKorong->pluck('id'))
+                    ->merge($staf->pluck('id'));
+                $lainnya = $officials->reject(fn ($o) => $terpetakanIds->contains($o->id));
+
+                // Setiap baris dipecah eksplisit per beberapa item supaya tidak ke-wrap acak oleh
+                // flexbox (yang bikin garis penghubung jadi salah arah kalau jumlah kotaknya banyak).
+                $baguskanBaris = fn ($items, $maks, $compact = false) => $items->isEmpty()
+                    ? []
+                    : $items->chunk($maks)->map(fn ($c) => ['items' => $c->values()->all(), 'compact' => $compact])->values()->all();
+
+                $strukturBaris = array_merge(
+                    $waliNagari ? [['items' => [$waliNagari], 'compact' => false]] : [],
+                    $sekretaris ? [['items' => [$sekretaris], 'compact' => false]] : [],
+                    $baguskanBaris($kasiKaur, 5),
+                    $baguskanBaris($waliKorong, 8, true),
+                    $baguskanBaris($staf, 8, true),
+                    $baguskanBaris($lainnya, 5)
+                );
+            @endphp
+
+            <div class="org-chart animate-on-scroll delay-1">
+                @if ($officials->isEmpty())
+                    <p class="text-muted" style="text-align: center;">Data aparatur belum tersedia.</p>
+                @else
+                    @foreach ($strukturBaris as $baris)
+                        @continue(empty($baris['items']))
+                        <ul class="org-row @if($baris['compact']) org-row-compact @endif">
+                            @foreach ($baris['items'] as $official)
+                            <li class="org-node @if($official->is($waliNagari)) org-node-highlight @endif">
+                                <div class="org-box @if($baris['compact']) org-box-sm @endif">
+                                    @if ($official->photo_path)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($official->photo_path) }}" alt="{{ $official->name }}" class="org-photo" style="object-fit: cover;">
+                                    @else
+                                        <div class="org-photo">FOTO</div>
+                                    @endif
+                                    <div class="org-info">
+                                        <div class="org-position">{{ $official->position }}</div>
+                                        <div class="org-name">{{ $official->name }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            @endforeach
+                        </ul>
+                    @endforeach
+                @endif
             </div>
         </div>
     </section>
@@ -139,31 +182,35 @@
     <!-- 5. Statistik Nagari -->
     <section id="statistik" class="stats">
         @php
-            $korongList = [
-                ['icon' => '🛖', 'nama' => 'Korong Pasa', 'deskripsi' => 'Pusat perniagaan dan kegiatan warga Nagari Campago, berdekatan dengan pasar dan balai pertemuan nagari.', 'highlights' => ['Pasar Campago', 'Balai Pertemuan Nagari', 'Lapangan Serbaguna', 'Keripik Singkong Balado']],
-                ['icon' => '🌾', 'nama' => 'Korong Tarok', 'deskripsi' => 'Dikenal dengan hamparan sawah dan aktivitas pertanian yang menjadi mata pencaharian utama warganya.', 'highlights' => ['SD Negeri 01 Campago', 'Anyaman Bambu']],
-                ['icon' => '🏘️', 'nama' => 'Korong Koto', 'deskripsi' => 'Pusat pemerintahan nagari, menjadi lokasi Kantor Wali Nagari sekaligus salah satu titik perdagangan warga.', 'highlights' => ['Kantor Wali Nagari', 'Pasar Campago', 'Beras Organik Campago']],
-                ['icon' => '🌊', 'nama' => 'Korong Mudik', 'deskripsi' => 'Korong yang berada di kawasan hilir dengan layanan kesehatan warga dan usaha kuliner khas Campago.', 'highlights' => ['Posyandu Melati', 'Kue Sapik Tradisional']],
-                ['icon' => '💧', 'nama' => 'Korong Ampang', 'deskripsi' => 'Korong dengan potensi sumber daya air yang mendukung kebutuhan irigasi dan pertanian warga.', 'highlights' => []],
-                ['icon' => '🏛️', 'nama' => 'Korong Balai', 'deskripsi' => 'Menjadi salah satu pusat kegiatan sosial dan musyawarah masyarakat Nagari Campago.', 'highlights' => []],
-                ['icon' => '🌱', 'nama' => 'Korong Sawah', 'deskripsi' => 'Kawasan agraris dengan lahan pertanian yang subur sebagai penopang ekonomi warga.', 'highlights' => []],
-                ['icon' => '⛰️', 'nama' => 'Korong Bukit', 'deskripsi' => 'Berada di kawasan perbukitan dengan pemandangan alam yang menjadi daya tarik tersendiri.', 'highlights' => []],
-            ];
+            $korongIcons = ['🛖', '🌾', '🏘️', '🌊', '💧', '🏛️', '🌱', '⛰️'];
+            $luasWilayahText = $villageProfile->area_km2 ? number_format($villageProfile->area_km2, 2, ',', '.') : '—';
+            $pendudukText = $villageProfile->population ? number_format($villageProfile->population, 0, ',', '.') : '—';
+
+            $korongList = $korongs->map(function ($korong, $idx) use ($potentials, $korongIcons, $villageProfile) {
+                $highlights = $potentials->where('korong_id', $korong->id)->pluck('name')->all();
+
+                return [
+                    'icon' => $korongIcons[$idx % count($korongIcons)],
+                    'nama' => $korong->name,
+                    'deskripsi' => $korong->description ?: 'Salah satu korong di Nagari Campago, ' . $villageProfile->district . '.',
+                    'highlights' => $highlights,
+                ];
+            });
             $korongBadgeVariants = ['', 'modal-icon-badge-gold', 'modal-icon-badge-sky'];
         @endphp
         <input type="checkbox" id="toggle-korong" class="modal-toggle" hidden>
         <div class="container stats-grid">
             <label class="stat-item stat-item-clickable animate-on-scroll" for="toggle-korong">
-                <div class="stat-number">8</div>
+                <div class="stat-number">{{ $korongCount }}</div>
                 <div class="stat-label">Korong</div>
                 <span class="stat-item-hint">Lihat daftar</span>
             </label>
             <div class="stat-item animate-on-scroll delay-1">
-                <div class="stat-number">9,86</div>
+                <div class="stat-number">{{ $luasWilayahText }}</div>
                 <div class="stat-label">Luas Wilayah</div>
             </div>
             <div class="stat-item animate-on-scroll delay-2">
-                <div class="stat-number">&mdash;</div>
+                <div class="stat-number">{{ $pendudukText }}</div>
                 <div class="stat-label">Penduduk</div>
             </div>
         </div>
@@ -176,7 +223,7 @@
                     <div>
                         <span class="small-label">Wilayah Administratif</span>
                         <h2 id="categoryTitleKorong">Korong di Nagari Campago</h2>
-                        <p>Nagari Campago terbagi menjadi 8 korong yang tersebar di seluruh wilayah seluas 9,86 km².</p>
+                        <p>Nagari Campago terbagi menjadi {{ $korongCount }} korong yang tersebar di seluruh wilayah seluas {{ $luasWilayahText }} km².</p>
                     </div>
                 </div>
                 <div class="modal-body">
@@ -187,7 +234,7 @@
                         </div>
                         <div class="modal-quick-stat">
                             <span class="icon">📐</span>
-                            <div><span class="value">9,86 km²</span><span class="label">Luas wilayah</span></div>
+                            <div><span class="value">{{ $luasWilayahText }} km²</span><span class="label">Luas wilayah</span></div>
                         </div>
                     </div>
                     <div class="modal-list">
@@ -262,34 +309,21 @@
             </div>
 
             <div class="bento-grid">
-                <div class="bento-item bento-item-large animate-on-scroll">
-                    <div class="bento-img-placeholder">IMAGE PLACEHOLDER</div>
+                @forelse ($potentials as $i => $potential)
+                <div class="bento-item @if($potential->card_size === 'besar') bento-item-large @endif animate-on-scroll delay-{{ min($i, 3) }}">
+                    @if ($potential->featured_image_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($potential->featured_image_path) }}" alt="{{ $potential->name }}" class="bento-img">
+                    @else
+                        <div class="bento-img-placeholder">IMAGE PLACEHOLDER</div>
+                    @endif
                     <div class="bento-content">
-                        <h3 class="bento-title">Pertanian</h3>
-                        <p class="bento-desc">Hamparan sawah dan ladang yang menjadi sumber kehidupan masyarakat.</p>
+                        <h3 class="bento-title">{{ $potential->name }}</h3>
+                        <p class="bento-desc">{{ $potential->short_description }}</p>
                     </div>
                 </div>
-                <div class="bento-item animate-on-scroll delay-1">
-                    <div class="bento-img-placeholder">IMAGE PLACEHOLDER</div>
-                    <div class="bento-content">
-                        <h3 class="bento-title">UMKM Lokal</h3>
-                        <p class="bento-desc">Kerajinan dan kuliner khas Campago.</p>
-                    </div>
-                </div>
-                <div class="bento-item animate-on-scroll delay-2">
-                    <div class="bento-img-placeholder">IMAGE PLACEHOLDER</div>
-                    <div class="bento-content">
-                        <h3 class="bento-title">Budaya Minangkabau</h3>
-                        <p class="bento-desc">Kesenian dan adat istiadat yang terus lestari.</p>
-                    </div>
-                </div>
-                <div class="bento-item animate-on-scroll delay-3">
-                    <div class="bento-img-placeholder">IMAGE PLACEHOLDER</div>
-                    <div class="bento-content">
-                        <h3 class="bento-title">Wisata & Alam</h3>
-                        <p class="bento-desc">Keindahan alam Nagari Campago.</p>
-                    </div>
-                </div>
+                @empty
+                <p class="text-muted">Data potensi belum tersedia.</p>
+                @endforelse
             </div>
         </div>
     </section>
@@ -307,38 +341,42 @@
             </div>
 
             <div class="news-grid">
+                @if ($mainPost)
                 <div class="news-main animate-on-scroll">
-                    <div class="placeholder-img">NEWS IMAGE PLACEHOLDER</div>
+                    @if ($mainPost->featured_image_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($mainPost->featured_image_path) }}" alt="{{ $mainPost->title }}" class="placeholder-img" style="object-fit: cover;">
+                    @else
+                        <div class="placeholder-img">NEWS IMAGE PLACEHOLDER</div>
+                    @endif
                     <div class="news-meta">
-                        <span class="news-meta-cat">Pemerintahan</span>
-                        <span>24 Juli 2026</span>
+                        @if ($mainPost->category)
+                            <span class="news-meta-cat">{{ $mainPost->category->name }}</span>
+                        @endif
+                        <span>{{ $mainPost->published_at?->locale('id')->translatedFormat('d F Y') }}</span>
                     </div>
-                    <h3 class="news-main-title">Gotong Royong Bersama Membersihkan Saluran Irigasi di Korong Pasa</h3>
-                    <p class="news-main-desc text-justify">Masyarakat Nagari Campago antusias mengikuti kegiatan gotong royong rutin yang diadakan setiap akhir bulan...</p>
+                    <h3 class="news-main-title">{{ $mainPost->title }}</h3>
+                    <p class="news-main-desc text-justify">{{ $mainPost->excerpt }}</p>
                 </div>
+                @else
+                <div class="news-main animate-on-scroll">
+                    <p class="text-muted">Belum ada berita.</p>
+                </div>
+                @endif
 
                 <div class="news-list animate-on-scroll delay-1">
+                    @foreach ($otherPosts as $post)
                     <div class="news-item">
-                        <div class="placeholder-img">IMAGE PLACEHOLDER</div>
+                        @if ($post->featured_image_path)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}" alt="{{ $post->title }}" class="placeholder-img" style="object-fit: cover;">
+                        @else
+                            <div class="placeholder-img">IMAGE PLACEHOLDER</div>
+                        @endif
                         <div>
-                            <a href="#"><h4 class="news-item-title">Pelatihan Pembuatan Kerajinan Tangan untuk Ibu-ibu PKK</h4></a>
-                            <div class="news-meta">20 Juli 2026</div>
+                            <a href="#"><h4 class="news-item-title">{{ $post->title }}</h4></a>
+                            <div class="news-meta">{{ $post->published_at?->locale('id')->translatedFormat('d F Y') }}</div>
                         </div>
                     </div>
-                    <div class="news-item">
-                        <div class="placeholder-img">IMAGE PLACEHOLDER</div>
-                        <div>
-                            <a href="#"><h4 class="news-item-title">Penyaluran Bantuan Langsung Tunai (BLT) Tahap III Berjalan Lancar</h4></a>
-                            <div class="news-meta">15 Juli 2026</div>
-                        </div>
-                    </div>
-                    <div class="news-item">
-                        <div class="placeholder-img">IMAGE PLACEHOLDER</div>
-                        <div>
-                            <a href="#"><h4 class="news-item-title">Persiapan Menyambut Hari Kemerdekaan RI ke-81 di Tingkat Nagari</h4></a>
-                            <div class="news-meta">10 Juli 2026</div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -365,20 +403,8 @@
             </div>
 
             @php
-                $fasilitasUmumList = [
-                    ['icon' => '🏛️', 'nama' => 'Balai Pertemuan Nagari', 'korong' => 'Korong Pasa'],
-                    ['icon' => '🏫', 'nama' => 'SD Negeri 01 Campago', 'korong' => 'Korong Tarok'],
-                    ['icon' => '🛒', 'nama' => 'Pasar Campago', 'korong' => 'Korong Koto'],
-                    ['icon' => '🏥', 'nama' => 'Posyandu Melati', 'korong' => 'Korong Mudik'],
-                    ['icon' => '⚽', 'nama' => 'Lapangan Serbaguna', 'korong' => 'Korong Pasa'],
-                    ['icon' => '🏢', 'nama' => 'Kantor Wali Nagari', 'korong' => 'Korong Koto'],
-                ];
-                $umkmModalList = [
-                    ['kategori' => 'Kuliner', 'judul' => 'Keripik Singkong Balado', 'pemilik' => 'Usaha Ibu Rohani', 'lokasi' => 'Korong Pasa'],
-                    ['kategori' => 'Kerajinan', 'judul' => 'Anyaman Bambu', 'pemilik' => 'Kelompok Tani Harapan', 'lokasi' => 'Korong Tarok'],
-                    ['kategori' => 'Pertanian', 'judul' => 'Beras Organik Campago', 'pemilik' => 'KUD Campago', 'lokasi' => 'Korong Koto'],
-                    ['kategori' => 'Kuliner', 'judul' => 'Kue Sapik Tradisional', 'pemilik' => 'Usaha Mande', 'lokasi' => 'Korong Mudik'],
-                ];
+                $umkmKategoriList = $umkms->pluck('category')->unique()->values();
+                $fasumAreaTags = array_filter(array_map('trim', explode(',', $peta['fasum_area'])));
             @endphp
 
             <div class="modal-overlay modal-fasilitas-umum">
@@ -389,38 +415,38 @@
                         <div>
                             <span class="small-label">Informasi Kategori</span>
                             <h2 id="categoryTitle">Fasilitas Umum Campago</h2>
-                            <p id="categoryDescription">Kumpulan tempat umum penting seperti balai, sekolah, pasar, dan fasilitas sosial yang mendukung keseharian warga Campago.</p>
+                            <p id="categoryDescription">{{ $peta['fasum_deskripsi'] }}</p>
                         </div>
                     </div>
                     <div class="modal-body">
                         <div class="modal-quick-stats">
                             <div class="modal-quick-stat">
                                 <span class="icon">📍</span>
-                                <div><span class="value">{{ count($fasilitasUmumList) }}</span><span class="label">Lokasi tersebar</span></div>
+                                <div><span class="value">{{ $fasilitasUmumList->count() }}</span><span class="label">Lokasi tersebar</span></div>
                             </div>
                             <div class="modal-quick-stat">
                                 <span class="icon">🗂️</span>
-                                <div><span class="value">4</span><span class="label">Kategori area utama</span></div>
+                                <div><span class="value">{{ count($fasumAreaTags) }}</span><span class="label">Kategori area utama</span></div>
                             </div>
                         </div>
                         <div class="modal-tags">
-                            <span class="modal-tag">Balai</span>
-                            <span class="modal-tag">Sekolah</span>
-                            <span class="modal-tag">Pasar</span>
-                            <span class="modal-tag">Kantor Pelayanan</span>
+                            @foreach ($fasumAreaTags as $tag)
+                            <span class="modal-tag">{{ $tag }}</span>
+                            @endforeach
                         </div>
                         <div class="modal-list">
                             <h3>Daftar Lokasi</h3>
                             <div class="location-grid">
-                                @foreach ($fasilitasUmumList as $lokasi)
+                                @forelse ($fasilitasUmumList as $lokasi)
                                 <div class="location-card">
-                                    <span class="icon">{{ $lokasi['icon'] }}</span>
+                                    <span class="icon">📍</span>
                                     <div>
-                                        <div class="name">{{ $lokasi['nama'] }}</div>
-                                        <div class="korong">{{ $lokasi['korong'] }}</div>
+                                        <div class="name">{{ $lokasi->name }}</div>
                                     </div>
                                 </div>
-                                @endforeach
+                                @empty
+                                <p class="text-muted">Data fasilitas umum belum tersedia.</p>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -442,30 +468,36 @@
                         <div class="modal-quick-stats">
                             <div class="modal-quick-stat">
                                 <span class="icon">🏪</span>
-                                <div><span class="value">{{ count($umkmModalList) }}</span><span class="label">Produk unggulan</span></div>
+                                <div><span class="value">{{ $umkms->count() }}</span><span class="label">Produk unggulan</span></div>
                             </div>
                             <div class="modal-quick-stat">
                                 <span class="icon">🗂️</span>
-                                <div><span class="value">3</span><span class="label">Kategori usaha</span></div>
+                                <div><span class="value">{{ $umkmKategoriList->count() }}</span><span class="label">Kategori usaha</span></div>
                             </div>
                         </div>
                         <div class="modal-tags">
-                            <span class="modal-tag">Kuliner</span>
-                            <span class="modal-tag">Kerajinan</span>
-                            <span class="modal-tag">Pertanian</span>
+                            @foreach ($umkmKategoriList as $kategori)
+                            <span class="modal-tag">{{ $kategori }}</span>
+                            @endforeach
                         </div>
                         <div class="modal-list">
                             <h3>Produk dari Campago</h3>
                             <div class="modal-umkm-grid">
-                                @foreach ($umkmModalList as $produk)
+                                @forelse ($umkms as $produk)
                                 <div class="umkm-card">
-                                    <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
-                                    <span class="umkm-cat">{{ $produk['kategori'] }}</span>
-                                    <h3 class="umkm-title">{{ $produk['judul'] }}</h3>
-                                    <div class="umkm-owner">{{ $produk['pemilik'] }}</div>
-                                    <div class="umkm-location">{{ $produk['lokasi'] }}</div>
+                                    @if ($produk->featured_image_path)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($produk->featured_image_path) }}" alt="{{ $produk->name }}" class="umkm-img" style="object-fit: cover;">
+                                    @else
+                                        <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
+                                    @endif
+                                    <span class="umkm-cat">{{ $produk->category }}</span>
+                                    <h3 class="umkm-title">{{ $produk->name }}</h3>
+                                    <div class="umkm-owner">{{ $produk->owner_name }}</div>
+                                    <div class="umkm-location">{{ $produk->address }}</div>
                                 </div>
-                                @endforeach
+                                @empty
+                                <p class="text-muted">Data UMKM belum tersedia.</p>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -479,9 +511,9 @@
                     ['icon' => '🚫', 'nama' => 'Sabtu - Minggu', 'keterangan' => 'Libur'],
                 ];
                 $kontakPelayanan = [
-                    ['icon' => '📍', 'nama' => 'Alamat Kantor', 'keterangan' => '[Placeholder Alamat Kantor Wali Nagari]'],
-                    ['icon' => '✉️', 'nama' => 'Email', 'keterangan' => 'info@campago.desa.id'],
-                    ['icon' => '📞', 'nama' => 'Telepon', 'keterangan' => '[Placeholder Nomor Telepon]'],
+                    ['icon' => '📍', 'nama' => 'Alamat Kantor', 'keterangan' => $kontak['alamat']],
+                    ['icon' => '✉️', 'nama' => 'Email', 'keterangan' => $kontak['email']],
+                    ['icon' => '📞', 'nama' => 'Telepon', 'keterangan' => $kontak['telepon']],
                 ];
             @endphp
 
@@ -531,12 +563,12 @@
                         <div class="modal-list">
                             <h3>Kontak Kantor Wali Nagari</h3>
                             <div class="location-grid">
-                                @foreach ($kontakPelayanan as $kontak)
+                                @foreach ($kontakPelayanan as $kp)
                                 <div class="location-card">
-                                    <span class="icon">{{ $kontak['icon'] }}</span>
+                                    <span class="icon">{{ $kp['icon'] }}</span>
                                     <div>
-                                        <div class="name">{{ $kontak['nama'] }}</div>
-                                        <div class="korong">{{ $kontak['keterangan'] }}</div>
+                                        <div class="name">{{ $kp['nama'] }}</div>
+                                        <div class="korong">{{ $kp['keterangan'] }}</div>
                                     </div>
                                 </div>
                                 @endforeach
@@ -560,12 +592,15 @@
             </div>
         </div>
 
+        @php
+            $galeriUkuranClass = ['besar' => 'g-item-1', 'sedang' => 'g-item-2', 'tinggi' => 'g-item-3', 'lebar' => 'g-item-4'];
+        @endphp
         <div class="container gallery-grid animate-on-scroll delay-1">
-            <div class="placeholder-img gallery-item g-item-1">PHOTO</div>
-            <div class="placeholder-img gallery-item g-item-2">PHOTO</div>
-            <div class="placeholder-img gallery-item g-item-3">PHOTO</div>
-            <div class="placeholder-img gallery-item g-item-2">PHOTO</div>
-            <div class="placeholder-img gallery-item g-item-4">PHOTO</div>
+            @forelse ($galleryImages as $image)
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($image->image_path) }}" alt="{{ $image->caption ?? 'Galeri Nagari Campago' }}" class="gallery-photo gallery-item {{ $galeriUkuranClass[$image->size] ?? 'g-item-2' }}">
+            @empty
+                <p class="text-muted">Belum ada foto galeri.</p>
+            @endforelse
         </div>
     </section>
 
@@ -576,7 +611,7 @@
                 <div class="footer-brand">
                     <div class="nav-logo-placeholder">LOGO</div>
                     <h3>Nagari Campago</h3>
-                    <p>Kecamatan V Koto Kampung Dalam,<br>Kabupaten Padang Pariaman,<br>Sumatera Barat.</p>
+                    <p>{{ $kontak['deskripsi'] }}</p>
                 </div>
                 
                 <div>
@@ -602,15 +637,15 @@
                 <div>
                     <h4 class="footer-heading">Kontak</h4>
                     <ul class="footer-contact" style="list-style: none;">
-                        <li><strong>Alamat:</strong> <br> [Placeholder Alamat Kantor Wali Nagari]</li>
-                        <li><strong>Email:</strong> <br> info@campago.desa.id</li>
-                        <li><strong>Telepon:</strong> <br> [Placeholder Nomor Telepon]</li>
+                        <li><strong>Alamat:</strong> <br> {{ $kontak['alamat'] }}</li>
+                        <li><strong>Email:</strong> <br> {{ $kontak['email'] }}</li>
+                        <li><strong>Telepon:</strong> <br> {{ $kontak['telepon'] }}</li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                &copy; 2026 Pemerintah Nagari Campago. All Rights Reserved.
+                {{ $kontak['copyright'] }}
             </div>
         </div>
     </footer>
@@ -618,6 +653,17 @@
     <!-- Scripts for simple interactions -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Slideshow Foto Hero -- ganti foto aktif setiap beberapa detik (crossfade)
+            const heroSlides = document.querySelectorAll('.hero-bg-slide');
+            if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                let heroSlideIndex = 0;
+                setInterval(() => {
+                    heroSlides[heroSlideIndex].classList.remove('is-active');
+                    heroSlideIndex = (heroSlideIndex + 1) % heroSlides.length;
+                    heroSlides[heroSlideIndex].classList.add('is-active');
+                }, 5000);
+            }
+
             // Navbar Scroll Effect
             const navbar = document.getElementById('navbar');
             const mobileMenuButton = document.querySelector('.mobile-menu-btn');

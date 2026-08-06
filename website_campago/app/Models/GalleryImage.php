@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GalleryImage extends Model
 {
     protected $fillable = [
-        'gallery_id', 'image_path', 'caption', 'sort_order',
+        'gallery_id', 'image_path', 'caption', 'size', 'sort_order',
     ];
 
     protected $casts = [

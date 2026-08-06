@@ -21,6 +21,10 @@ class DatabaseSeeder extends Seeder
             KorongSeeder::class,
             PostCategorySeeder::class,
             LocationCategorySeeder::class,
+            OfficialSeeder::class,
+            PotentialSeeder::class,
+            PostSeeder::class,
+            LocationSeeder::class,
         ]);
     }
 }
