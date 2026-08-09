@@ -22,11 +22,13 @@ class KorongSeeder extends Seeder
         ];
 
         foreach ($korongs as $index => $name) {
-            Korong::create([
-                'name' => $name,
-                'slug' => Str::slug($name),
-                'sort_order' => $index + 1,
-            ]);
+            Korong::updateOrCreate(
+                ['name' => $name],
+                [
+                    'slug' => Str::slug($name),
+                    'sort_order' => $index + 1,
+                ]
+            );
         }
     }
 }

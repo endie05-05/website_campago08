@@ -10,12 +10,14 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@campago.desa.id',
-            'password' => Hash::make('password123'), // password default
-            'role' => 'super_admin',
-            'is_active' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@campago.desa.id'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password123'), // password default
+                'role' => 'super_admin',
+                'is_active' => true,
+            ]
+        );
     }
 }

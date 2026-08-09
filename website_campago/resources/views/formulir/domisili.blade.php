@@ -220,6 +220,32 @@
             color: var(--color-text-muted);
         }
 
+        .form-error {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.78rem;
+            color: #b02a2a;
+            font-weight: 600;
+        }
+
+        .gform-alert {
+            padding: 0.9rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .gform-alert-success {
+            background: rgba(47, 93, 80, 0.12);
+            border: 1px solid rgba(47, 93, 80, 0.3);
+            color: var(--color-green-dark);
+        }
+        .gform-alert-error {
+            background: rgba(200, 60, 60, 0.1);
+            border: 1px solid rgba(200, 60, 60, 0.3);
+            color: #b02a2a;
+        }
+
         .gform-actions {
             display: flex;
             justify-content: flex-end;
@@ -268,7 +294,16 @@
             <div class="gform-required-note">Kolom bertanda <span class="required">*</span> wajib diisi.</div>
         </div>
 
-        <form onsubmit="return handleGformSubmit(event)">
+        @if (session('success'))
+        <div class="gform-alert gform-alert-success">✓ {{ session('success') }}</div>
+        @endif
+
+        @if ($errors->any())
+        <div class="gform-alert gform-alert-error">Formulir belum bisa dikirim, periksa kembali isian di bawah ini.</div>
+        @endif
+
+        <form method="POST" action="{{ route('formulir.domisili.store') }}" enctype="multipart/form-data">
+            @csrf
 
             <!-- Jenis Permohonan -->
             <div class="gform-card">
@@ -278,15 +313,16 @@
                         <label class="form-label">Jenis Permohonan Domisili <span class="required">*</span></label>
                         <div class="form-radio-group">
                             <div class="form-radio-pill">
-                                <input type="radio" id="jenis_perorangan" name="jenis_permohonan" value="Perorangan" required>
+                                <input type="radio" id="jenis_perorangan" name="jenis_permohonan" value="Perorangan" {{ old('jenis_permohonan') === 'Perorangan' ? 'checked' : '' }} required>
                                 <label for="jenis_perorangan">Perorangan</label>
                             </div>
                             <div class="form-radio-pill">
-                                <input type="radio" id="jenis_organisasi" name="jenis_permohonan" value="Organisasi atau Kelompok">
+                                <input type="radio" id="jenis_organisasi" name="jenis_permohonan" value="Organisasi atau Kelompok" {{ old('jenis_permohonan') === 'Organisasi atau Kelompok' ? 'checked' : '' }}>
                                 <label for="jenis_organisasi">Organisasi atau Kelompok</label>
                             </div>
                         </div>
                         <span class="form-hint">Pilih "Organisasi atau Kelompok" jika surat diajukan atas nama komunitas/kegiatan, bukan pribadi.</span>
+                        @error('jenis_permohonan')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -297,75 +333,75 @@
                 <div class="gform-grid">
                     <div class="form-group full">
                         <label class="form-label">Nama Pemohon / Nama Organisasi <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="nama" placeholder="Contoh: Ade Irma Suryani, atau BKMT Kecamatan V Koto" required>
+                        <input type="text" class="form-input" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Ade Irma Suryani, atau BKMT Kecamatan V Koto" required>
+                        @error('nama')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">NIK <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="nik" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}">
+                        <input type="text" class="form-input" name="nik" value="{{ old('nik') }}" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}">
+                        @error('nik')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Nomor HP / WhatsApp <span class="required">*</span></label>
-                        <input type="tel" class="form-input" name="no_hp" placeholder="Contoh: 08xxxxxxxxxx" required>
+                        <input type="tel" class="form-input" name="no_hp" value="{{ old('no_hp') }}" placeholder="Contoh: 08xxxxxxxxxx" required>
+                        @error('no_hp')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tempat Lahir <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="tempat_lahir" placeholder="Contoh: Kampung Dalam">
+                        <input type="text" class="form-input" name="tempat_lahir" value="{{ old('tempat_lahir') }}" placeholder="Contoh: Kampung Dalam">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tanggal Lahir <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="date" class="form-input" name="tanggal_lahir">
+                        <input type="date" class="form-input" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}">
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Jenis Kelamin <span class="optional-tag">(khusus perorangan)</span></label>
                         <div class="form-radio-group">
                             <div class="form-radio-pill">
-                                <input type="radio" id="jk_l" name="jenis_kelamin" value="Laki-laki">
+                                <input type="radio" id="jk_l" name="jenis_kelamin" value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'checked' : '' }}>
                                 <label for="jk_l">Laki-laki</label>
                             </div>
                             <div class="form-radio-pill">
-                                <input type="radio" id="jk_p" name="jenis_kelamin" value="Perempuan">
+                                <input type="radio" id="jk_p" name="jenis_kelamin" value="Perempuan" {{ old('jenis_kelamin') === 'Perempuan' ? 'checked' : '' }}>
                                 <label for="jk_p">Perempuan</label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Suku / Agama <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="suku_agama" placeholder="Contoh: Chaniago / Islam">
+                        <input type="text" class="form-input" name="suku_agama" value="{{ old('suku_agama') }}" placeholder="Contoh: Chaniago / Islam">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Kewarganegaraan</label>
-                        <input type="text" class="form-input" name="kewarganegaraan" value="WNI">
+                        <input type="text" class="form-input" name="kewarganegaraan" value="{{ old('kewarganegaraan', 'WNI') }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Pekerjaan <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="pekerjaan" placeholder="Contoh: Mengurus Rumah Tangga">
+                        <input type="text" class="form-input" name="pekerjaan" value="{{ old('pekerjaan') }}" placeholder="Contoh: Mengurus Rumah Tangga">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Bentuk Organisasi <span class="optional-tag">(khusus organisasi)</span></label>
-                        <input type="text" class="form-input" name="bentuk_organisasi" placeholder="Contoh: Organisasi Non Formal">
+                        <input type="text" class="form-input" name="bentuk_organisasi" value="{{ old('bentuk_organisasi') }}" placeholder="Contoh: Organisasi Non Formal">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Jenis Kegiatan <span class="optional-tag">(khusus organisasi)</span></label>
-                        <input type="text" class="form-input" name="jenis_kegiatan" placeholder="Contoh: Keagamaan">
+                        <input type="text" class="form-input" name="jenis_kegiatan" value="{{ old('jenis_kegiatan') }}" placeholder="Contoh: Keagamaan">
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Alamat Saat Ini <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="alamat_saat_ini" placeholder="Alamat tempat tinggal/kesekretariatan saat ini, boleh di luar Nagari Campago" required></textarea>
+                        <textarea class="form-textarea" name="alamat_saat_ini" placeholder="Alamat tempat tinggal/kesekretariatan saat ini, boleh di luar Nagari Campago" required>{{ old('alamat_saat_ini') }}</textarea>
+                        @error('alamat_saat_ini')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Korong Domisili di Nagari Campago <span class="required">*</span></label>
                         <select class="form-select" name="korong_domisili" required>
                             <option value="">Pilih korong</option>
-                            <option>Korong Pasa</option>
-                            <option>Korong Tarok</option>
-                            <option>Korong Koto</option>
-                            <option>Korong Mudik</option>
-                            <option>Korong Ampang</option>
-                            <option>Korong Balai</option>
-                            <option>Korong Sawah</option>
-                            <option>Korong Bukit</option>
+                            @foreach (['Korong Pasa', 'Korong Tarok', 'Korong Koto', 'Korong Mudik', 'Korong Ampang', 'Korong Balai', 'Korong Sawah', 'Korong Bukit'] as $korong)
+                            <option {{ old('korong_domisili') === $korong ? 'selected' : '' }}>{{ $korong }}</option>
+                            @endforeach
                         </select>
                         <span class="form-hint">Korong tempat pemohon/organisasi terdaftar berdomisili di Nagari Campago.</span>
+                        @error('korong_domisili')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -379,15 +415,16 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Nama Wali</label>
-                        <input type="text" class="form-input" name="wali_nama" placeholder="Nama lengkap wali">
+                        <input type="text" class="form-input" name="wali_nama" value="{{ old('wali_nama') }}" placeholder="Nama lengkap wali">
                     </div>
                     <div class="form-group">
                         <label class="form-label">NIK Wali</label>
-                        <input type="text" class="form-input" name="wali_nik" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}">
+                        <input type="text" class="form-input" name="wali_nik" value="{{ old('wali_nik') }}" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}">
+                        @error('wali_nik')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Nomor HP Wali</label>
-                        <input type="tel" class="form-input" name="wali_no_hp" placeholder="Contoh: 08xxxxxxxxxx">
+                        <input type="tel" class="form-input" name="wali_no_hp" value="{{ old('wali_no_hp') }}" placeholder="Contoh: 08xxxxxxxxxx">
                     </div>
                 </div>
             </div>
@@ -398,8 +435,9 @@
                 <div class="gform-grid">
                     <div class="form-group full">
                         <label class="form-label">Penjelasan Surat Ini Untuk Apa <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="penjelasan_keperluan" style="min-height: 130px;" placeholder="Contoh: Surat ini digunakan untuk keperluan bekerja di luar negeri (Jepang)." required></textarea>
+                        <textarea class="form-textarea" name="penjelasan_keperluan" style="min-height: 130px;" placeholder="Contoh: Surat ini digunakan untuk keperluan bekerja di luar negeri (Jepang)." required>{{ old('penjelasan_keperluan') }}</textarea>
                         <span class="form-hint">Jelaskan sejelas-jelasnya, misalnya untuk keperluan pekerjaan, administrasi organisasi, atau keperluan lain yang membutuhkan bukti domisili.</span>
+                        @error('penjelasan_keperluan')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Lampiran Pendukung</label>
@@ -407,6 +445,7 @@
                             <input type="file" name="lampiran" accept="image/*,.pdf">
                         </div>
                         <span class="form-hint">Opsional: scan/foto KTP, KK, atau dokumen organisasi yang relevan.</span>
+                        @error('lampiran')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -416,13 +455,5 @@
             </div>
         </form>
     </div>
-
-    <script>
-        function handleGformSubmit(event) {
-            event.preventDefault();
-            alert('Ini baru antarmuka (UI) formulir. Backend pengajuan Surat Domisili perlu ditambahkan nanti!');
-            return false;
-        }
-    </script>
 </body>
 </html>

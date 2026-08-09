@@ -21,10 +21,10 @@ class PostCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $name) {
-            PostCategory::create([
-                'name' => $name,
-                'slug' => Str::slug($name),
-            ]);
+            PostCategory::updateOrCreate(
+                ['name' => $name],
+                ['slug' => Str::slug($name)]
+            );
         }
     }
 }

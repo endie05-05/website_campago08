@@ -12,6 +12,47 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+
+    <style>
+        .service-overview-grid-duo {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .service-overview-card {
+            position: relative;
+        }
+
+        .service-overview-card-action {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-overview-card-action:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 32px rgba(31, 64, 55, 0.12);
+        }
+
+        .card-stretched-label {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .modal-header-surat {
+            background: linear-gradient(120deg, rgba(218, 191, 132, 0.24) 0%, rgba(47, 93, 80, 0.14) 100%);
+        }
+        .modal-header-surat::before { width: 170px; height: 170px; background: rgba(218, 191, 132, 0.5); top: -70px; right: 30px; }
+        .modal-header-surat::after { width: 120px; height: 120px; background: rgba(47, 93, 80, 0.2); bottom: -75px; left: 30%; }
+
+        #toggle-surat-pengantar:checked ~ .modal-overlay.modal-surat-pengantar {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .service-overview-grid-duo { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body class="antialiased">
 
@@ -52,64 +93,65 @@
     <!-- 2. Layanan & Informasi -->
     <section class="service-intro section-padding">
         <div class="container">
+            <input type="checkbox" id="toggle-surat-pengantar" class="modal-toggle" hidden>
+
             <div class="service-intro-heading animate-on-scroll">
                 <span class="small-label">Pelayanan Publik</span>
                 <h1 class="section-heading">Layanan Nagari</h1>
                 <p class="potensi-desc">Pusat layanan administrasi, kependudukan, dan pengaduan bagi masyarakat Nagari Campago. Untuk jam operasional dan kontak kantor, lihat bagian <a href="/#peta" class="btn-link">Informasi</a> di beranda.</p>
             </div>
 
-            <div class="service-overview-grid animate-on-scroll delay-1">
-                <article class="service-overview-card">
+            <div class="service-overview-grid service-overview-grid-duo animate-on-scroll delay-1">
+                <div class="service-overview-card service-overview-card-action">
+                    <label for="toggle-surat-pengantar" class="card-stretched-label" aria-label="Pilih jenis surat pengantar yang ingin diajukan"></label>
                     <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
                     <h2 class="info-title">Surat Pengantar</h2>
                     <p class="info-desc text-justify">Layanan pembuatan surat pengantar KTP, KK, SKCK, dan keperluan administrasi lainnya.</p>
-                </article>
-                <article class="service-overview-card">
-                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path></svg></div>
-                    <h2 class="info-title">Legalisir Dokumen</h2>
-                    <p class="info-desc text-justify">Legalisir surat dan dokumen kependudukan yang memerlukan pengesahan dari nagari.</p>
-                </article>
-                <article class="service-overview-card">
+                    <span class="btn-link" style="margin-top: 1rem; display: inline-block;">Pilih Jenis Surat</span>
+                </div>
+                <a href="{{ route('pengaduan.form') }}" class="service-overview-card">
                     <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"></path><path d="m8.09 9.91 1.27-1.27"></path></svg></div>
                     <h2 class="info-title">Pengaduan</h2>
                     <p class="info-desc text-justify">Saluran komunikasi bagi masyarakat untuk menyampaikan aspirasi dan pengaduan layanan.</p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. Daftar Layanan -->
-    <section class="service-details section-padding bg-cream-light">
-        <div class="container">
-            <div class="service-details-heading">
-                <span class="small-label">Administrasi Nagari</span>
-                <h2 class="section-heading">Daftar Layanan</h2>
+                    <span class="btn-link" style="margin-top: 1rem; display: inline-block;">Buat Pengaduan</span>
+                </a>
             </div>
 
-            <div class="info-grid animate-on-scroll delay-1">
-                <a href="{{ route('formulir.sku') }}" class="info-card info-card-clickable">
-                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-                    <h3 class="info-title">Surat Keterangan Usaha (SKU)</h3>
-                    <p class="info-desc text-justify">Prosedur pengurusan SKU untuk keperluan perbankan dan izin usaha UMKM.</p>
-                    <span class="btn-link" style="margin-top: 1rem; display: inline-block;">Isi Formulir Online</span>
-                </a>
-                <a href="{{ route('formulir.sktm') }}" class="info-card info-card-clickable">
-                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
-                    <h3 class="info-title">Surat Keterangan Tidak Mampu (SKTM)</h3>
-                    <p class="info-desc text-justify">Surat keterangan untuk keperluan bantuan sosial, beasiswa, atau keringanan biaya yang memerlukan bukti ketidakmampuan ekonomi.</p>
-                    <span class="btn-link" style="margin-top: 1rem; display: inline-block;">Isi Formulir Online</span>
-                </a>
-                <a href="{{ route('formulir.domisili') }}" class="info-card info-card-clickable">
-                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
-                    <h3 class="info-title">Surat Keterangan Domisili</h3>
-                    <p class="info-desc text-justify">Surat keterangan tempat tinggal untuk perorangan maupun organisasi/kelompok, untuk keperluan pekerjaan, administrasi, atau kegiatan tertentu.</p>
-                    <span class="btn-link" style="margin-top: 1rem; display: inline-block;">Isi Formulir Online</span>
-                </a>
-                <div class="info-card">
-                    <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
-                    <h3 class="info-title">Surat Lainnya</h3>
-                    <p class="info-desc text-justify">Kebutuhan surat keterangan lain seperti kelahiran, kematian, atau kehilangan dapat diajukan langsung ke kantor nagari.</p>
-                    <a href="#" class="btn-link" style="margin-top: 1rem; display: inline-block;">Hubungi Kantor</a>
+            <div class="modal-overlay modal-surat-pengantar">
+                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="suratPengantarTitle">
+                    <label class="modal-close" for="toggle-surat-pengantar" aria-label="Tutup pilihan surat">×</label>
+                    <div class="modal-header modal-header-surat">
+                        <div class="modal-icon-badge">📄</div>
+                        <div>
+                            <span class="small-label">Surat Pengantar</span>
+                            <h2 id="suratPengantarTitle">Pilih Jenis Surat</h2>
+                            <p>Pilih salah satu jenis surat di bawah ini, lalu isi formulir pengajuan secara online.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="info-grid">
+                            <a href="{{ route('formulir.sku') }}" class="info-card info-card-clickable">
+                                <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+                                <h3 class="info-title">Surat Keterangan Usaha (SKU)</h3>
+                                <p class="info-desc text-justify">Untuk keperluan perbankan dan izin usaha UMKM.</p>
+                            </a>
+                            <a href="{{ route('formulir.sktm') }}" class="info-card info-card-clickable">
+                                <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                                <h3 class="info-title">Surat Keterangan Tidak Mampu (SKTM)</h3>
+                                <p class="info-desc text-justify">Untuk bantuan sosial, beasiswa, atau keringanan biaya.</p>
+                            </a>
+                            <a href="{{ route('formulir.domisili') }}" class="info-card info-card-clickable">
+                                <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
+                                <h3 class="info-title">Surat Keterangan Domisili</h3>
+                                <p class="info-desc text-justify">Untuk perorangan maupun organisasi/kelompok.</p>
+                            </a>
+                            <a href="/#peta" class="info-card info-card-clickable">
+                                <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
+                                <h3 class="info-title">Surat Lainnya</h3>
+                                <p class="info-desc text-justify">Kelahiran, kematian, kehilangan — hubungi kantor nagari langsung.</p>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

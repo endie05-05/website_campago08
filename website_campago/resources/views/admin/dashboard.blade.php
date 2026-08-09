@@ -55,6 +55,21 @@
                 </button>
 
                 <span class="admin-nav-group-label">Lainnya</span>
+                <button type="button" class="admin-nav-link" data-panel="surat" data-title="Pengajuan Surat Pengantar" data-desc="Lihat dan proses pengajuan SKU, SKTM, dan Surat Domisili yang masih berjalan.">
+                    <span class="icon">📝</span> Surat Pengantar
+                    @if ($newSuratRequestsCount > 0)
+                        <span class="admin-nav-count">{{ $newSuratRequestsCount }}</span>
+                    @endif
+                </button>
+                <button type="button" class="admin-nav-link" data-panel="riwayat-surat" data-title="Riwayat Surat Pengantar" data-desc="Arsip pengajuan surat yang sudah selesai atau ditolak.">
+                    <span class="icon">🗂️</span> Riwayat Surat
+                </button>
+                <button type="button" class="admin-nav-link" data-panel="pengaduan" data-title="Pengaduan Masyarakat" data-desc="Lihat dan tindak lanjuti pengaduan/aspirasi yang masuk dari masyarakat.">
+                    <span class="icon">📮</span> Pengaduan
+                    @if ($newContactMessagesCount > 0)
+                        <span class="admin-nav-count">{{ $newContactMessagesCount }}</span>
+                    @endif
+                </button>
                 <button type="button" class="admin-nav-link" data-panel="kontak" data-title="Footer &amp; Kontak" data-desc="Kelola informasi kontak dan deskripsi singkat pada footer.">
                     <span class="icon">✉️</span> Footer &amp; Kontak
                 </button>
@@ -103,6 +118,8 @@
                         <div class="admin-stat-card"><div class="num">{{ $posts->where('status', 'published')->count() }}</div><div class="label">Berita Terpublikasi</div></div>
                         <div class="admin-stat-card"><div class="num">{{ $umkms->count() }}</div><div class="label">Produk UMKM</div></div>
                         <div class="admin-stat-card"><div class="num">{{ $galleryImages->count() }}</div><div class="label">Foto Galeri</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $newContactMessagesCount }}</div><div class="label">Pengaduan Baru</div></div>
+                        <div class="admin-stat-card"><div class="num">{{ $newSuratRequestsCount }}</div><div class="label">Pengajuan Surat Baru</div></div>
                     </div>
 
                     <div class="admin-card">
@@ -132,6 +149,14 @@
                             <button type="button" class="admin-shortcut-card" data-goto="galeri">
                                 <span class="icon">🖼</span>
                                 <div><div class="title">Galeri</div><div class="desc">Foto budaya dan kehidupan warga.</div></div>
+                            </button>
+                            <button type="button" class="admin-shortcut-card" data-goto="surat">
+                                <span class="icon">📝</span>
+                                <div><div class="title">Surat Pengantar</div><div class="desc">Pengajuan SKU, SKTM, dan Domisili masuk.</div></div>
+                            </button>
+                            <button type="button" class="admin-shortcut-card" data-goto="pengaduan">
+                                <span class="icon">📮</span>
+                                <div><div class="title">Pengaduan</div><div class="desc">Aduan dan aspirasi masyarakat masuk.</div></div>
                             </button>
                         </div>
                     </div>
@@ -710,6 +735,145 @@
                     </div>
                 </template>
 
+                <!-- ================= SURAT PENGANTAR (AKTIF) ================= -->
+                <section class="admin-panel" id="panel-surat">
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div><h2>Pengajuan Surat Pengantar</h2><p>Pengajuan SKU, SKTM, dan Surat Domisili yang masih berjalan, terbaru di atas.</p></div>
+                            <div class="admin-table-filter">
+                                <label class="form-label" for="filterJenisSuratAktif" style="margin: 0;">Jenis Surat</label>
+                                <select id="filterJenisSuratAktif" class="form-select">
+                                    <option value="">Semua Jenis</option>
+                                    @foreach (\App\Models\SuratRequest::TYPES as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="admin-table-wrap">
+                            <table class="admin-table" id="tableSuratAktif">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Pemohon</th>
+                                        <th>Jenis Surat</th>
+                                        <th>Tanggal Diajukan</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($activeSuratRequests as $pengajuan)
+                                    @include('admin.partials.surat-row', ['pengajuan' => $pengajuan])
+                                    @empty
+                                    <tr><td colspan="5" class="admin-table-empty">Belum ada pengajuan surat yang masih berjalan.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= RIWAYAT SURAT ================= -->
+                <section class="admin-panel" id="panel-riwayat-surat">
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div><h2>Riwayat Surat Pengantar</h2><p>Arsip pengajuan surat yang sudah selesai atau ditolak, terbaru di atas.</p></div>
+                            <div class="admin-table-filter">
+                                <label class="form-label" for="filterJenisSuratRiwayat" style="margin: 0;">Jenis Surat</label>
+                                <select id="filterJenisSuratRiwayat" class="form-select">
+                                    <option value="">Semua Jenis</option>
+                                    @foreach (\App\Models\SuratRequest::TYPES as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="admin-table-wrap">
+                            <table class="admin-table" id="tableSuratRiwayat">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Pemohon</th>
+                                        <th>Jenis Surat</th>
+                                        <th>Tanggal Diajukan</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($suratHistory as $pengajuan)
+                                    @include('admin.partials.surat-row', ['pengajuan' => $pengajuan])
+                                    @empty
+                                    <tr><td colspan="5" class="admin-table-empty">Belum ada riwayat pengajuan surat yang selesai diproses.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= PENGADUAN ================= -->
+                <section class="admin-panel" id="panel-pengaduan">
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div><h2>Pengaduan Masyarakat</h2><p>Daftar pengaduan/aspirasi yang dikirim masyarakat lewat formulir online, terbaru di atas.</p></div>
+                        </div>
+
+                        <div class="repeater-list pengaduan-list">
+                            @forelse ($contactMessages as $pesan)
+                            <div class="repeater-item">
+                                <div class="pengaduan-item-head">
+                                    <div>
+                                        <strong>{{ $pesan->name }}</strong>
+                                        <span class="status-pill status-{{ $pesan->status }}">
+                                            @switch($pesan->status)
+                                                @case('new') Baru @break
+                                                @case('read') Dibaca @break
+                                                @case('replied') Ditindaklanjuti @break
+                                                @case('closed') Selesai @break
+                                            @endswitch
+                                        </span>
+                                    </div>
+                                    <span class="pengaduan-date">{{ $pesan->created_at->translatedFormat('d M Y, H:i') }}</span>
+                                </div>
+                                <div class="pengaduan-contact">
+                                    <span>📞 {{ $pesan->phone }}</span>
+                                    @if ($pesan->email)
+                                        <span>✉️ {{ $pesan->email }}</span>
+                                    @endif
+                                </div>
+                                <p class="pengaduan-subject">{{ $pesan->subject }}</p>
+                                <p class="pengaduan-message">{{ $pesan->message }}</p>
+                                @if ($pesan->photo_path)
+                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($pesan->photo_path) }}" target="_blank" rel="noopener">
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($pesan->photo_path) }}" alt="Foto pendukung dari {{ $pesan->name }}" class="pengaduan-photo">
+                                    </a>
+                                @endif
+
+                                <div class="pengaduan-actions">
+                                    <form method="POST" action="{{ route('admin.pengaduan.status', $pesan) }}">
+                                        @csrf
+                                        <select name="status" class="form-select" onchange="this.form.submit()">
+                                            <option value="new" {{ $pesan->status === 'new' ? 'selected' : '' }}>Baru</option>
+                                            <option value="read" {{ $pesan->status === 'read' ? 'selected' : '' }}>Dibaca</option>
+                                            <option value="replied" {{ $pesan->status === 'replied' ? 'selected' : '' }}>Ditindaklanjuti</option>
+                                            <option value="closed" {{ $pesan->status === 'closed' ? 'selected' : '' }}>Selesai</option>
+                                        </select>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.pengaduan.destroy', $pesan) }}" onsubmit="return confirm('Hapus pengaduan dari ' + {{ Js::from($pesan->name) }} + '?');">
+                                        @csrf
+                                        <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus pengaduan">&times;</button>
+                                    </form>
+                                </div>
+                            </div>
+                            @empty
+                            <p style="color: var(--color-text-muted);">Belum ada pengaduan yang masuk.</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </section>
+
                 <!-- ================= KONTAK / FOOTER ================= -->
                 <section class="admin-panel" id="panel-kontak">
                     <form class="admin-form" method="POST" action="{{ route('admin.kontak.update') }}">
@@ -749,6 +913,11 @@
                 </section>
 
             </div>
+
+            {{-- Modal detail Surat Pengantar dirender di sini (di luar tabel) lewat @@push di
+                 admin/partials/surat-row.blade.php, supaya position:fixed-nya tidak kejebak di
+                 dalam struktur <table>. --}}
+            @stack('surat-modals')
         </main>
     </div>
 
@@ -788,6 +957,21 @@
             });
 
             menuToggle.addEventListener('click', () => sidebar.classList.toggle('is-open'));
+
+            // Filter tabel Surat Pengantar & Riwayat Surat berdasarkan jenis surat
+            function setupJenisSuratFilter(selectId, tableId) {
+                const select = document.getElementById(selectId);
+                const table = document.getElementById(tableId);
+                if (!select || !table) return;
+                select.addEventListener('change', () => {
+                    const jenis = select.value;
+                    table.querySelectorAll('tbody tr[data-type]').forEach(row => {
+                        row.style.display = (!jenis || row.dataset.type === jenis) ? '' : 'none';
+                    });
+                });
+            }
+            setupJenisSuratFilter('filterJenisSuratAktif', 'tableSuratAktif');
+            setupJenisSuratFilter('filterJenisSuratRiwayat', 'tableSuratRiwayat');
 
             // Buka tab sesuai parameter ?panel= di URL (dipakai setelah redirect simpan data)
             const requestedPanel = new URLSearchParams(window.location.search).get('panel');

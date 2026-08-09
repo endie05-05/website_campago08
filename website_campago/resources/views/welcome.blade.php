@@ -99,7 +99,7 @@
     <!-- 4. Section "Mengenal Campago" -->
     <section id="profil" class="section-padding">
         <div class="container about-grid">
-            <img src="{{ asset('images/petanagari.png') }}" alt="Peta Nagari Campago" class="about-img animate-on-scroll" style="object-fit: cover; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <x-peta-nagari class="about-img animate-on-scroll" />
             <div class="about-content animate-on-scroll delay-1">
                 <span class="small-label">Tentang Nagari</span>
                 <h2 class="section-heading">Mengenal Nagari Campago</h2>

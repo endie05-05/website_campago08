@@ -24,11 +24,13 @@ class LocationCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $index => $name) {
-            LocationCategory::create([
-                'name' => $name,
-                'slug' => Str::slug($name),
-                'sort_order' => $index + 1,
-            ]);
+            LocationCategory::updateOrCreate(
+                ['name' => $name],
+                [
+                    'slug' => Str::slug($name),
+                    'sort_order' => $index + 1,
+                ]
+            );
         }
     }
 }

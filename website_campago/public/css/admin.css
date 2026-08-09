@@ -734,3 +734,300 @@ img {
         padding: 1.1rem 1.5rem;
     }
 }
+
+/* Pengaduan */
+.pengaduan-list > .repeater-item {
+    max-width: 640px;
+}
+
+.admin-nav-count {
+    margin-left: auto;
+    background: var(--color-danger);
+    color: var(--color-white);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.28rem 0.5rem;
+    border-radius: 999px;
+}
+
+.pengaduan-item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.pengaduan-item-head strong {
+    color: var(--color-green-dark);
+    margin-right: 0.6rem;
+}
+
+.pengaduan-date {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.status-new { background: rgba(179, 69, 61, 0.12); color: var(--color-danger); }
+.status-read { background: rgba(218, 191, 132, 0.28); color: #8a6d2f; }
+.status-replied { background: rgba(47, 93, 80, 0.14); color: var(--color-green-dark); }
+.status-closed { background: rgba(107, 107, 101, 0.14); color: var(--color-text-muted); }
+
+.status-diajukan { background: rgba(179, 69, 61, 0.12); color: var(--color-danger); }
+.status-diproses { background: rgba(218, 191, 132, 0.28); color: #8a6d2f; }
+.status-selesai { background: rgba(47, 93, 80, 0.14); color: var(--color-green-dark); }
+.status-ditolak { background: rgba(107, 107, 101, 0.14); color: var(--color-text-muted); }
+
+.pengaduan-contact {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.pengaduan-subject {
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: 0.35rem;
+}
+
+.pengaduan-message {
+    font-size: 0.9rem;
+    color: var(--color-text-main);
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.pengaduan-photo {
+    display: block;
+    max-width: 220px;
+    max-height: 160px;
+    width: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(47, 93, 80, 0.15);
+    margin-top: 0.75rem;
+    object-fit: cover;
+}
+
+.pengaduan-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(47, 93, 80, 0.1);
+}
+
+.pengaduan-actions .form-select {
+    width: auto;
+}
+
+.pengaduan-delete-btn {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: none;
+    background: rgba(179, 69, 61, 0.1);
+    color: var(--color-danger);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.pengaduan-delete-btn:hover {
+    background: var(--color-danger);
+    color: var(--color-white);
+}
+
+/* Surat Pengantar */
+.status-pill.status-type {
+    background: rgba(218, 191, 132, 0.28);
+    color: #8a6d2f;
+}
+
+.surat-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+    padding: 0.85rem;
+    background: rgba(244, 239, 230, 0.4);
+    border-radius: 10px;
+}
+
+.surat-detail-item .label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.admin-table-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+.admin-table-filter .form-select {
+    width: auto;
+    padding: 0.5rem 0.85rem;
+}
+
+.admin-table-wrap {
+    overflow-x: auto;
+    border: 1px solid rgba(47, 93, 80, 0.12);
+    border-radius: 12px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 0.85rem 1.1rem;
+    background: rgba(47, 93, 80, 0.08);
+    color: var(--color-green-dark);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 0.85rem 1.1rem;
+    border-top: 1px solid rgba(47, 93, 80, 0.1);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(244, 239, 230, 0.4);
+}
+
+.admin-table-status {
+    width: auto;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+}
+
+.admin-table-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.admin-table-empty {
+    text-align: center;
+    padding: 2rem !important;
+    color: var(--color-text-muted);
+    white-space: normal !important;
+}
+
+@media (max-width: 640px) {
+    .admin-card-header {
+        flex-wrap: wrap;
+    }
+}
+
+/* Modal detail surat (checkbox-hack, sama pola dengan modal di public site) */
+.admin-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgba(15, 35, 24, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    white-space: normal;
+}
+
+.detail-toggle input:checked ~ .admin-modal-overlay {
+    display: flex;
+}
+
+.admin-modal-content {
+    position: relative;
+    width: min(100%, 640px);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--color-white) 0%, var(--color-cream-light) 100%);
+    border-radius: 16px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+    text-align: left;
+    animation: fadeInPanel 0.2s ease;
+}
+
+.admin-modal-body {
+    overflow-y: auto;
+    min-height: 0;
+    padding: 2rem;
+}
+
+.admin-modal-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(47, 93, 80, 0.1);
+}
+
+.admin-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    z-index: 5;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(47, 93, 80, 0.08);
+    color: var(--color-green-dark);
+    font-size: 1.3rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-modal-close:hover {
+    background: var(--color-green-dark);
+    color: var(--color-white);
+}
+
+.surat-detail-item .value {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-main);
+    white-space: pre-line;
+}

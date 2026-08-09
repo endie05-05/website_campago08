@@ -784,6 +784,18 @@ img {
     border-radius: 8px;
 }
 
+/* Lokasi Nagari (Google Maps Embed) -- aspect-ratio & border-radius datang dari
+   class yang di-merge di titik pemakaian (mis. .about-img), bukan di sini,
+   supaya komponennya bisa dipakai di ukuran/bentuk berbeda-beda. */
+.peta-nagari-wrap {
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.peta-nagari-wrap iframe {
+    display: block;
+}
+
 .modal-overlay {
     position: fixed;
     inset: 0;

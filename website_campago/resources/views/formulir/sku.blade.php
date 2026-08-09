@@ -215,6 +215,32 @@
             color: var(--color-text-muted);
         }
 
+        .form-error {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.78rem;
+            color: #b02a2a;
+            font-weight: 600;
+        }
+
+        .gform-alert {
+            padding: 0.9rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .gform-alert-success {
+            background: rgba(47, 93, 80, 0.12);
+            border: 1px solid rgba(47, 93, 80, 0.3);
+            color: var(--color-green-dark);
+        }
+        .gform-alert-error {
+            background: rgba(200, 60, 60, 0.1);
+            border: 1px solid rgba(200, 60, 60, 0.3);
+            color: #b02a2a;
+        }
+
         .gform-actions {
             display: flex;
             justify-content: flex-end;
@@ -263,7 +289,16 @@
             <div class="gform-required-note">Kolom bertanda <span class="required">*</span> wajib diisi.</div>
         </div>
 
-        <form onsubmit="return handleGformSubmit(event)">
+        @if (session('success'))
+        <div class="gform-alert gform-alert-success">✓ {{ session('success') }}</div>
+        @endif
+
+        @if ($errors->any())
+        <div class="gform-alert gform-alert-error">Formulir belum bisa dikirim, periksa kembali isian di bawah ini.</div>
+        @endif
+
+        <form method="POST" action="{{ route('formulir.sku.store') }}" enctype="multipart/form-data">
+            @csrf
 
             <!-- Data Pemohon -->
             <div class="gform-card">
@@ -271,71 +306,71 @@
                 <div class="gform-grid">
                     <div class="form-group full">
                         <label class="form-label">Nama Lengkap <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="pemohon_nama" placeholder="Contoh: Ridwan Agus Rizal" required>
+                        <input type="text" class="form-input" name="pemohon_nama" value="{{ old('pemohon_nama') }}" placeholder="Contoh: Ridwan Agus Rizal" required>
+                        @error('pemohon_nama')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tempat Lahir <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="pemohon_tempat_lahir" placeholder="Contoh: Medan" required>
+                        <input type="text" class="form-input" name="pemohon_tempat_lahir" value="{{ old('pemohon_tempat_lahir') }}" placeholder="Contoh: Medan" required>
+                        @error('pemohon_tempat_lahir')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tanggal Lahir <span class="required">*</span></label>
-                        <input type="date" class="form-input" name="pemohon_tanggal_lahir" required>
+                        <input type="date" class="form-input" name="pemohon_tanggal_lahir" value="{{ old('pemohon_tanggal_lahir') }}" required>
+                        @error('pemohon_tanggal_lahir')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Jenis Kelamin <span class="required">*</span></label>
                         <div class="form-radio-group">
                             <div class="form-radio-pill">
-                                <input type="radio" id="jk_l" name="pemohon_jenis_kelamin" value="Laki-laki" required>
+                                <input type="radio" id="jk_l" name="pemohon_jenis_kelamin" value="Laki-laki" {{ old('pemohon_jenis_kelamin') === 'Laki-laki' ? 'checked' : '' }} required>
                                 <label for="jk_l">Laki-laki</label>
                             </div>
                             <div class="form-radio-pill">
-                                <input type="radio" id="jk_p" name="pemohon_jenis_kelamin" value="Perempuan">
+                                <input type="radio" id="jk_p" name="pemohon_jenis_kelamin" value="Perempuan" {{ old('pemohon_jenis_kelamin') === 'Perempuan' ? 'checked' : '' }}>
                                 <label for="jk_p">Perempuan</label>
                             </div>
                         </div>
+                        @error('pemohon_jenis_kelamin')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Agama <span class="required">*</span></label>
                         <select class="form-select" name="pemohon_agama" required>
                             <option value="">Pilih agama</option>
-                            <option>Islam</option>
-                            <option>Kristen Protestan</option>
-                            <option>Katolik</option>
-                            <option>Hindu</option>
-                            <option>Buddha</option>
-                            <option>Konghucu</option>
-                            <option>Lainnya</option>
+                            @foreach (['Islam', 'Kristen Protestan', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'] as $agama)
+                            <option {{ old('pemohon_agama') === $agama ? 'selected' : '' }}>{{ $agama }}</option>
+                            @endforeach
                         </select>
+                        @error('pemohon_agama')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Kewarganegaraan</label>
-                        <input type="text" class="form-input" name="pemohon_kewarganegaraan" value="Indonesia">
+                        <input type="text" class="form-input" name="pemohon_kewarganegaraan" value="{{ old('pemohon_kewarganegaraan', 'Indonesia') }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Pekerjaan <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="pemohon_pekerjaan" placeholder="Contoh: Buruh Tani/Perkebunan" required>
+                        <input type="text" class="form-input" name="pemohon_pekerjaan" value="{{ old('pemohon_pekerjaan') }}" placeholder="Contoh: Buruh Tani/Perkebunan" required>
+                        @error('pemohon_pekerjaan')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">NIK (Nomor Induk Kependudukan) <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="pemohon_nik" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}" required>
+                        <input type="text" class="form-input" name="pemohon_nik" value="{{ old('pemohon_nik') }}" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}" required>
+                        @error('pemohon_nik')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Korong <span class="required">*</span></label>
                         <select class="form-select" name="pemohon_korong" required>
                             <option value="">Pilih korong</option>
-                            <option>Korong Pasa</option>
-                            <option>Korong Tarok</option>
-                            <option>Korong Koto</option>
-                            <option>Korong Mudik</option>
-                            <option>Korong Ampang</option>
-                            <option>Korong Balai</option>
-                            <option>Korong Sawah</option>
-                            <option>Korong Bukit</option>
+                            @foreach (['Korong Pasa', 'Korong Tarok', 'Korong Koto', 'Korong Mudik', 'Korong Ampang', 'Korong Balai', 'Korong Sawah', 'Korong Bukit'] as $korong)
+                            <option {{ old('pemohon_korong') === $korong ? 'selected' : '' }}>{{ $korong }}</option>
+                            @endforeach
                         </select>
+                        @error('pemohon_korong')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Alamat Sesuai KTP <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="pemohon_alamat" placeholder="Nama jalan, RT/RW, dan keterangan lain" required></textarea>
+                        <textarea class="form-textarea" name="pemohon_alamat" placeholder="Nama jalan, RT/RW, dan keterangan lain" required>{{ old('pemohon_alamat') }}</textarea>
+                        @error('pemohon_alamat')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -348,27 +383,26 @@
                         <label class="form-label">Jenis Usaha <span class="required">*</span></label>
                         <select class="form-select" name="jenis_usaha" required>
                             <option value="">Pilih jenis usaha</option>
-                            <option>Pertanian / Perkebunan</option>
-                            <option>Peternakan</option>
-                            <option>Perikanan</option>
-                            <option>Perdagangan / Kuliner</option>
-                            <option>Kerajinan</option>
-                            <option>Jasa</option>
-                            <option>Lainnya</option>
+                            @foreach (['Pertanian / Perkebunan', 'Peternakan', 'Perikanan', 'Perdagangan / Kuliner', 'Kerajinan', 'Jasa', 'Lainnya'] as $jenis)
+                            <option {{ old('jenis_usaha') === $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                            @endforeach
                         </select>
+                        @error('jenis_usaha')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Nama / Uraian Usaha <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="uraian_usaha" placeholder="Contoh: Hasil bumi perkebunan dan peternakan ikan" required>
+                        <input type="text" class="form-input" name="uraian_usaha" value="{{ old('uraian_usaha') }}" placeholder="Contoh: Hasil bumi perkebunan dan peternakan ikan" required>
+                        @error('uraian_usaha')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label">Lama Usaha Berjalan</label>
-                        <input type="text" class="form-input" name="lama_usaha" placeholder="Contoh: 2 tahun">
+                        <input type="text" class="form-input" name="lama_usaha" value="{{ old('lama_usaha') }}" placeholder="Contoh: 2 tahun">
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Lokasi Usaha <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="lokasi_usaha" placeholder="Contoh: Lubuk Ongong, Nagari Campago, Kecamatan V Koto Kampung Dalam" required></textarea>
+                        <textarea class="form-textarea" name="lokasi_usaha" placeholder="Contoh: Lubuk Ongong, Nagari Campago, Kecamatan V Koto Kampung Dalam" required>{{ old('lokasi_usaha') }}</textarea>
                         <span class="form-hint">Boleh diisi berbeda dari alamat KTP jika lokasi usaha tidak sama dengan tempat tinggal.</span>
+                        @error('lokasi_usaha')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -379,8 +413,9 @@
                 <div class="gform-grid">
                     <div class="form-group full">
                         <label class="form-label">Penjelasan Surat Ini Untuk Apa <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="penjelasan_keperluan" style="min-height: 130px;" placeholder="Contoh: Surat ini digunakan untuk keperluan pengajuan kredit usaha di bank." required></textarea>
+                        <textarea class="form-textarea" name="penjelasan_keperluan" style="min-height: 130px;" placeholder="Contoh: Surat ini digunakan untuk keperluan pengajuan kredit usaha di bank." required>{{ old('penjelasan_keperluan') }}</textarea>
                         <span class="form-hint">Jelaskan sejelas-jelasnya, misalnya untuk pengajuan kredit perbankan, izin usaha, atau keperluan UMKM lainnya.</span>
+                        @error('penjelasan_keperluan')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group full">
                         <label class="form-label">Lampiran Pendukung</label>
@@ -388,6 +423,7 @@
                             <input type="file" name="lampiran" accept="image/*,.pdf">
                         </div>
                         <span class="form-hint">Opsional: scan/foto KTP atau foto lokasi usaha.</span>
+                        @error('lampiran')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -397,13 +433,5 @@
             </div>
         </form>
     </div>
-
-    <script>
-        function handleGformSubmit(event) {
-            event.preventDefault();
-            alert('Ini baru antarmuka (UI) formulir. Backend pengajuan SKU perlu ditambahkan nanti!');
-            return false;
-        }
-    </script>
 </body>
 </html>
