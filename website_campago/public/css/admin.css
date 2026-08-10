@@ -171,6 +171,12 @@ img {
     gap: 0.25rem;
     flex: 1;
     overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge lama */
+}
+
+.admin-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Edge, Safari */
 }
 
 .admin-nav-group-label {
@@ -201,9 +207,18 @@ img {
 }
 
 .admin-nav-link .icon {
-    font-size: 1rem;
     width: 1.25rem;
-    text-align: center;
+    height: 1.25rem;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.85;
+}
+
+.admin-nav-link .icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .admin-nav-link:hover {
@@ -396,7 +411,6 @@ img {
 }
 
 .admin-shortcut-card .icon {
-    font-size: 1.4rem;
     width: 44px;
     height: 44px;
     flex-shrink: 0;
@@ -407,6 +421,11 @@ img {
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease;
+}
+
+.admin-shortcut-card .icon svg {
+    width: 22px;
+    height: 22px;
 }
 
 .admin-shortcut-card:hover .icon {
@@ -859,6 +878,36 @@ img {
     color: var(--color-white);
 }
 
+.pengaduan-delete-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.admin-table-edit-btn {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: none;
+    background: rgba(31, 64, 55, 0.1);
+    color: var(--color-green-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.admin-table-edit-btn:hover {
+    background: var(--color-green-dark);
+    color: var(--color-white);
+}
+
+.admin-table-edit-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
 /* Surat Pengantar */
 .status-pill.status-type {
     background: rgba(218, 191, 132, 0.28);
@@ -1030,4 +1079,99 @@ img {
     font-size: 0.85rem;
     color: var(--color-text-main);
     white-space: pre-line;
+}
+
+/* Modal konfirmasi (pengganti window.confirm() bawaan browser) */
+.confirm-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(15, 35, 24, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.confirm-modal-overlay.is-open {
+    display: flex;
+}
+
+.confirm-modal-box {
+    width: min(100%, 380px);
+    background: linear-gradient(160deg, var(--color-white) 0%, var(--color-cream-light) 100%);
+    border-radius: 18px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+    padding: 2.1rem 1.75rem 1.75rem;
+    text-align: center;
+    animation: confirmModalPop 0.2s ease;
+}
+
+@keyframes confirmModalPop {
+    from { opacity: 0; transform: scale(0.92) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.confirm-modal-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1.1rem;
+    border-radius: 50%;
+    background: rgba(179, 69, 61, 0.12);
+    color: var(--color-danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-modal-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.confirm-modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin-bottom: 0.5rem;
+}
+
+.confirm-modal-message {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.6rem;
+}
+
+.confirm-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.confirm-modal-actions .btn-ghost,
+.confirm-modal-actions .btn-confirm-danger {
+    flex: 1;
+}
+
+.btn-confirm-danger {
+    padding: 0.8rem 1.5rem;
+    background: var(--color-danger);
+    border: none;
+    color: var(--color-white);
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(179, 69, 61, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-confirm-danger:hover {
+    background: #96362f;
+    transform: translateY(-2px);
 }

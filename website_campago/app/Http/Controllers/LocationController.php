@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
+use App\Http\Controllers\Concerns\ValidatesForPanel;
 use App\Models\Location;
 use App\Models\LocationCategory;
 use App\Models\Setting;
@@ -12,12 +13,12 @@ use Illuminate\Support\Facades\DB;
 class LocationController extends Controller
 {
     use GeneratesUniqueSlug;
+    use ValidatesForPanel;
 
     public function update(Request $request)
     {
-        $validated = $request->validate([
+        $validated = $this->validatePanel($request, 'peta', [
             'deskripsi' => ['required', 'string'],
-            'area' => ['required', 'string', 'max:255'],
             'lokasi' => ['required', 'array', 'min:1'],
             'lokasi.*' => ['required', 'string', 'max:200'],
         ]);
@@ -25,7 +26,6 @@ class LocationController extends Controller
         $category = LocationCategory::where('slug', 'fasilitas-umum')->firstOrFail();
 
         Setting::set('peta_fasum_deskripsi', $validated['deskripsi']);
-        Setting::set('peta_fasum_area', $validated['area']);
 
         DB::transaction(function () use ($validated, $category) {
             // Daftar lokasi cuma berupa nama teks tanpa detail lain, jadi paling sederhana

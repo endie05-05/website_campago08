@@ -2,62 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesForPanel;
 use App\Models\Official;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class OfficialController extends Controller
 {
-    public function update(Request $request)
+    use ValidatesForPanel;
+
+    private function rules(): array
     {
-        $validated = $request->validate([
-            'aparatur' => ['required', 'array', 'min:1'],
-            'aparatur.*.id' => ['nullable', 'integer', 'exists:officials,id'],
-            'aparatur.*.nama' => ['required', 'string', 'max:150'],
-            'aparatur.*.jabatan' => ['required', 'string', 'max:150'],
-            'aparatur.*.foto' => ['nullable', 'image', 'max:2048'],
-            'removed_ids' => ['nullable', 'array'],
-            'removed_ids.*' => ['integer', 'exists:officials,id'],
-        ]);
+        return [
+            'nama' => ['required', 'string', 'max:150'],
+            'jabatan' => ['required', 'string', 'max:150'],
+            'foto' => ['nullable', 'image', 'max:8192'],
+        ];
+    }
 
-        DB::transaction(function () use ($validated, $request) {
-            foreach ($validated['removed_ids'] ?? [] as $removedId) {
-                $official = Official::find($removedId);
-                if ($official) {
-                    if ($official->photo_path) {
-                        Storage::disk('public')->delete($official->photo_path);
-                    }
-                    $official->delete();
-                }
+    public function store(Request $request)
+    {
+        $validated = $this->validatePanel($request, 'aparatur', $this->rules());
+
+        $official = new Official();
+        $official->name = $validated['nama'];
+        $official->position = $validated['jabatan'];
+        $official->is_active = true;
+        $official->sort_order = (Official::max('sort_order') ?? 0) + 1;
+
+        if ($request->hasFile('foto')) {
+            $official->photo_path = $request->file('foto')->store('officials', 'public');
+        }
+
+        $official->save();
+
+        return redirect('/admin?panel=aparatur')->with('success', 'Perangkat Aparatur berhasil ditambahkan.');
+    }
+
+    public function update(Request $request, Official $official)
+    {
+        $validated = $this->validatePanel($request, 'aparatur', $this->rules());
+
+        $official->name = $validated['nama'];
+        $official->position = $validated['jabatan'];
+
+        if ($request->hasFile('foto')) {
+            if ($official->photo_path) {
+                Storage::disk('public')->delete($official->photo_path);
             }
+            $official->photo_path = $request->file('foto')->store('officials', 'public');
+        }
 
-            foreach ($validated['aparatur'] as $index => $item) {
-                $official = ! empty($item['id'])
-                    ? Official::find($item['id'])
-                    : new Official();
+        $official->save();
 
-                if (! $official) {
-                    $official = new Official();
-                }
+        return redirect('/admin?panel=aparatur')->with('success', 'Perangkat Aparatur berhasil diperbarui.');
+    }
 
-                $official->name = $item['nama'];
-                $official->position = $item['jabatan'];
-                $official->sort_order = $index + 1;
-                $official->is_active = true;
+    public function destroy(Official $official)
+    {
+        if ($official->photo_path) {
+            Storage::disk('public')->delete($official->photo_path);
+        }
+        $official->delete();
 
-                $fotoInput = $request->file("aparatur.$index.foto");
-                if ($fotoInput) {
-                    if ($official->photo_path) {
-                        Storage::disk('public')->delete($official->photo_path);
-                    }
-                    $official->photo_path = $fotoInput->store('officials', 'public');
-                }
-
-                $official->save();
-            }
-        });
-
-        return redirect('/admin?panel=aparatur')->with('success', 'Data Aparatur Nagari berhasil disimpan.');
+        return redirect('/admin?panel=aparatur')->with('success', 'Perangkat Aparatur berhasil dihapus.');
     }
 }

@@ -3,17 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login Pengelola - Nagari Campago</title>
-    
+    <title>Daftar Akun Masyarakat - Nagari Campago</title>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=cormorant-garamond:600,700|inter:400,500,600|manrope:400,500,600,700" rel="stylesheet" />
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    
+
     <style>
-        /* Specific overrides for Login Page */
+        /* Specific overrides for Login/Register Page */
         .login-page {
             min-height: 100vh;
             display: flex;
@@ -29,11 +29,11 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(47, 93, 80, 0.15);
-            
+
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             padding: 3rem 2.5rem;
             position: relative;
             z-index: 10;
@@ -84,6 +84,13 @@
             font-size: 0.9rem;
         }
 
+        .form-hint-text {
+            display: block;
+            margin-top: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+        }
+
         .form-input {
             width: 100%;
             padding: 0.85rem 1rem;
@@ -101,41 +108,6 @@
             border-color: var(--color-green-soft);
             box-shadow: 0 0 0 4px rgba(110, 136, 120, 0.15);
             background: #ffffff;
-        }
-
-        .password-field {
-            position: relative;
-        }
-
-        .password-field .form-input {
-            padding-right: 3rem;
-        }
-
-        .password-toggle {
-            position: absolute;
-            top: 50%;
-            right: 0.6rem;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            padding: 0.4rem;
-            cursor: pointer;
-            color: var(--color-text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            transition: color 0.2s ease, background-color 0.2s ease;
-        }
-
-        .password-toggle:hover {
-            color: var(--color-green-dark);
-            background-color: rgba(47, 93, 80, 0.08);
-        }
-
-        .password-toggle svg {
-            width: 20px;
-            height: 20px;
         }
 
         .login-btn {
@@ -159,6 +131,19 @@
             box-shadow: 0 6px 20px rgba(31, 64, 55, 0.25);
         }
 
+        .login-switch {
+            text-align: center;
+            margin-top: 1.75rem;
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .login-switch a {
+            color: var(--color-green-dark);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -166,7 +151,7 @@
             color: var(--color-text-muted);
             text-decoration: none;
             font-size: 0.9rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             font-weight: 500;
             transition: color 0.3s ease;
         }
@@ -182,7 +167,7 @@
             z-index: 1;
             filter: blur(50px);
         }
-        
+
         .circle-1 {
             width: 350px;
             height: 350px;
@@ -190,7 +175,7 @@
             top: -100px;
             right: -100px;
         }
-        
+
         .circle-2 {
             width: 300px;
             height: 300px;
@@ -201,7 +186,7 @@
     </style>
 </head>
 <body class="antialiased login-page">
-    
+
     <!-- Dekorasi di belakang Card -->
     <div class="decor-circle circle-1"></div>
     <div class="decor-circle circle-2"></div>
@@ -209,8 +194,8 @@
     <div class="login-card">
         <div class="login-header">
             <div class="login-logo">LOGO</div>
-            <h1 class="login-title">Selamat Datang</h1>
-            <p class="login-subtitle">Silakan login untuk mengelola website Nagari Campago</p>
+            <h1 class="login-title">Daftar Akun</h1>
+            <p class="login-subtitle">Buat akun masyarakat untuk pengajuan surat pengantar online</p>
         </div>
 
         @if ($errors->any())
@@ -219,26 +204,30 @@
         </div>
         @endif
 
-        <form action="{{ route('login') }}" method="POST">
+        <form action="{{ route('warga.register.store') }}" method="POST">
             @csrf
             <div class="form-group">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" placeholder="Masukkan email Anda" required autofocus>
+                <label for="kk_number" class="form-label">Nomor Kartu Keluarga (KK)</label>
+                <input type="text" inputmode="numeric" id="kk_number" name="kk_number" class="form-input" value="{{ old('kk_number') }}" placeholder="16 digit Nomor KK" maxlength="16" required autofocus>
             </div>
 
             <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="password-field">
-                    <input type="password" id="password" name="password" class="form-input" placeholder="Masukkan password Anda" required>
-                    <button type="button" class="password-toggle" id="togglePassword" aria-label="Tampilkan password" aria-pressed="false">
-                        <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                    </button>
-                </div>
+                <label for="nik" class="form-label">NIK</label>
+                <input type="text" inputmode="numeric" id="nik" name="nik" class="form-input" value="{{ old('nik') }}" placeholder="16 digit Nomor Induk Kependudukan" maxlength="16" required>
             </div>
 
-            <button type="submit" class="login-btn">Masuk</button>
+            <div class="form-group">
+                <label for="name" class="form-label">Nama Lengkap</label>
+                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" placeholder="Sesuai KTP/KK" required>
+                <span class="form-hint-text">Gunakan nama yang sama setiap kali login.</span>
+            </div>
+
+            <button type="submit" class="login-btn">Daftar</button>
         </form>
+
+        <div class="login-switch">
+            Sudah punya akun? <a href="{{ route('warga.login') }}">Masuk di sini</a>
+        </div>
 
         <div style="text-align: center;">
             <a href="/" class="back-link">
@@ -248,19 +237,5 @@
         </div>
     </div>
 
-    <script>
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        if (togglePassword && passwordInput) {
-            togglePassword.addEventListener('click', () => {
-                const isHidden = passwordInput.type === 'password';
-                passwordInput.type = isHidden ? 'text' : 'password';
-                togglePassword.setAttribute('aria-pressed', isHidden);
-                togglePassword.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
-                togglePassword.querySelector('.icon-eye').style.display = isHidden ? 'none' : '';
-                togglePassword.querySelector('.icon-eye-off').style.display = isHidden ? '' : 'none';
-            });
-        }
-    </script>
 </body>
 </html>

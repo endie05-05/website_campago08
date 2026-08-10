@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\ContactMessage;
 use App\Models\GalleryImage;
 use App\Models\Korong;
@@ -18,6 +19,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $heroSlides = Banner::orderBy('sort_order')->get();
         $officials = Official::orderBy('sort_order')->get();
         $potentials = Potential::orderBy('sort_order')->get();
         $korongCount = Korong::count();
@@ -39,6 +41,7 @@ class DashboardController extends Controller
         $newSuratRequestsCount = $suratRequests->where('status', 'diajukan')->count();
 
         return view('admin.dashboard', compact(
+            'heroSlides',
             'officials',
             'potentials',
             'korongCount',

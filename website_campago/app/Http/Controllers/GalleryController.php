@@ -2,69 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesForPanel;
 use App\Models\Gallery;
 use App\Models\GalleryImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
-    public function update(Request $request)
+    use ValidatesForPanel;
+
+    public function store(Request $request)
     {
-        $validated = $request->validate([
-            'galeri' => ['required', 'array', 'min:1'],
-            'galeri.*.id' => ['nullable', 'integer', 'exists:gallery_images,id'],
-            'galeri.*.ukuran' => ['required', 'in:besar,sedang,tinggi,lebar'],
-            'galeri.*.gambar' => ['nullable', 'image', 'max:2048'],
-            'removed_ids' => ['nullable', 'array'],
-            'removed_ids.*' => ['integer', 'exists:gallery_images,id'],
+        $validated = $this->validatePanel($request, 'galeri', [
+            'ukuran' => ['required', 'in:besar,sedang,tinggi,lebar'],
+            'gambar' => ['required', 'image', 'max:8192'],
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
-            $gallery = Gallery::firstOrCreate(
-                ['slug' => 'galeri-utama'],
-                ['title' => 'Galeri Utama', 'status' => 'published']
-            );
+        $gallery = Gallery::firstOrCreate(
+            ['slug' => 'galeri-utama'],
+            ['title' => 'Galeri Utama', 'status' => 'published']
+        );
 
-            foreach ($validated['removed_ids'] ?? [] as $removedId) {
-                $image = GalleryImage::find($removedId);
-                if ($image) {
-                    Storage::disk('public')->delete($image->image_path);
-                    $image->delete();
-                }
+        $image = new GalleryImage();
+        $image->gallery_id = $gallery->id;
+        $image->size = $validated['ukuran'];
+        $image->sort_order = (GalleryImage::max('sort_order') ?? 0) + 1;
+        $image->image_path = $request->file('gambar')->store('gallery', 'public');
+        $image->save();
+
+        return redirect('/admin?panel=galeri')->with('success', 'Foto galeri berhasil ditambahkan.');
+    }
+
+    public function update(Request $request, GalleryImage $galeri)
+    {
+        $validated = $this->validatePanel($request, 'galeri', [
+            'ukuran' => ['required', 'in:besar,sedang,tinggi,lebar'],
+            'gambar' => ['nullable', 'image', 'max:8192'],
+        ]);
+
+        $galeri->size = $validated['ukuran'];
+
+        if ($request->hasFile('gambar')) {
+            if ($galeri->image_path) {
+                Storage::disk('public')->delete($galeri->image_path);
             }
+            $galeri->image_path = $request->file('gambar')->store('gallery', 'public');
+        }
 
-            foreach ($validated['galeri'] as $index => $item) {
-                $image = ! empty($item['id'])
-                    ? GalleryImage::find($item['id'])
-                    : new GalleryImage();
+        $galeri->save();
 
-                if (! $image) {
-                    $image = new GalleryImage();
-                }
+        return redirect('/admin?panel=galeri')->with('success', 'Foto galeri berhasil diperbarui.');
+    }
 
-                $gambarInput = $request->file("galeri.$index.gambar");
-                if (! $image->exists && ! $gambarInput) {
-                    // Baris baru tanpa foto -- lewati, tidak ada yang bisa disimpan.
-                    continue;
-                }
+    public function destroy(GalleryImage $galeri)
+    {
+        if ($galeri->image_path) {
+            Storage::disk('public')->delete($galeri->image_path);
+        }
+        $galeri->delete();
 
-                $image->gallery_id = $gallery->id;
-                $image->size = $item['ukuran'];
-                $image->sort_order = $index + 1;
-
-                if ($gambarInput) {
-                    if ($image->image_path) {
-                        Storage::disk('public')->delete($image->image_path);
-                    }
-                    $image->image_path = $gambarInput->store('gallery', 'public');
-                }
-
-                $image->save();
-            }
-        });
-
-        return redirect('/admin?panel=galeri')->with('success', 'Galeri berhasil disimpan.');
+        return redirect('/admin?panel=galeri')->with('success', 'Foto galeri berhasil dihapus.');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\GalleryImage;
 use App\Models\Korong;
 use App\Models\Location;
@@ -16,6 +17,7 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $heroSlides = Banner::where('is_active', true)->orderBy('sort_order')->get();
         $officials = Official::where('is_active', true)->orderBy('sort_order')->get();
         $potentials = Potential::published()->orderBy('sort_order')->get();
         $korongs = Korong::where('is_active', true)->orderBy('sort_order')->get();
@@ -38,6 +40,7 @@ class HomeController extends Controller
         $peta = $this->petaSettings();
 
         return view('welcome', compact(
+            'heroSlides',
             'officials',
             'potentials',
             'korongs',
@@ -58,8 +61,11 @@ class HomeController extends Controller
         return [
             'deskripsi' => Setting::get('kontak_deskripsi', 'Kecamatan V Koto Kampung Dalam, Kabupaten Padang Pariaman, Sumatera Barat.'),
             'alamat' => Setting::get('kontak_alamat', 'Kantor Wali Nagari Campago'),
+            'kode_wilayah' => Setting::get('kontak_kode_wilayah', ''),
             'email' => Setting::get('kontak_email', 'info@campago.desa.id'),
             'telepon' => Setting::get('kontak_telepon', '-'),
+            'facebook_url' => Setting::get('kontak_facebook_url', ''),
+            'youtube_url' => Setting::get('kontak_youtube_url', ''),
             'copyright' => Setting::get('kontak_copyright', '© '.date('Y').' Pemerintah Nagari Campago. All Rights Reserved.'),
         ];
     }
@@ -68,7 +74,6 @@ class HomeController extends Controller
     {
         return [
             'fasum_deskripsi' => Setting::get('peta_fasum_deskripsi', 'Kumpulan tempat umum penting seperti balai, sekolah, pasar, dan fasilitas sosial yang mendukung keseharian warga Campago.'),
-            'fasum_area' => Setting::get('peta_fasum_area', 'Balai, Sekolah, Pasar, Kantor Pelayanan'),
         ];
     }
 }

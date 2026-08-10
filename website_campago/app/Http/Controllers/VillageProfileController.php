@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesForPanel;
 use App\Models\VillageProfile;
 use Illuminate\Http\Request;
 
 class VillageProfileController extends Controller
 {
+    use ValidatesForPanel;
+
     public function updateStats(Request $request)
     {
-        $validated = $request->validate([
+        $validated = $this->validatePanel($request, 'statistik', [
             'area_km2' => ['nullable', 'numeric', 'min:0'],
             'population' => ['nullable', 'integer', 'min:0'],
             'district' => ['required', 'string', 'max:150'],

@@ -28,7 +28,7 @@
                 <li><a href="#profil" class="nav-link">Profil</a></li>
                 <li><a href="#pemerintahan" class="nav-link">Struktur Nagari</a></li>
                 <li><a href="#potensi" class="nav-link">Potensi</a></li>
-                <li><a href="#peta" class="nav-link">Informasi</a></li>
+                <li><a href="#informasi" class="nav-link">Informasi</a></li>
                 <li><a href="#galeri" class="nav-link">Galeri</a></li>
                 <li><a href="/layanan" class="nav-link">Layanan</a></li>
             </ul>
@@ -62,19 +62,13 @@
     </div>
 
     <!-- 2. Hero Section -->
-    @php
-        // Foto slideshow beranda. Untuk menambah foto: taruh file gambarnya di folder
-        // public/images/, lalu tambahkan nama filenya ke daftar di bawah ini.
-        $heroSlides = [
-            'ngaricampago.jpeg',
-            'kegiatan-1.jpg',
-        ];
-    @endphp
     <header class="hero">
         <div class="hero-bg-slideshow" aria-hidden="true">
-            @foreach ($heroSlides as $i => $slide)
-            <div class="hero-bg-slide @if($i === 0) is-active @endif" style="background-image: url('{{ asset('images/'.$slide) }}')"></div>
-            @endforeach
+            @forelse ($heroSlides as $i => $slide)
+            <div class="hero-bg-slide @if($i === 0) is-active @endif" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::url($slide->image_path) }}')"></div>
+            @empty
+            <div class="hero-bg-slide is-active" style="background-image: url('{{ asset('images/ngaricampago.jpeg') }}')"></div>
+            @endforelse
         </div>
         <div class="container">
             <div class="hero-content animate-on-scroll">
@@ -334,7 +328,7 @@
         <div class="container">
             <div class="news-header animate-on-scroll">
                 <div>
-                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">Cerita dari Campago</h2>
+                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">Berita Terkini dari Campago</h2>
                     <p class="potensi-desc">Berita, kegiatan, dan cerita terbaru dari masyarakat Nagari Campago.</p>
                 </div>
                 <a href="#" class="btn-link">Lihat semua berita</a>
@@ -404,14 +398,13 @@
 
             @php
                 $umkmKategoriList = $umkms->pluck('category')->unique()->values();
-                $fasumAreaTags = array_filter(array_map('trim', explode(',', $peta['fasum_area'])));
             @endphp
 
             <div class="modal-overlay modal-fasilitas-umum">
                 <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitle">
                     <label class="modal-close" for="toggle-fasilitas-umum" aria-label="Tutup informasi">×</label>
                     <div class="modal-header modal-header-fasum">
-                        <div class="modal-icon-badge">🏘️</div>
+                        <div class="modal-icon-badge"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
                         <div>
                             <span class="small-label">Informasi Kategori</span>
                             <h2 id="categoryTitle">Fasilitas Umum Campago</h2>
@@ -421,25 +414,16 @@
                     <div class="modal-body">
                         <div class="modal-quick-stats">
                             <div class="modal-quick-stat">
-                                <span class="icon">📍</span>
+                                <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
                                 <div><span class="value">{{ $fasilitasUmumList->count() }}</span><span class="label">Lokasi tersebar</span></div>
                             </div>
-                            <div class="modal-quick-stat">
-                                <span class="icon">🗂️</span>
-                                <div><span class="value">{{ count($fasumAreaTags) }}</span><span class="label">Kategori area utama</span></div>
-                            </div>
-                        </div>
-                        <div class="modal-tags">
-                            @foreach ($fasumAreaTags as $tag)
-                            <span class="modal-tag">{{ $tag }}</span>
-                            @endforeach
                         </div>
                         <div class="modal-list">
                             <h3>Daftar Lokasi</h3>
                             <div class="location-grid">
                                 @forelse ($fasilitasUmumList as $lokasi)
                                 <div class="location-card">
-                                    <span class="icon">📍</span>
+                                    <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
                                     <div>
                                         <div class="name">{{ $lokasi->name }}</div>
                                     </div>
@@ -582,25 +566,25 @@
     </section>
 
     <!-- 10. Culture / Gallery -->
-    <section id="galeri" class="section-padding" style="padding-top: 0;">
-        <div class="gallery-hero animate-on-scroll">
-            <div class="placeholder-img">CULTURAL IMAGE PLACEHOLDER</div>
-            <div class="gallery-hero-label">Campago Punya Cerita</div>
-            <div class="gallery-hero-content">
-                <h2 class="gallery-title">Dari adat, budaya, kehidupan masyarakat, hingga berbagai cerita yang terus hidup dari generasi ke generasi.</h2>
-                <a href="#" class="btn-link">Jelajahi Galeri</a>
+    <section id="galeri" class="section-padding">
+        <div class="container gallery-split animate-on-scroll">
+            <div class="gallery-text">
+                <div class="gallery-hero-label">Campago Punya Cerita</div>
+                <div class="gallery-hero-content">
+                    <p class="gallery-title">"Setiap sudut Nagari Campago menyimpan cerita — dari adat istiadat dan gotong royong, hingga warna kehidupan sehari-hari yang terus hidup lintas generasi."</p>
+                    <a href="#" class="btn-link">Lihat Galeri Selengkapnya</a>
+                </div>
             </div>
-        </div>
 
-        @php
-            $galeriUkuranClass = ['besar' => 'g-item-1', 'sedang' => 'g-item-2', 'tinggi' => 'g-item-3', 'lebar' => 'g-item-4'];
-        @endphp
-        <div class="container gallery-grid animate-on-scroll delay-1">
-            @forelse ($galleryImages as $image)
-                <img src="{{ \Illuminate\Support\Facades\Storage::url($image->image_path) }}" alt="{{ $image->caption ?? 'Galeri Nagari Campago' }}" class="gallery-photo gallery-item {{ $galeriUkuranClass[$image->size] ?? 'g-item-2' }}">
-            @empty
-                <p class="text-muted">Belum ada foto galeri.</p>
-            @endforelse
+            <div class="gallery-collage">
+                @forelse ($galleryImages->take(5) as $i => $image)
+                    <div class="collage-item collage-item-{{ $i + 1 }}">
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($image->image_path) }}" alt="{{ $image->caption ?? 'Galeri Nagari Campago' }}">
+                    </div>
+                @empty
+                    <div class="gallery-collage-empty">Belum ada foto galeri.<br>Nantikan cerita Nagari Campago selanjutnya.</div>
+                @endforelse
+            </div>
         </div>
     </section>
 
@@ -610,37 +594,40 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <div class="nav-logo-placeholder">LOGO</div>
-                    <h3>Nagari Campago</h3>
-                    <p>{{ $kontak['deskripsi'] }}</p>
-                </div>
-                
-                <div>
-                    <h4 class="footer-heading">Navigasi</h4>
-                    <ul class="footer-links">
-                        <li><a href="#profil">Profil</a></li>
-                        <li><a href="#pemerintahan">Pemerintahan</a></li>
-                        <li><a href="#potensi">Potensi</a></li>
-                        <li><a href="#peta">Informasi</a></li>
-                        <li><a href="#berita">Berita</a></li>
-                    </ul>
+                    <h3>Pemerintah Nagari Campago</h3>
+                    <p class="footer-tagline">{{ $kontak['deskripsi'] }}</p>
+                    <p class="footer-address">{{ $kontak['alamat'] }}</p>
+                    @if ($kontak['kode_wilayah'])
+                        <p class="footer-kode-wilayah"><strong>Kode Wilayah:</strong> {{ $kontak['kode_wilayah'] }}</p>
+                    @endif
                 </div>
 
                 <div>
-                    <h4 class="footer-heading">Informasi</h4>
-                    <ul class="footer-links">
-                        <li><a href="#peta">Peta</a></li>
-                        <li><a href="#galeri">Galeri</a></li>
-                        <li><a href="#">Kontak</a></li>
+                    <h4 class="footer-heading">Hubungi Kami</h4>
+                    <ul class="footer-contact">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <a href="tel:{{ $kontak['telepon'] }}">{{ $kontak['telepon'] }}</a>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <a href="mailto:{{ $kontak['email'] }}">{{ $kontak['email'] }}</a>
+                        </li>
                     </ul>
-                </div>
-
-                <div>
-                    <h4 class="footer-heading">Kontak</h4>
-                    <ul class="footer-contact" style="list-style: none;">
-                        <li><strong>Alamat:</strong> <br> {{ $kontak['alamat'] }}</li>
-                        <li><strong>Email:</strong> <br> {{ $kontak['email'] }}</li>
-                        <li><strong>Telepon:</strong> <br> {{ $kontak['telepon'] }}</li>
-                    </ul>
+                    @if ($kontak['facebook_url'] || $kontak['youtube_url'])
+                        <div class="footer-social">
+                            @if ($kontak['facebook_url'])
+                                <a href="{{ $kontak['facebook_url'] }}" target="_blank" rel="noopener" aria-label="Facebook" class="footer-social-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06C2 17.08 5.66 21.23 10.44 22v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.45 2.91h-2.33V22C18.34 21.23 22 17.08 22 12.06z"></path></svg>
+                                </a>
+                            @endif
+                            @if ($kontak['youtube_url'])
+                                <a href="{{ $kontak['youtube_url'] }}" target="_blank" rel="noopener" aria-label="YouTube" class="footer-social-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81zM9.6 15.5v-7l6.3 3.5-6.3 3.5z"></path></svg>
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -682,6 +669,7 @@
                     mobileMenuButton.setAttribute('aria-label', 'Buka menu navigasi');
                 }
             });
+
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
                     navbar.classList.add('scrolled');
@@ -730,7 +718,7 @@
                 { title: 'Pertanian', desc: 'Potensi Nagari - Hamparan sawah dan ladang', category: 'Potensi', url: '#potensi' },
                 { title: 'Budaya Minangkabau', desc: 'Potensi Nagari - Kesenian dan adat istiadat', category: 'Potensi', url: '#potensi' },
                 { title: 'Wisata & Alam', desc: 'Potensi Nagari - Keindahan alam Nagari Campago', category: 'Potensi', url: '#potensi' },
-                { title: 'Cerita dari Campago', desc: 'Berita dan kegiatan terbaru masyarakat', category: 'Berita', url: '#berita' },
+                { title: 'Berita Terkini dari Campago', desc: 'Berita dan kegiatan terbaru masyarakat', category: 'Berita', url: '#berita' },
                 { title: 'Gotong Royong Bersama Membersihkan Saluran Irigasi di Korong Pasa', desc: 'Berita - Pemerintahan', category: 'Berita', url: '#berita' },
                 { title: 'Pelatihan Pembuatan Kerajinan Tangan untuk Ibu-ibu PKK', desc: 'Berita terbaru', category: 'Berita', url: '#berita' },
                 { title: 'Penyaluran Bantuan Langsung Tunai (BLT) Tahap III', desc: 'Berita terbaru', category: 'Berita', url: '#berita' },
@@ -743,7 +731,9 @@
                 { title: 'Kue Sapik Tradisional', desc: 'UMKM Kuliner - Usaha Mande, Korong Mudik', category: 'UMKM', url: '#peta' },
                 { title: 'Galeri Budaya', desc: 'Campago Punya Cerita - foto adat dan kehidupan masyarakat', category: 'Galeri', url: '#galeri' },
                 { title: 'Layanan Informasi', desc: 'Layanan dan informasi untuk masyarakat Nagari Campago', category: 'Halaman', url: '/layanan' },
-                { title: 'Login Pengelola', desc: 'Masuk sebagai pengelola website Nagari Campago', category: 'Halaman', url: '/login' }
+                { title: 'Login Pengelola', desc: 'Masuk sebagai pengelola website Nagari Campago', category: 'Halaman', url: '/login' },
+                { title: 'Login Masyarakat Campago', desc: 'Masuk untuk pengajuan surat pengantar online', category: 'Halaman', url: '/warga/login' },
+                { title: 'Daftar Akun Masyarakat', desc: 'Buat akun masyarakat dengan Nomor KK, NIK, dan nama', category: 'Halaman', url: '/warga/daftar' }
             ];
 
             function openSearch() {

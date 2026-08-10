@@ -3,78 +3,82 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
+use App\Http\Controllers\Concerns\ValidatesForPanel;
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
     use GeneratesUniqueSlug;
+    use ValidatesForPanel;
 
-    public function update(Request $request)
+    private function rules(): array
     {
-        $validated = $request->validate([
-            'berita' => ['required', 'array', 'min:1'],
-            'berita.*.id' => ['nullable', 'integer', 'exists:posts,id'],
-            'berita.*.judul' => ['required', 'string', 'max:255'],
-            'berita.*.kategori_id' => ['nullable', 'integer', 'exists:post_categories,id'],
-            'berita.*.jenis' => ['required', 'in:utama,biasa'],
-            'berita.*.tanggal' => ['required', 'date'],
-            'berita.*.deskripsi' => ['nullable', 'string'],
-            'berita.*.gambar' => ['nullable', 'image', 'max:2048'],
-            'removed_ids' => ['nullable', 'array'],
-            'removed_ids.*' => ['integer', 'exists:posts,id'],
-        ]);
+        return [
+            'judul' => ['required', 'string', 'max:255'],
+            'kategori_id' => ['nullable', 'integer', 'exists:post_categories,id'],
+            'jenis' => ['required', 'in:utama,biasa'],
+            'tanggal' => ['required', 'date'],
+            'deskripsi' => ['nullable', 'string'],
+            'gambar' => ['nullable', 'image', 'max:8192'],
+        ];
+    }
 
-        DB::transaction(function () use ($validated, $request) {
-            foreach ($validated['removed_ids'] ?? [] as $removedId) {
-                $post = Post::find($removedId);
-                if ($post) {
-                    if ($post->featured_image_path) {
-                        Storage::disk('public')->delete($post->featured_image_path);
-                    }
-                    $post->delete();
-                }
+    public function store(Request $request)
+    {
+        $validated = $this->validatePanel($request, 'berita', $this->rules());
+
+        $post = new Post();
+        $post->title = $validated['judul'];
+        $post->category_id = $validated['kategori_id'] ?? null;
+        $post->is_featured = $validated['jenis'] === 'utama';
+        $post->published_at = $validated['tanggal'];
+        $post->excerpt = $validated['deskripsi'] ?? null;
+        $post->content = $validated['deskripsi'] ?? '';
+        $post->status = 'published';
+        $post->author_id = $request->user()->id;
+        $post->slug = $this->uniqueSlug(Post::class, $validated['judul'], null);
+
+        if ($request->hasFile('gambar')) {
+            $post->featured_image_path = $request->file('gambar')->store('posts', 'public');
+        }
+
+        $post->save();
+
+        return redirect('/admin?panel=berita')->with('success', 'Berita berhasil ditambahkan.');
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        $validated = $this->validatePanel($request, 'berita', $this->rules());
+
+        $post->title = $validated['judul'];
+        $post->category_id = $validated['kategori_id'] ?? null;
+        $post->is_featured = $validated['jenis'] === 'utama';
+        $post->published_at = $validated['tanggal'];
+        $post->excerpt = $validated['deskripsi'] ?? null;
+        $post->content = $validated['deskripsi'] ?? '';
+
+        if ($request->hasFile('gambar')) {
+            if ($post->featured_image_path) {
+                Storage::disk('public')->delete($post->featured_image_path);
             }
+            $post->featured_image_path = $request->file('gambar')->store('posts', 'public');
+        }
 
-            foreach ($validated['berita'] as $index => $item) {
-                $post = ! empty($item['id'])
-                    ? Post::find($item['id'])
-                    : new Post();
+        $post->save();
 
-                if (! $post) {
-                    $post = new Post();
-                }
+        return redirect('/admin?panel=berita')->with('success', 'Berita berhasil diperbarui.');
+    }
 
-                $post->title = $item['judul'];
-                $post->category_id = $item['kategori_id'] ?? null;
-                $post->is_featured = $item['jenis'] === 'utama';
-                $post->published_at = $item['tanggal'];
-                $post->excerpt = $item['deskripsi'] ?? null;
-                $post->content = $item['deskripsi'] ?? '';
-                $post->status = 'published';
+    public function destroy(Post $post)
+    {
+        if ($post->featured_image_path) {
+            Storage::disk('public')->delete($post->featured_image_path);
+        }
+        $post->delete();
 
-                if (! $post->exists) {
-                    $post->author_id = $request->user()->id;
-                }
-
-                if (! $post->exists || $post->slug === null) {
-                    $post->slug = $this->uniqueSlug(Post::class, $item['judul'], $post->id);
-                }
-
-                $gambarInput = $request->file("berita.$index.gambar");
-                if ($gambarInput) {
-                    if ($post->featured_image_path) {
-                        Storage::disk('public')->delete($post->featured_image_path);
-                    }
-                    $post->featured_image_path = $gambarInput->store('posts', 'public');
-                }
-
-                $post->save();
-            }
-        });
-
-        return redirect('/admin?panel=berita')->with('success', 'Berita & Kegiatan berhasil disimpan.');
+        return redirect('/admin?panel=berita')->with('success', 'Berita berhasil dihapus.');
     }
 }

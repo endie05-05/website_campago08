@@ -49,6 +49,10 @@
             display: flex;
         }
 
+        #toggle-surat-login-required:checked ~ .modal-overlay.modal-surat-login-required {
+            display: flex;
+        }
+
         @media (max-width: 768px) {
             .service-overview-grid-duo { grid-template-columns: 1fr; }
         }
@@ -94,6 +98,7 @@
     <section class="service-intro section-padding">
         <div class="container">
             <input type="checkbox" id="toggle-surat-pengantar" class="modal-toggle" hidden>
+            <input type="checkbox" id="toggle-surat-login-required" class="modal-toggle" hidden>
 
             <div class="service-intro-heading animate-on-scroll">
                 <span class="small-label">Pelayanan Publik</span>
@@ -101,9 +106,15 @@
                 <p class="potensi-desc">Pusat layanan administrasi, kependudukan, dan pengaduan bagi masyarakat Nagari Campago. Untuk jam operasional dan kontak kantor, lihat bagian <a href="/#peta" class="btn-link">Informasi</a> di beranda.</p>
             </div>
 
+            @if (session('success'))
+            <div style="background: rgba(47, 93, 80, 0.12); border: 1px solid rgba(47, 93, 80, 0.3); color: var(--color-green-dark); padding: 0.9rem 1.25rem; border-radius: 10px; margin-bottom: 1.5rem; font-weight: 600;">
+                ✓ {{ session('success') }}
+            </div>
+            @endif
+
             <div class="service-overview-grid service-overview-grid-duo animate-on-scroll delay-1">
                 <div class="service-overview-card service-overview-card-action">
-                    <label for="toggle-surat-pengantar" class="card-stretched-label" aria-label="Pilih jenis surat pengantar yang ingin diajukan"></label>
+                    <label for="{{ auth('resident')->check() ? 'toggle-surat-pengantar' : 'toggle-surat-login-required' }}" class="card-stretched-label" aria-label="Pilih jenis surat pengantar yang ingin diajukan"></label>
                     <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
                     <h2 class="info-title">Surat Pengantar</h2>
                     <p class="info-desc text-justify">Layanan pembuatan surat pengantar KTP, KK, SKCK, dan keperluan administrasi lainnya.</p>
@@ -151,6 +162,24 @@
                                 <p class="info-desc text-justify">Kelahiran, kematian, kehilangan — hubungi kantor nagari langsung.</p>
                             </a>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-overlay modal-surat-login-required">
+                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="suratLoginRequiredTitle" style="max-width: 480px;">
+                    <label class="modal-close" for="toggle-surat-login-required" aria-label="Tutup">×</label>
+                    <div class="modal-header modal-header-surat">
+                        <div class="modal-icon-badge"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+                        <div>
+                            <span class="small-label">Surat Pengantar</span>
+                            <h2 id="suratLoginRequiredTitle">Silakan Masuk Dulu</h2>
+                            <p>Layanan ini khusus untuk warga yang sudah terdaftar. Masuk pakai NIK dan nama sesuai KTP, atau daftar dulu kalau belum punya akun.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                        <a href="{{ route('warga.login') }}" class="btn-primary" style="text-align: center; padding: 0.85rem 1.5rem; border-radius: 8px;">Masuk sebagai Masyarakat</a>
+                        <a href="{{ route('warga.register') }}" class="btn-link" style="text-align: center;">Belum punya akun? Daftar di sini</a>
                     </div>
                 </div>
             </div>
@@ -223,6 +252,7 @@
                     mobileMenuButton.setAttribute('aria-label', 'Buka menu navigasi');
                 }
             });
+
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
                     navbar.classList.add('scrolled');

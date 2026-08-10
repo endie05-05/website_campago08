@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalleryController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OfficialController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PotentialController;
+use App\Http\Controllers\ResidentAuthController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SuratRequestController;
 use App\Http\Controllers\UmkmController;
@@ -48,16 +50,37 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+Route::prefix('warga')->name('warga.')->group(function () {
+    Route::get('/login', [ResidentAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [ResidentAuthController::class, 'login'])->name('login.store');
+    Route::get('/daftar', [ResidentAuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/daftar', [ResidentAuthController::class, 'register'])->name('register.store');
+    Route::post('/logout', [ResidentAuthController::class, 'logout'])->name('logout');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::post('/admin/aparatur', [OfficialController::class, 'update'])->name('admin.aparatur.update');
-    Route::post('/admin/potensi', [PotentialController::class, 'update'])->name('admin.potensi.update');
+    Route::post('/admin/banner', [BannerController::class, 'store'])->name('admin.banner.store');
+    Route::post('/admin/banner/{banner}', [BannerController::class, 'update'])->name('admin.banner.update');
+    Route::post('/admin/banner/{banner}/hapus', [BannerController::class, 'destroy'])->name('admin.banner.destroy');
+    Route::post('/admin/aparatur', [OfficialController::class, 'store'])->name('admin.aparatur.store');
+    Route::post('/admin/aparatur/{official}', [OfficialController::class, 'update'])->name('admin.aparatur.update');
+    Route::post('/admin/aparatur/{official}/hapus', [OfficialController::class, 'destroy'])->name('admin.aparatur.destroy');
+    Route::post('/admin/potensi', [PotentialController::class, 'store'])->name('admin.potensi.store');
+    Route::post('/admin/potensi/{potential}', [PotentialController::class, 'update'])->name('admin.potensi.update');
+    Route::post('/admin/potensi/{potential}/hapus', [PotentialController::class, 'destroy'])->name('admin.potensi.destroy');
     Route::post('/admin/statistik', [VillageProfileController::class, 'updateStats'])->name('admin.statistik.update');
     Route::post('/admin/kontak', [SettingController::class, 'updateKontak'])->name('admin.kontak.update');
-    Route::post('/admin/galeri', [GalleryController::class, 'update'])->name('admin.galeri.update');
-    Route::post('/admin/umkm', [UmkmController::class, 'update'])->name('admin.umkm.update');
-    Route::post('/admin/berita', [PostController::class, 'update'])->name('admin.berita.update');
+    Route::post('/admin/galeri', [GalleryController::class, 'store'])->name('admin.galeri.store');
+    Route::post('/admin/galeri/{galeri}', [GalleryController::class, 'update'])->name('admin.galeri.update');
+    Route::post('/admin/galeri/{galeri}/hapus', [GalleryController::class, 'destroy'])->name('admin.galeri.destroy');
+    Route::post('/admin/umkm', [UmkmController::class, 'store'])->name('admin.umkm.store');
+    Route::post('/admin/umkm/{umkm}', [UmkmController::class, 'update'])->name('admin.umkm.update');
+    Route::post('/admin/umkm/{umkm}/hapus', [UmkmController::class, 'destroy'])->name('admin.umkm.destroy');
+    Route::post('/admin/berita', [PostController::class, 'store'])->name('admin.berita.store');
+    Route::post('/admin/berita/{post}', [PostController::class, 'update'])->name('admin.berita.update');
+    Route::post('/admin/berita/{post}/hapus', [PostController::class, 'destroy'])->name('admin.berita.destroy');
     Route::post('/admin/peta', [LocationController::class, 'update'])->name('admin.peta.update');
     Route::post('/admin/pengaduan/{contactMessage}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.pengaduan.status');
     Route::post('/admin/pengaduan/{contactMessage}/hapus', [ContactMessageController::class, 'destroy'])->name('admin.pengaduan.destroy');

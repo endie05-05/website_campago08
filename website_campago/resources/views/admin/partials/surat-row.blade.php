@@ -16,7 +16,7 @@
         <div class="admin-table-actions">
             <label for="toggle-surat-{{ $pengajuan->id }}" class="btn-link" style="font-size: 0.82rem;">Detail</label>
 
-            <form method="POST" action="{{ route('admin.surat.destroy', $pengajuan) }}" onsubmit="return confirm('Hapus pengajuan surat dari ' + {{ Js::from($pengajuan->applicant_name) }} + '?');">
+            <form method="POST" action="{{ route('admin.surat.destroy', $pengajuan) }}" data-confirm="Hapus pengajuan surat dari {{ $pengajuan->applicant_name }}?">
                 @csrf
                 <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus pengajuan">&times;</button>
             </form>
