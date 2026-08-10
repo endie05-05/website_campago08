@@ -81,4 +81,19 @@ class PostController extends Controller
 
         return redirect('/admin?panel=berita')->with('success', 'Berita berhasil dihapus.');
     }
+
+    public function show(Post $post)
+    {
+        abort_unless($post->status === 'published', 404);
+
+        $post->loadMissing('category');
+
+        $latestPosts = Post::published()
+            ->where('id', '!=', $post->id)
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get();
+
+        return view('berita.show', compact('post', 'latestPosts'));
+    }
 }

@@ -28,10 +28,15 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
         $umkms = Umkm::published()->orderBy('id')->get();
+        $latestUmkms = Umkm::published()->with('korong')->orderByDesc('created_at')->take(3)->get();
 
-        $posts = Post::published()->with('category')->orderByDesc('published_at')->get();
-        $mainPost = $posts->firstWhere('is_featured', true) ?? $posts->first();
-        $otherPosts = $posts->reject(fn ($p) => $mainPost && $p->is($mainPost))->take(3);
+        $posts = Post::published()->with('category')
+            ->orderByDesc('is_featured')
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get();
+        $mainPost = $posts->first();
+        $otherPosts = $posts->slice(1);
 
         $fasilitasUmumList = Location::whereHas('category', fn ($q) => $q->where('slug', 'fasilitas-umum'))
             ->where('status', 'published')
@@ -49,6 +54,7 @@ class HomeController extends Controller
             'kontak',
             'galleryImages',
             'umkms',
+            'latestUmkms',
             'mainPost',
             'otherPosts',
             'fasilitasUmumList',

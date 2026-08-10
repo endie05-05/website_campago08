@@ -456,13 +456,21 @@
                         <span class="form-hint">Jelaskan sejelas-jelasnya, termasuk data pendukung terkait jenis surat yang dipilih (misalnya nama sekolah &amp; kelas untuk SKTM Anak Sekolah, atau nomor KK lama/baru untuk SKTM Pindah KK dan KTP).</span>
                         @error('penjelasan_keperluan')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
-                    <div class="form-group full">
-                        <label class="form-label">Lampiran Pendukung</label>
+                    <div class="form-group">
+                        <label class="form-label">Upload KTP <span class="required">*</span></label>
                         <div class="form-file">
-                            <input type="file" name="lampiran" accept="image/*,.pdf">
+                            <input type="file" name="ktp" accept="image/*,.pdf" required>
                         </div>
-                        <span class="form-hint">Opsional: scan/foto Kartu Keluarga atau KTP orang tua.</span>
-                        @error('lampiran')<span class="form-error">{{ $message }}</span>@enderror
+                        <span class="form-hint">Scan/foto KTP untuk diverifikasi pengelola.</span>
+                        @error('ktp')<span class="form-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Upload Kartu Keluarga (KK) <span class="required">*</span></label>
+                        <div class="form-file">
+                            <input type="file" name="kk" accept="image/*,.pdf" required>
+                        </div>
+                        <span class="form-hint">Scan/foto KK untuk diverifikasi pengelola.</span>
+                        @error('kk')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>

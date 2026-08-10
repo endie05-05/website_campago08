@@ -76,4 +76,13 @@ class UmkmController extends Controller
 
         return redirect('/admin?panel=umkm')->with('success', 'Produk UMKM berhasil dihapus.');
     }
+
+    public function show(Umkm $umkm)
+    {
+        abort_unless($umkm->status === 'published' && $umkm->is_verified, 404);
+
+        $umkm->loadMissing('korong');
+
+        return view('umkm.show', compact('umkm'));
+    }
 }

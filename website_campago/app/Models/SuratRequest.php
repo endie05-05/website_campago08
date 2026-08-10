@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SuratRequest extends Model
 {
     protected $fillable = [
-        'type', 'applicant_name', 'keperluan', 'data', 'attachment_path', 'status',
+        'type', 'applicant_name', 'keperluan', 'data', 'ktp_path', 'kk_path', 'status',
     ];
 
     protected $casts = [

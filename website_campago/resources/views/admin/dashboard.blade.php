@@ -175,20 +175,21 @@
                         </div>
                         <div class="admin-table-wrap">
                             <table class="admin-table">
-                                <thead><tr><th>Foto</th><th>Aksi</th></tr></thead>
+                                <thead><tr><th>Foto</th><th>Judul</th><th>Aksi</th></tr></thead>
                                 <tbody>
                                     @forelse ($heroSlides as $slide)
                                     <tr>
                                         <td>
                                             <img src="{{ \Illuminate\Support\Facades\Storage::url($slide->image_path) }}" alt="Foto beranda" style="width:64px; height:44px; object-fit:cover; border-radius:8px; display:block;">
                                         </td>
+                                        <td>{{ $slide->title ?: '—' }}</td>
                                         <td>
                                             <div class="admin-table-actions">
                                                 <button type="button" class="admin-table-edit-btn btn-edit-item" aria-label="Edit foto"
                                                     data-update-url="{{ route('admin.banner.update', $slide) }}"
                                                     data-id="{{ $slide->id }}"
                                                     data-preview="{{ \Illuminate\Support\Facades\Storage::url($slide->image_path) }}"
-                                                    data-item="{{ json_encode([]) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
+                                                    data-item="{{ json_encode(['title' => $slide->title, 'subtitle' => $slide->subtitle, 'button_text' => $slide->button_text, 'button_url' => $slide->button_url]) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
                                                 <form method="POST" action="{{ route('admin.banner.destroy', $slide) }}" data-confirm="Hapus foto beranda ini?">
                                                     @csrf
                                                     <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
@@ -197,7 +198,7 @@
                                         </td>
                                     </tr>
                                     @empty
-                                    <tr><td colspan="2" class="admin-table-empty">Belum ada foto beranda. Klik "+ Tambah Foto" untuk menambahkan.</td></tr>
+                                    <tr><td colspan="3" class="admin-table-empty">Belum ada foto beranda. Klik "+ Tambah Foto" untuk menambahkan.</td></tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -209,7 +210,7 @@
                             @csrf
                             <input type="hidden" name="_target_id" value="{{ $bannerEditingId }}">
                             <div class="admin-card-header">
-                                <div><h2 class="crud-form-title">{{ $bannerEditingItem ? 'Edit Foto Beranda' : 'Tambah Foto Beranda' }}</h2><p>Unggah foto untuk slideshow beranda.</p></div>
+                                <div><h2 class="crud-form-title">{{ $bannerEditingItem ? 'Edit Foto Beranda' : 'Tambah Foto Beranda' }}</h2><p>Foto ini tampil sebagai kartu ringkas di beranda, lengkap dengan judul, deskripsi singkat, dan tombol.</p></div>
                             </div>
                             @if ($errors->any())
                                 <div style="background: rgba(200, 60, 60, 0.1); border: 1px solid rgba(200, 60, 60, 0.3); border-radius: 10px; padding: 0.85rem 1rem; color: #B3453D; font-weight:600; margin-bottom:1rem;">
@@ -226,6 +227,25 @@
                                         <input type="file" name="gambar" accept="image/*" data-required-on-add {{ $bannerEditingItem ? '' : 'required' }}>
                                     </div>
                                     <span class="form-hint crud-form-hint" style="display: {{ $bannerEditingItem ? 'inline' : 'none' }};">Biarkan kosong jika tidak ingin mengganti foto.</span>
+                                </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Judul <span class="optional-tag">(opsional)</span></label>
+                                    <input type="text" class="form-input" name="title" maxlength="200" placeholder="Contoh: Panen Raya Padi Nagari Campago">
+                                </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Deskripsi Singkat <span class="optional-tag">(opsional)</span></label>
+                                    <textarea class="form-textarea" name="subtitle" maxlength="255" placeholder="Satu-dua kalimat ringkas, tampil di kartu beranda."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Teks Tombol <span class="optional-tag">(opsional)</span></label>
+                                    <input type="text" class="form-input" name="button_text" maxlength="100" placeholder="Contoh: Baca Selengkapnya">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Link Tombol <span class="optional-tag">(opsional)</span></label>
+                                    <input type="text" class="form-input" name="button_url" maxlength="500" placeholder="Contoh: #berita">
+                                </div>
+                                <div class="form-group full">
+                                    <span class="form-hint" style="margin-top: 0;">Kosongkan judul/deskripsi/tombol jika belum ada isinya — beranda akan otomatis memakai teks bawaan.</span>
                                 </div>
                             </div>
                             <div class="admin-card-actions">

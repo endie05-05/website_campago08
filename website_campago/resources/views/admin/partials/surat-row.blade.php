@@ -43,9 +43,14 @@
                 <p class="pengaduan-subject">Keperluan</p>
                 <p class="pengaduan-message">{{ $pengajuan->keperluan }}</p>
 
-                @if ($pengajuan->attachment_path)
-                    <a href="{{ \Illuminate\Support\Facades\Storage::url($pengajuan->attachment_path) }}" target="_blank" rel="noopener" class="btn-link" style="display: inline-block; margin-top: 0.85rem; font-size: 0.85rem;">Lihat Lampiran</a>
-                @endif
+                <div style="display: flex; gap: 1.5rem; margin-top: 0.85rem;">
+                    @if ($pengajuan->ktp_path)
+                        <a href="{{ \Illuminate\Support\Facades\Storage::url($pengajuan->ktp_path) }}" target="_blank" rel="noopener" class="btn-link" style="font-size: 0.85rem;">Lihat KTP</a>
+                    @endif
+                    @if ($pengajuan->kk_path)
+                        <a href="{{ \Illuminate\Support\Facades\Storage::url($pengajuan->kk_path) }}" target="_blank" rel="noopener" class="btn-link" style="font-size: 0.85rem;">Lihat KK</a>
+                    @endif
+                </div>
 
                 @if (! empty($pengajuan->data))
                 <div class="surat-detail-grid" style="margin-top: 1.25rem;">

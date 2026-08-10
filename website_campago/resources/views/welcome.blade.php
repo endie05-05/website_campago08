@@ -28,7 +28,7 @@
                 <li><a href="#profil" class="nav-link">Profil</a></li>
                 <li><a href="#pemerintahan" class="nav-link">Struktur Nagari</a></li>
                 <li><a href="#potensi" class="nav-link">Potensi</a></li>
-                <li><a href="#informasi" class="nav-link">Informasi</a></li>
+                <li><a href="#berita" class="nav-link">Informasi</a></li>
                 <li><a href="#galeri" class="nav-link">Galeri</a></li>
                 <li><a href="/layanan" class="nav-link">Layanan</a></li>
             </ul>
@@ -62,35 +62,152 @@
     </div>
 
     <!-- 2. Hero Section -->
+    @php
+        $featuredSlide = $heroSlides->first();
+        $heroUmkms = $latestUmkms->take(4);
+    @endphp
     <header class="hero">
-        <div class="hero-bg-slideshow" aria-hidden="true">
-            @forelse ($heroSlides as $i => $slide)
-            <div class="hero-bg-slide @if($i === 0) is-active @endif" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::url($slide->image_path) }}')"></div>
-            @empty
-            <div class="hero-bg-slide is-active" style="background-image: url('{{ asset('images/ngaricampago.jpeg') }}')"></div>
-            @endforelse
-        </div>
-        <div class="container">
+        <div class="container hero-grid">
             <div class="hero-content animate-on-scroll">
-            <span class="small-label">Website Resmi</span>
-            <h1 class="hero-headline">NAGARI<br>CAMPAGO</h1>
-            <h2 class="hero-subheadline">Kecamatan V Koto Kampung Dalam<br>Kabupaten Padang Pariaman</h2>
-            <p class="hero-desc">Menjelajahi potensi, budaya, dan kehidupan masyarakat Nagari Campago.</p>
-            
-            <div class="hero-actions">
-                <a href="#potensi" class="btn btn-primary">Jelajahi Campago</a>
-                <a href="#peta" class="btn-link">Lihat Peta Nagari</a>
+                <span class="small-label">Website Resmi</span>
+                <h1 class="hero-headline">NAGARI<br>CAMPAGO</h1>
+                <h2 class="hero-subheadline">Kecamatan V Koto Kampung Dalam<br>Kabupaten Padang Pariaman</h2>
+                <p class="hero-desc">Menjelajahi potensi, budaya, dan kehidupan masyarakat Nagari Campago.</p>
+
+                <div class="hero-actions">
+                    <a href="#potensi" class="btn btn-primary">Jelajahi Campago</a>
+                    <a href="#peta" class="btn-link">Lihat Peta Nagari</a>
+                </div>
             </div>
+
+            <div class="hero-photo animate-on-scroll delay-1">
+                <div class="hero-photo-frame">
+                    <img src="{{ $featuredSlide ? \Illuminate\Support\Facades\Storage::url($featuredSlide->image_path) : asset('images/ngaricampago.jpeg') }}" alt="{{ $featuredSlide->title ?? 'Nagari Campago' }}" class="hero-photo-img">
+                </div>
+                <p class="hero-photo-caption">{{ $featuredSlide->title ?? 'Nagari Campago' }}</p>
             </div>
         </div>
-        
-        <div class="scroll-indicator">
-            Scroll to Explore
-            <span class="scroll-arrow">↓</span>
+
+        {{-- UMKM Product Showcase Strip --}}
+        @if ($heroUmkms->isNotEmpty())
+        <div class="container hero-umkm-strip animate-on-scroll delay-2">
+            <div class="hero-umkm-label">
+                <span class="hero-umkm-label-icon">🛍️</span>
+                <span>Produk UMKM Lokal</span>
+            </div>
+            <div class="hero-umkm-scroll">
+                @foreach ($heroUmkms as $umkm)
+                <a href="{{ route('umkm.show', $umkm) }}" class="hero-umkm-item">
+                    <div class="hero-umkm-thumb">
+                        @if ($umkm->featured_image_path)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($umkm->featured_image_path) }}" alt="{{ $umkm->name }}">
+                        @else
+                            <div class="hero-umkm-placeholder">📦</div>
+                        @endif
+                    </div>
+                    <div class="hero-umkm-info">
+                        <span class="hero-umkm-name">{{ $umkm->name }}</span>
+                        <span class="hero-umkm-cat">{{ $umkm->category ?? ($umkm->korong->name ?? 'Campago') }}</span>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            <a href="#umkm-lokal" class="hero-umkm-more">Lihat Semua →</a>
         </div>
+        @endif
     </header>
 
-    <!-- 4. Section "Mengenal Campago" -->
+    <!-- 3. Berita Terkini -->
+    <section id="berita" class="section-padding bg-cream-light">
+        <div class="container">
+            <div class="news-header animate-on-scroll">
+                <div>
+                    <span class="small-label">Informasi Nagari</span>
+                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">Berita Terkini dari Campago</h2>
+                    <p class="potensi-desc">Berita, kegiatan, dan cerita terbaru dari masyarakat Nagari Campago.</p>
+                </div>
+                <a href="#berita" class="btn-link">Lihat semua berita</a>
+            </div>
+
+            <div class="news-grid">
+                @if ($mainPost)
+                <a href="{{ route('berita.show', $mainPost) }}" class="news-main animate-on-scroll">
+                    @if ($mainPost->featured_image_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($mainPost->featured_image_path) }}" alt="{{ $mainPost->title }}" class="placeholder-img" style="object-fit: cover;">
+                    @else
+                        <div class="placeholder-img">NEWS IMAGE PLACEHOLDER</div>
+                    @endif
+                    <div class="news-meta">
+                        @if ($mainPost->category)
+                            <span class="news-meta-cat">{{ $mainPost->category->name }}</span>
+                        @endif
+                        <span>{{ $mainPost->published_at?->locale('id')->translatedFormat('d F Y') }}</span>
+                    </div>
+                    <h3 class="news-main-title">{{ $mainPost->title }}</h3>
+                    <p class="news-main-desc text-justify">{{ \Illuminate\Support\Str::limit(strip_tags($mainPost->content ?: ($mainPost->excerpt ?? '')), 170) }}</p>
+                    <span class="btn-link">Baca selengkapnya</span>
+                </a>
+                @else
+                <div class="news-main animate-on-scroll">
+                    <p class="text-muted">Belum ada berita.</p>
+                </div>
+                @endif
+
+                <div class="news-list animate-on-scroll delay-1">
+                    @forelse ($otherPosts as $post)
+                    <a href="{{ route('berita.show', $post) }}" class="news-item">
+                        @if ($post->featured_image_path)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}" alt="{{ $post->title }}" class="placeholder-img" style="object-fit: cover;">
+                        @else
+                            <div class="placeholder-img">IMAGE PLACEHOLDER</div>
+                        @endif
+                        <div>
+                            <div class="news-meta">{{ $post->published_at?->locale('id')->translatedFormat('d F Y') }}</div>
+                            <h4 class="news-item-title">{{ $post->title }}</h4>
+                            <p class="news-item-desc">{{ \Illuminate\Support\Str::limit(strip_tags($post->content ?: ($post->excerpt ?? '')), 85) }}</p>
+                        </div>
+                    </a>
+                    @empty
+                    <p class="text-muted">Belum ada berita lainnya.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. UMKM Lokal -->
+    <section id="umkm-lokal" class="section-padding">
+        <div class="container">
+            <div class="news-header animate-on-scroll">
+                <div>
+                    <span class="small-label">Ekonomi Lokal</span>
+                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">UMKM Lokal Campago</h2>
+                    <p class="potensi-desc">Produk dan usaha masyarakat Nagari Campago, dari kuliner hingga kerajinan.</p>
+                </div>
+                <label for="toggle-umkm" class="btn-link" style="cursor: pointer;">Lihat semua UMKM</label>
+            </div>
+
+            <div class="umkm-showcase animate-on-scroll delay-1">
+                @forelse ($latestUmkms as $produk)
+                <a href="{{ route('umkm.show', $produk) }}" class="umkm-card">
+                    @if ($produk->featured_image_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($produk->featured_image_path) }}" alt="{{ $produk->name }}" class="umkm-img" style="object-fit: cover;">
+                    @else
+                        <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
+                    @endif
+                    <span class="umkm-cat">{{ $produk->korong->name ?? 'Nagari Campago' }}</span>
+                    <h3 class="umkm-title">{{ $produk->name }}</h3>
+                    <p class="umkm-desc">{{ \Illuminate\Support\Str::limit(strip_tags($produk->description ?? ''), 95) }}</p>
+                    <span class="btn-link">Lihat detail</span>
+                </a>
+                @empty
+                <p class="text-muted">Data UMKM belum tersedia.</p>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Section "Mengenal Campago" -->
     <section id="profil" class="section-padding">
         <div class="container about-grid">
             <x-peta-nagari class="about-img animate-on-scroll" />
@@ -105,7 +222,7 @@
         </div>
     </section>
 
-    <!-- 4.5 Struktur Nagari -->
+    <!-- 6. Struktur Nagari -->
     <section id="pemerintahan" class="section-padding bg-cream-light org-section">
         <div class="container">
             <div class="potensi-header animate-on-scroll org-header" style="text-align: center; margin: 0 auto 0.85rem; max-width: 700px;">
@@ -173,7 +290,7 @@
         </div>
     </section>
 
-    <!-- 5. Statistik Nagari -->
+    <!-- 7. Statistik Nagari -->
     <section id="statistik" class="stats">
         @php
             $korongIcons = ['🛖', '🌾', '🏘️', '🌊', '💧', '🏛️', '🌱', '⛰️'];
@@ -294,7 +411,7 @@
         @endforeach
     </section>
 
-    <!-- 6. Potensi Nagari -->
+    <!-- 8. Potensi Nagari -->
     <section id="potensi" class="section-padding">
         <div class="container">
             <div class="potensi-header animate-on-scroll">
@@ -322,62 +439,8 @@
         </div>
     </section>
 
-    <!-- 7 & 8. Informasi (Berita & Peta Digital) -->
-    <section id="informasi">
-        <div class="section-padding bg-cream-light" id="berita">
-        <div class="container">
-            <div class="news-header animate-on-scroll">
-                <div>
-                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">Berita Terkini dari Campago</h2>
-                    <p class="potensi-desc">Berita, kegiatan, dan cerita terbaru dari masyarakat Nagari Campago.</p>
-                </div>
-                <a href="#" class="btn-link">Lihat semua berita</a>
-            </div>
-
-            <div class="news-grid">
-                @if ($mainPost)
-                <div class="news-main animate-on-scroll">
-                    @if ($mainPost->featured_image_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($mainPost->featured_image_path) }}" alt="{{ $mainPost->title }}" class="placeholder-img" style="object-fit: cover;">
-                    @else
-                        <div class="placeholder-img">NEWS IMAGE PLACEHOLDER</div>
-                    @endif
-                    <div class="news-meta">
-                        @if ($mainPost->category)
-                            <span class="news-meta-cat">{{ $mainPost->category->name }}</span>
-                        @endif
-                        <span>{{ $mainPost->published_at?->locale('id')->translatedFormat('d F Y') }}</span>
-                    </div>
-                    <h3 class="news-main-title">{{ $mainPost->title }}</h3>
-                    <p class="news-main-desc text-justify">{{ $mainPost->excerpt }}</p>
-                </div>
-                @else
-                <div class="news-main animate-on-scroll">
-                    <p class="text-muted">Belum ada berita.</p>
-                </div>
-                @endif
-
-                <div class="news-list animate-on-scroll delay-1">
-                    @foreach ($otherPosts as $post)
-                    <div class="news-item">
-                        @if ($post->featured_image_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}" alt="{{ $post->title }}" class="placeholder-img" style="object-fit: cover;">
-                        @else
-                            <div class="placeholder-img">IMAGE PLACEHOLDER</div>
-                        @endif
-                        <div>
-                            <a href="#"><h4 class="news-item-title">{{ $post->title }}</h4></a>
-                            <div class="news-meta">{{ $post->published_at?->locale('id')->translatedFormat('d F Y') }}</div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        </div>
-
-        <!-- 8. Peta Digital -->
-        <div class="section-padding map-section" id="peta">
+    <!-- 9. Peta Digital -->
+    <section id="peta" class="section-padding map-section">
         <div class="container map-grid">
             <input type="checkbox" id="toggle-fasilitas-umum" class="modal-toggle" hidden>
             <input type="checkbox" id="toggle-umkm" class="modal-toggle" hidden>
@@ -562,7 +625,6 @@
                 </div>
             </div>
         </div>
-        </div>
     </section>
 
     <!-- 10. Culture / Gallery -->
@@ -640,17 +702,6 @@
     <!-- Scripts for simple interactions -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Slideshow Foto Hero -- ganti foto aktif setiap beberapa detik (crossfade)
-            const heroSlides = document.querySelectorAll('.hero-bg-slide');
-            if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                let heroSlideIndex = 0;
-                setInterval(() => {
-                    heroSlides[heroSlideIndex].classList.remove('is-active');
-                    heroSlideIndex = (heroSlideIndex + 1) % heroSlides.length;
-                    heroSlides[heroSlideIndex].classList.add('is-active');
-                }, 5000);
-            }
-
             // Navbar Scroll Effect
             const navbar = document.getElementById('navbar');
             const mobileMenuButton = document.querySelector('.mobile-menu-btn');

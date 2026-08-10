@@ -28,7 +28,8 @@ class SuratRequestController extends Controller
             'lama_usaha' => ['nullable', 'string', 'max:100'],
             'lokasi_usaha' => ['required', 'string'],
             'penjelasan_keperluan' => ['required', 'string'],
-            'lampiran' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'ktp' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'kk' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ], 'pemohon_nama');
     }
 
@@ -65,7 +66,8 @@ class SuratRequestController extends Controller
             'ibu_pekerjaan' => ['nullable', 'string', 'max:150'],
             'ibu_alamat' => ['nullable', 'string'],
             'penjelasan_keperluan' => ['required', 'string'],
-            'lampiran' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'ktp' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'kk' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ], 'pemohon_nama');
     }
 
@@ -90,7 +92,8 @@ class SuratRequestController extends Controller
             'wali_nik' => ['nullable', 'digits:16'],
             'wali_no_hp' => ['nullable', 'string', 'max:30'],
             'penjelasan_keperluan' => ['required', 'string'],
-            'lampiran' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'ktp' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'kk' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ], 'nama');
     }
 
@@ -107,8 +110,11 @@ class SuratRequestController extends Controller
 
     public function destroy(SuratRequest $suratRequest): RedirectResponse
     {
-        if ($suratRequest->attachment_path) {
-            Storage::disk('public')->delete($suratRequest->attachment_path);
+        if ($suratRequest->ktp_path) {
+            Storage::disk('public')->delete($suratRequest->ktp_path);
+        }
+        if ($suratRequest->kk_path) {
+            Storage::disk('public')->delete($suratRequest->kk_path);
         }
 
         $suratRequest->delete();
@@ -120,17 +126,16 @@ class SuratRequestController extends Controller
     {
         $validated = $request->validate($rules);
 
-        $attachmentPath = null;
-        if ($request->hasFile('lampiran')) {
-            $attachmentPath = $request->file('lampiran')->store('surat-pengantar', 'public');
-        }
+        $ktpPath = $request->file('ktp')->store('surat-pengantar', 'public');
+        $kkPath = $request->file('kk')->store('surat-pengantar', 'public');
 
         SuratRequest::create([
             'type' => $type,
             'applicant_name' => $validated[$applicantNameField],
             'keperluan' => $validated['penjelasan_keperluan'],
-            'data' => collect($validated)->except(['lampiran', $applicantNameField, 'penjelasan_keperluan'])->toArray(),
-            'attachment_path' => $attachmentPath,
+            'data' => collect($validated)->except(['ktp', 'kk', $applicantNameField, 'penjelasan_keperluan'])->toArray(),
+            'ktp_path' => $ktpPath,
+            'kk_path' => $kkPath,
         ]);
 
         return redirect()->route("formulir.$type")

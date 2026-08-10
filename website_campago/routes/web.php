@@ -23,6 +23,9 @@ Route::get('/layanan', function () {
     return view('layanan');
 });
 
+Route::get('/berita/{post:slug}', [PostController::class, 'show'])->name('berita.show');
+Route::get('/umkm/{umkm:slug}', [UmkmController::class, 'show'])->name('umkm.show');
+
 Route::get('/formulir/sktm', function () {
     return view('formulir.sktm');
 })->name('formulir.sktm');

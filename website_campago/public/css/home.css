@@ -295,37 +295,241 @@ img {
 
 /* 2. Hero Section */
 .hero {
-    min-height: 100vh;
     display: flex;
-    align-items: flex-end;
-    padding-bottom: 10vh;
+    flex-direction: column;
+    padding: clamp(8rem, 15vh, 11rem) 0 clamp(2rem, 4vh, 3rem);
     position: relative;
     overflow: hidden;
     background-color: var(--color-cream-alt);
     border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.hero-bg-slideshow {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    position: relative;
+    z-index: 10;
 }
 
-.hero-bg-slide {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    transition: opacity 1.8s ease-in-out;
+.hero-photo {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: auto;
 }
 
-.hero-bg-slide.is-active {
-    opacity: 1;
+.hero-photo-frame {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: var(--color-cream-alt);
+    box-shadow:
+        0 25px 60px rgba(31, 64, 55, 0.18),
+        0 8px 20px rgba(31, 64, 55, 0.08);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .hero-bg-slide { transition: none; }
+.hero-photo-frame:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+        0 30px 70px rgba(31, 64, 55, 0.22),
+        0 12px 28px rgba(31, 64, 55, 0.1);
+}
+
+.hero-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.hero-photo-frame:hover .hero-photo-img {
+    transform: scale(1.03);
+}
+
+.hero-photo-caption {
+    margin-top: 0.85rem;
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--color-text-muted);
+}
+
+/* Hero UMKM Product Showcase Strip */
+.hero-umkm-strip {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(47, 93, 80, 0.1);
+    border-radius: 16px;
+    position: relative;
+    z-index: 10;
+}
+
+.hero-umkm-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--color-green-dark);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.hero-umkm-label-icon {
+    font-size: 1.2rem;
+}
+
+.hero-umkm-scroll {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0.25rem 0;
+}
+
+.hero-umkm-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.hero-umkm-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0.85rem 0.5rem 0.5rem;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(47, 93, 80, 0.08);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.hero-umkm-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(47, 93, 80, 0.2);
+    box-shadow: 0 4px 16px rgba(31, 64, 55, 0.1);
+    transform: translateY(-2px);
+}
+
+.hero-umkm-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--color-cream-alt);
+}
+
+.hero-umkm-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-umkm-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--color-cream-alt), var(--color-cream-light));
+}
+
+.hero-umkm-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.hero-umkm-name {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.hero-umkm-cat {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.hero-umkm-more {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-green-secondary);
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.hero-umkm-more:hover {
+    color: var(--color-green-dark);
+}
+
+@media (max-width: 1100px) {
+    .hero-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 2.5rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-photo {
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .hero-umkm-strip {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .hero-umkm-label {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 7rem 0 2rem;
+    }
+
+    .hero-umkm-strip {
+        margin-top: 1.5rem;
+        padding: 0.85rem 1rem;
+    }
+
+    .hero-umkm-thumb {
+        width: 40px;
+        height: 40px;
+    }
 }
 
 /* Hero Overlay */
@@ -348,7 +552,7 @@ img {
 }
 
 .hero-headline {
-    font-size: clamp(4rem, 8vw, 6rem);
+    font-size: clamp(2.75rem, 5vw, 4rem);
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1.5rem;
@@ -366,7 +570,7 @@ img {
 .hero-desc {
     font-size: 1.125rem;
     color: var(--color-text-main);
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     max-width: 600px;
 }
 
@@ -374,29 +578,6 @@ img {
     display: flex;
     align-items: center;
     gap: 2rem;
-}
-
-.scroll-indicator {
-    position: absolute;
-    bottom: 2rem;
-    right: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    z-index: 10;
-}
-
-.scroll-arrow {
-    animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
 }
 
 /* 3. Quick Access */
@@ -723,6 +904,10 @@ img {
 .news-item .placeholder-img {
     aspect-ratio: 1;
     transition: transform 0.3s ease;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 0.25rem;
 }
 .news-item:hover .placeholder-img {
     transform: scale(1.05);
@@ -737,6 +922,12 @@ img {
 
 .news-item-title:hover {
     color: var(--color-green-secondary);
+}
+
+.news-item-desc {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
 }
 
 /* 8. Peta Digital */
@@ -1274,26 +1465,16 @@ img {
 }
 
 .umkm-showcase {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    overflow-x: auto;
-    padding-bottom: 2rem;
-    /* Hide scrollbar */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-.umkm-showcase::-webkit-scrollbar {
-    display: none;
 }
 
 .umkm-card {
-    min-width: 300px;
-    flex-shrink: 0;
     transition: transform 0.4s ease, box-shadow 0.4s ease;
-    background-color: var(--color-white);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid rgba(110, 136, 120, 0.1);
+    /* background/border final: lihat override .umkm-card di bagian "Tema Gradasi" (dekat .info-card) */
 }
 .umkm-card:hover {
     transform: translateY(-8px);
@@ -1332,6 +1513,13 @@ img {
 .umkm-location {
     font-size: 0.9rem;
     color: var(--color-text-muted);
+}
+
+.umkm-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
 }
 
 /* 10. Culture / Gallery */
@@ -1881,7 +2069,11 @@ img {
     .news-grid {
         grid-template-columns: 1fr;
     }
-    
+
+    .umkm-showcase {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .map-grid {
         grid-template-columns: 1fr;
     }
@@ -1932,6 +2124,10 @@ img {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
         grid-auto-rows: 350px;
+    }
+
+    .umkm-showcase {
+        grid-template-columns: 1fr;
     }
 
     .footer-grid {
