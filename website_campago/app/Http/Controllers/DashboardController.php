@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Banner;
 use App\Models\ContactMessage;
 use App\Models\GalleryImage;
 use App\Models\Korong;
@@ -12,6 +11,7 @@ use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\Potential;
 use App\Models\SuratRequest;
+use App\Models\SuratTemplate;
 use App\Models\Umkm;
 use App\Models\VillageProfile;
 
@@ -19,10 +19,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $heroSlides = Banner::orderBy('sort_order')->get();
         $officials = Official::orderBy('sort_order')->get();
         $potentials = Potential::orderBy('sort_order')->get();
-        $korongCount = Korong::count();
+        $korongs = Korong::orderBy('sort_order')->get();
         $villageProfile = VillageProfile::first();
         $kontak = HomeController::kontakSettings();
         $galleryImages = GalleryImage::orderBy('sort_order')->get();
@@ -39,12 +38,12 @@ class DashboardController extends Controller
         $activeSuratRequests = $suratRequests->whereIn('status', ['diajukan', 'diproses'])->values();
         $suratHistory = $suratRequests->whereIn('status', ['selesai', 'ditolak'])->values();
         $newSuratRequestsCount = $suratRequests->where('status', 'diajukan')->count();
+        $suratTemplates = SuratTemplate::with('fields')->withCount('fields')->orderBy('sort_order')->get();
 
         return view('admin.dashboard', compact(
-            'heroSlides',
             'officials',
             'potentials',
-            'korongCount',
+            'korongs',
             'villageProfile',
             'kontak',
             'galleryImages',
@@ -57,7 +56,8 @@ class DashboardController extends Controller
             'newContactMessagesCount',
             'activeSuratRequests',
             'suratHistory',
-            'newSuratRequestsCount'
+            'newSuratRequestsCount',
+            'suratTemplates'
         ));
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Banner;
 use App\Models\GalleryImage;
 use App\Models\Korong;
 use App\Models\Location;
@@ -12,16 +11,16 @@ use App\Models\Potential;
 use App\Models\Setting;
 use App\Models\Umkm;
 use App\Models\VillageProfile;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $heroSlides = Banner::where('is_active', true)->orderBy('sort_order')->get();
         $officials = Official::where('is_active', true)->orderBy('sort_order')->get();
         $potentials = Potential::published()->orderBy('sort_order')->get();
         $korongs = Korong::where('is_active', true)->orderBy('sort_order')->get();
-        $korongCount = Korong::count();
+        $korongCount = $korongs->count();
         $villageProfile = VillageProfile::first();
         $kontak = $this->kontakSettings();
         $galleryImages = GalleryImage::whereHas('gallery', fn ($q) => $q->where('status', 'published'))
@@ -37,6 +36,22 @@ class HomeController extends Controller
             ->get();
         $mainPost = $posts->first();
         $otherPosts = $posts->slice(1);
+
+        // Foto slide beranda diambil dari foto berita dan foto produk UMKM yang
+        // sudah diupload -- tidak ada lagi menu "Foto Beranda" terpisah di admin.
+        $heroPostSlides = Post::published()->whereNotNull('featured_image_path')->get()
+            ->map(fn ($post) => [
+                'url' => Storage::url($post->featured_image_path),
+                'title' => $post->title,
+                'label' => 'Berita Terkini',
+            ]);
+        $heroUmkmSlides = $umkms->whereNotNull('featured_image_path')
+            ->map(fn ($produk) => [
+                'url' => Storage::url($produk->featured_image_path),
+                'title' => $produk->name,
+                'label' => 'Produk UMKM Lokal',
+            ]);
+        $heroSlides = $heroPostSlides->concat($heroUmkmSlides)->values();
 
         $fasilitasUmumList = Location::whereHas('category', fn ($q) => $q->where('slug', 'fasilitas-umum'))
             ->where('status', 'published')
@@ -80,6 +95,7 @@ class HomeController extends Controller
     {
         return [
             'fasum_deskripsi' => Setting::get('peta_fasum_deskripsi', 'Kumpulan tempat umum penting seperti balai, sekolah, pasar, dan fasilitas sosial yang mendukung keseharian warga Campago.'),
+            'foto_path' => Setting::get('peta_foto_path'),
         ];
     }
 }

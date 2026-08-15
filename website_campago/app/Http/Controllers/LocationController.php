@@ -9,6 +9,7 @@ use App\Models\LocationCategory;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class LocationController extends Controller
 {
@@ -17,15 +18,24 @@ class LocationController extends Controller
 
     public function update(Request $request)
     {
-        $validated = $this->validatePanel($request, 'peta', [
+        $validated = $this->validatePanel($request, 'fasum', [
             'deskripsi' => ['required', 'string'],
             'lokasi' => ['required', 'array', 'min:1'],
             'lokasi.*' => ['required', 'string', 'max:200'],
+            'foto' => ['nullable', 'image', 'max:8192'],
         ]);
 
         $category = LocationCategory::where('slug', 'fasilitas-umum')->firstOrFail();
 
         Setting::set('peta_fasum_deskripsi', $validated['deskripsi']);
+
+        if ($request->hasFile('foto')) {
+            $oldPath = Setting::get('peta_foto_path');
+            if ($oldPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            Setting::set('peta_foto_path', $request->file('foto')->store('peta', 'public'));
+        }
 
         DB::transaction(function () use ($validated, $category) {
             // Daftar lokasi cuma berupa nama teks tanpa detail lain, jadi paling sederhana
@@ -46,6 +56,6 @@ class LocationController extends Controller
             }
         });
 
-        return redirect('/admin?panel=peta')->with('success', 'Peta Digital berhasil disimpan.');
+        return redirect('/admin?panel=fasum')->with('success', 'Fasilitas Umum berhasil disimpan.');
     }
 }

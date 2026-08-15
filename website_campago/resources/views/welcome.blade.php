@@ -9,7 +9,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=cormorant-garamond:400,600,700,400i|inter:400,500,600|manrope:400,500,600,700,800" rel="stylesheet" />
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 </head>
@@ -19,10 +19,14 @@
     <nav class="navbar" id="navbar" aria-label="Navigasi utama">
         <div class="container nav-container">
             <a href="/" class="nav-brand">
+                @if ($villageProfile->logo_path ?? null)
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($villageProfile->logo_path) }}" alt="Logo Nagari Campago" class="nav-logo-img">
+                @else
                 <div class="nav-logo-placeholder">LOGO</div>
+                @endif
                 Nagari Campago
             </a>
-            
+
             <ul class="nav-links" id="primary-navigation">
                 <li><a href="#" class="nav-link active">Beranda</a></li>
                 <li><a href="#profil" class="nav-link">Profil</a></li>
@@ -34,7 +38,7 @@
             </ul>
 
             <div class="nav-actions">
-                
+
                 <button class="search-btn" type="button" id="searchTrigger" aria-label="Cari di situs" aria-haspopup="dialog" aria-controls="searchOverlay"><span>Cari</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
@@ -63,154 +67,51 @@
 
     <!-- 2. Hero Section -->
     @php
-        $featuredSlide = $heroSlides->first();
-        $heroUmkms = $latestUmkms->take(4);
+        // Slide foto beranda diambil langsung dari foto Berita dan foto produk UMKM
+        // (digabung di HomeController), jadi admin cukup upload sekali lewat menu itu.
+        $heroSlideItems = $heroSlides;
+        $featuredSlide = $heroSlideItems->first();
     @endphp
     <header class="hero">
-        <div class="container hero-grid">
-            <div class="hero-content animate-on-scroll">
-                <span class="small-label">Website Resmi</span>
-                <h1 class="hero-headline">NAGARI<br>CAMPAGO</h1>
-                <h2 class="hero-subheadline">Kecamatan V Koto Kampung Dalam<br>Kabupaten Padang Pariaman</h2>
-                <p class="hero-desc">Menjelajahi potensi, budaya, dan kehidupan masyarakat Nagari Campago.</p>
+        <div class="hero-card">
+            <div class="hero-grid">
+                <div class="hero-content animate-on-scroll">
+                    <span class="small-label">Website Resmi</span>
+                    <h1 class="hero-headline">NAGARI<br>CAMPAGO</h1>
+                    <h2 class="hero-subheadline">Kecamatan V Koto Kampung Dalam<br>Kabupaten Padang Pariaman</h2>
+                    <p class="hero-desc">Menjelajahi potensi, budaya, dan kehidupan masyarakat Nagari Campago.</p>
 
-                <div class="hero-actions">
-                    <a href="#potensi" class="btn btn-primary">Jelajahi Campago</a>
-                    <a href="#peta" class="btn-link">Lihat Peta Nagari</a>
+                    <div class="hero-actions">
+                        <a href="#potensi" class="btn btn-primary">Jelajahi Campago</a>
+                    </div>
+                </div>
+
+                <div class="hero-photo animate-on-scroll delay-1">
+                    <div class="hero-photo-frame" id="heroSlideFrame">
+                        <div class="hero-slide-track" id="heroSlideTrack">
+                            @forelse ($heroSlideItems as $slide)
+                                <div class="hero-slide" data-title="{{ $slide['title'] }}" data-label="{{ $slide['label'] }}">
+                                    <img src="{{ $slide['url'] }}" alt="{{ $slide['title'] }}" class="hero-photo-img">
+                                </div>
+                            @empty
+                                <div class="hero-slide" data-title="Nagari Campago" data-label="Website Resmi">
+                                    <img src="{{ asset('images/ngaricampago.jpeg') }}" alt="Nagari Campago" class="hero-photo-img">
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                    <div class="hero-photo-caption" id="heroSlideCaption">
+                        <span class="hero-photo-caption-label" id="heroSlideCaptionLabel">{{ $featuredSlide['label'] ?? 'Website Resmi' }}</span>
+                        <span class="hero-photo-caption-title" id="heroSlideCaptionTitle">{{ $featuredSlide['title'] ?? 'Nagari Campago' }}</span>
+                    </div>
                 </div>
             </div>
-
-            <div class="hero-photo animate-on-scroll delay-1">
-                <div class="hero-photo-frame">
-                    <img src="{{ $featuredSlide ? \Illuminate\Support\Facades\Storage::url($featuredSlide->image_path) : asset('images/ngaricampago.jpeg') }}" alt="{{ $featuredSlide->title ?? 'Nagari Campago' }}" class="hero-photo-img">
-                </div>
-                <p class="hero-photo-caption">{{ $featuredSlide->title ?? 'Nagari Campago' }}</p>
-            </div>
         </div>
-
-        {{-- UMKM Product Showcase Strip --}}
-        @if ($heroUmkms->isNotEmpty())
-        <div class="container hero-umkm-strip animate-on-scroll delay-2">
-            <div class="hero-umkm-label">
-                <span class="hero-umkm-label-icon">🛍️</span>
-                <span>Produk UMKM Lokal</span>
-            </div>
-            <div class="hero-umkm-scroll">
-                @foreach ($heroUmkms as $umkm)
-                <a href="{{ route('umkm.show', $umkm) }}" class="hero-umkm-item">
-                    <div class="hero-umkm-thumb">
-                        @if ($umkm->featured_image_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($umkm->featured_image_path) }}" alt="{{ $umkm->name }}">
-                        @else
-                            <div class="hero-umkm-placeholder">📦</div>
-                        @endif
-                    </div>
-                    <div class="hero-umkm-info">
-                        <span class="hero-umkm-name">{{ $umkm->name }}</span>
-                        <span class="hero-umkm-cat">{{ $umkm->category ?? ($umkm->korong->name ?? 'Campago') }}</span>
-                    </div>
-                </a>
-                @endforeach
-            </div>
-            <a href="#umkm-lokal" class="hero-umkm-more">Lihat Semua →</a>
-        </div>
-        @endif
     </header>
 
-    <!-- 3. Berita Terkini -->
-    <section id="berita" class="section-padding bg-cream-light">
-        <div class="container">
-            <div class="news-header animate-on-scroll">
-                <div>
-                    <span class="small-label">Informasi Nagari</span>
-                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">Berita Terkini dari Campago</h2>
-                    <p class="potensi-desc">Berita, kegiatan, dan cerita terbaru dari masyarakat Nagari Campago.</p>
-                </div>
-                <a href="#berita" class="btn-link">Lihat semua berita</a>
-            </div>
-
-            <div class="news-grid">
-                @if ($mainPost)
-                <a href="{{ route('berita.show', $mainPost) }}" class="news-main animate-on-scroll">
-                    @if ($mainPost->featured_image_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($mainPost->featured_image_path) }}" alt="{{ $mainPost->title }}" class="placeholder-img" style="object-fit: cover;">
-                    @else
-                        <div class="placeholder-img">NEWS IMAGE PLACEHOLDER</div>
-                    @endif
-                    <div class="news-meta">
-                        @if ($mainPost->category)
-                            <span class="news-meta-cat">{{ $mainPost->category->name }}</span>
-                        @endif
-                        <span>{{ $mainPost->published_at?->locale('id')->translatedFormat('d F Y') }}</span>
-                    </div>
-                    <h3 class="news-main-title">{{ $mainPost->title }}</h3>
-                    <p class="news-main-desc text-justify">{{ \Illuminate\Support\Str::limit(strip_tags($mainPost->content ?: ($mainPost->excerpt ?? '')), 170) }}</p>
-                    <span class="btn-link">Baca selengkapnya</span>
-                </a>
-                @else
-                <div class="news-main animate-on-scroll">
-                    <p class="text-muted">Belum ada berita.</p>
-                </div>
-                @endif
-
-                <div class="news-list animate-on-scroll delay-1">
-                    @forelse ($otherPosts as $post)
-                    <a href="{{ route('berita.show', $post) }}" class="news-item">
-                        @if ($post->featured_image_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}" alt="{{ $post->title }}" class="placeholder-img" style="object-fit: cover;">
-                        @else
-                            <div class="placeholder-img">IMAGE PLACEHOLDER</div>
-                        @endif
-                        <div>
-                            <div class="news-meta">{{ $post->published_at?->locale('id')->translatedFormat('d F Y') }}</div>
-                            <h4 class="news-item-title">{{ $post->title }}</h4>
-                            <p class="news-item-desc">{{ \Illuminate\Support\Str::limit(strip_tags($post->content ?: ($post->excerpt ?? '')), 85) }}</p>
-                        </div>
-                    </a>
-                    @empty
-                    <p class="text-muted">Belum ada berita lainnya.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. UMKM Lokal -->
-    <section id="umkm-lokal" class="section-padding">
-        <div class="container">
-            <div class="news-header animate-on-scroll">
-                <div>
-                    <span class="small-label">Ekonomi Lokal</span>
-                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">UMKM Lokal Campago</h2>
-                    <p class="potensi-desc">Produk dan usaha masyarakat Nagari Campago, dari kuliner hingga kerajinan.</p>
-                </div>
-                <label for="toggle-umkm" class="btn-link" style="cursor: pointer;">Lihat semua UMKM</label>
-            </div>
-
-            <div class="umkm-showcase animate-on-scroll delay-1">
-                @forelse ($latestUmkms as $produk)
-                <a href="{{ route('umkm.show', $produk) }}" class="umkm-card">
-                    @if ($produk->featured_image_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($produk->featured_image_path) }}" alt="{{ $produk->name }}" class="umkm-img" style="object-fit: cover;">
-                    @else
-                        <div class="placeholder-img umkm-img">UMKM IMAGE PLACEHOLDER</div>
-                    @endif
-                    <span class="umkm-cat">{{ $produk->korong->name ?? 'Nagari Campago' }}</span>
-                    <h3 class="umkm-title">{{ $produk->name }}</h3>
-                    <p class="umkm-desc">{{ \Illuminate\Support\Str::limit(strip_tags($produk->description ?? ''), 95) }}</p>
-                    <span class="btn-link">Lihat detail</span>
-                </a>
-                @empty
-                <p class="text-muted">Data UMKM belum tersedia.</p>
-                @endforelse
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Section "Mengenal Campago" -->
+    <!-- 3. Section "Mengenal Campago" -->
     <section id="profil" class="section-padding">
         <div class="container about-grid">
-            <x-peta-nagari class="about-img animate-on-scroll" />
             <div class="about-content animate-on-scroll delay-1">
                 <span class="small-label">Tentang Nagari</span>
                 <h2 class="section-heading">Mengenal Nagari Campago</h2>
@@ -219,15 +120,16 @@
                 </blockquote>
                 <a href="#" class="btn-link">Selengkapnya tentang Campago</a>
             </div>
+            <x-peta-nagari class="about-img animate-on-scroll" />
         </div>
     </section>
 
-    <!-- 6. Struktur Nagari -->
+    <!-- 4. Struktur Nagari -->
     <section id="pemerintahan" class="section-padding bg-cream-light org-section">
         <div class="container">
             <div class="potensi-header animate-on-scroll org-header" style="text-align: center; margin: 0 auto 0.85rem; max-width: 700px;">
                 <span class="small-label" style="justify-content: center; display: flex; margin-bottom: 0.35rem;">Pemerintahan</span>
-                <h2 class="section-heading" style="font-size: clamp(1.4rem, 2.2vw, 1.9rem); margin-bottom: 0.35rem;">Aparatur Nagari</h2>
+                <h2 class="section-heading org-heading-marked" style="font-size: clamp(2.3rem, 3.8vw, 3.3rem); margin-bottom: 0.4rem;">Aparatur Nagari</h2>
                 <p class="potensi-desc" style="text-align: center; font-size: 0.85rem;">Mengenal susunan perangkat Nagari Campago yang bertugas melayani masyarakat dan memajukan nagari.</p>
             </div>
 
@@ -290,24 +192,18 @@
         </div>
     </section>
 
-    <!-- 7. Statistik Nagari -->
+    <!-- 5. Statistik Nagari -->
     <section id="statistik" class="stats">
         @php
-            $korongIcons = ['🛖', '🌾', '🏘️', '🌊', '💧', '🏛️', '🌱', '⛰️'];
+            $korongIconSvgPath = '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>';
             $luasWilayahText = $villageProfile->area_km2 ? number_format($villageProfile->area_km2, 2, ',', '.') : '—';
             $pendudukText = $villageProfile->population ? number_format($villageProfile->population, 0, ',', '.') : '—';
 
-            $korongList = $korongs->map(function ($korong, $idx) use ($potentials, $korongIcons, $villageProfile) {
-                $highlights = $potentials->where('korong_id', $korong->id)->pluck('name')->all();
-
+            $korongList = $korongs->map(function ($korong) {
                 return [
-                    'icon' => $korongIcons[$idx % count($korongIcons)],
                     'nama' => $korong->name,
-                    'deskripsi' => $korong->description ?: 'Salah satu korong di Nagari Campago, ' . $villageProfile->district . '.',
-                    'highlights' => $highlights,
                 ];
             });
-            $korongBadgeVariants = ['', 'modal-icon-badge-gold', 'modal-icon-badge-sky'];
         @endphp
         <input type="checkbox" id="toggle-korong" class="modal-toggle" hidden>
         <div class="container stats-grid">
@@ -330,88 +226,43 @@
             <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitleKorong">
                 <label class="modal-close" for="toggle-korong" aria-label="Tutup informasi">×</label>
                 <div class="modal-header modal-header-korong">
-                    <div class="modal-icon-badge">📍</div>
+                    <div class="modal-icon-badge"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
                     <div>
                         <span class="small-label">Wilayah Administratif</span>
                         <h2 id="categoryTitleKorong">Korong di Nagari Campago</h2>
-                        <p>Nagari Campago terbagi menjadi {{ $korongCount }} korong yang tersebar di seluruh wilayah seluas {{ $luasWilayahText }} km².</p>
                     </div>
                 </div>
                 <div class="modal-body">
                     <div class="modal-quick-stats">
                         <div class="modal-quick-stat">
-                            <span class="icon">📍</span>
+                            <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
                             <div><span class="value">{{ count($korongList) }}</span><span class="label">Korong</span></div>
                         </div>
                         <div class="modal-quick-stat">
-                            <span class="icon">📐</span>
+                            <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg></span>
                             <div><span class="value">{{ $luasWilayahText }} km²</span><span class="label">Luas wilayah</span></div>
                         </div>
                     </div>
                     <div class="modal-list">
                         <h3>Daftar Korong</h3>
-                        <p class="modal-list-hint">Klik salah satu korong untuk melihat profil lengkapnya.</p>
                         <div class="location-grid">
                             @foreach ($korongList as $korong)
-                            <label class="location-card location-card-clickable" for="toggle-korong-detail-{{ $loop->iteration }}">
-                                <span class="icon">{{ $korong['icon'] }}</span>
+                            <div class="location-card">
+                                <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $korongIconSvgPath !!}</svg></span>
                                 <div>
                                     <div class="name">{{ $korong['nama'] }}</div>
                                     <div class="korong">Nagari Campago</div>
                                 </div>
-                            </label>
+                            </div>
                             @endforeach
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        @foreach ($korongList as $korong)
-        <div class="korong-detail-toggle">
-            <input type="checkbox" id="toggle-korong-detail-{{ $loop->iteration }}" class="modal-toggle" hidden>
-            <div class="modal-overlay modal-korong-detail">
-                <div class="modal-content">
-                    <label class="modal-close" for="toggle-korong-detail-{{ $loop->iteration }}" aria-label="Tutup informasi">×</label>
-                    <div class="modal-header modal-header-korong">
-                        <div class="modal-icon-badge {{ $korongBadgeVariants[$loop->iteration % 3] }}">{{ $korong['icon'] }}</div>
-                        <div>
-                            <span class="small-label">Profil Korong &middot; {{ $loop->iteration }} / {{ $loop->count }}</span>
-                            <h2>{{ $korong['nama'] }}</h2>
-                            <p>{{ $korong['deskripsi'] }}</p>
-                        </div>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-tags">
-                            <span class="modal-tag">Nagari Campago</span>
-                            <span class="modal-tag">Wilayah Administratif</span>
-                        </div>
-                        <div class="modal-list">
-                            <h3>Fasilitas &amp; Potensi Terkait</h3>
-                            @if (count($korong['highlights']))
-                            <div class="korong-highlight-list">
-                                @foreach ($korong['highlights'] as $highlight)
-                                <div class="korong-highlight-item">
-                                    <span class="icon">✦</span>
-                                    <span>{{ $highlight }}</span>
-                                </div>
-                                @endforeach
-                            </div>
-                            @else
-                            <div class="korong-empty-state">
-                                <span class="icon">🗂️</span>
-                                <p>Informasi fasilitas &amp; potensi korong ini belum ditambahkan admin.</p>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endforeach
     </section>
 
-    <!-- 8. Potensi Nagari -->
+    <!-- 6. Potensi Nagari -->
     <section id="potensi" class="section-padding">
         <div class="container">
             <div class="potensi-header animate-on-scroll">
@@ -439,29 +290,89 @@
         </div>
     </section>
 
-    <!-- 9. Peta Digital -->
+    <!-- 7. Berita Terkini -->
+    <section id="berita" class="section-padding bg-cream-light">
+        <div class="container">
+            <div class="news-header animate-on-scroll">
+                <div>
+                    <span class="small-label">Informasi Nagari</span>
+                    <h2 class="section-heading" style="margin-bottom: 0.5rem;">Berita Terkini dari Campago</h2>
+                    <p class="potensi-desc">Berita, kegiatan, dan cerita terbaru dari masyarakat Nagari Campago.</p>
+                </div>
+                <a href="#berita" class="btn-link">Lihat semua berita</a>
+            </div>
+
+            <div class="news-grid">
+                @if ($mainPost)
+                <a href="{{ route('berita.show', $mainPost) }}" class="news-main animate-on-scroll">
+                    @if ($mainPost->featured_image_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($mainPost->featured_image_path) }}" alt="{{ $mainPost->title }}" class="placeholder-img" style="object-fit: cover;">
+                    @else
+                        <div class="placeholder-img">NEWS IMAGE PLACEHOLDER</div>
+                    @endif
+                    <div class="news-meta">
+                        @if ($mainPost->category)
+                            <span class="news-meta-cat">{{ $mainPost->category->name }}</span>
+                        @endif
+                        <span>{{ $mainPost->published_at?->locale('id')->translatedFormat('d F Y') }}</span>
+                    </div>
+                    <h3 class="news-main-title">{{ $mainPost->title }}</h3>
+                    <p class="news-main-desc text-justify">{{ \Illuminate\Support\Str::limit(strip_tags($mainPost->content ?: ($mainPost->excerpt ?? '')), 170) }}</p>
+                    <span class="btn-link">Baca selengkapnya</span>
+                </a>
+                @else
+                <div class="news-main animate-on-scroll">
+                    <p class="text-muted">Belum ada berita.</p>
+                </div>
+                @endif
+
+                <div class="news-list animate-on-scroll delay-1">
+                    @forelse ($otherPosts as $post)
+                    <a href="{{ route('berita.show', $post) }}" class="news-item">
+                        @if ($post->featured_image_path)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($post->featured_image_path) }}" alt="{{ $post->title }}" class="placeholder-img" style="object-fit: cover;">
+                        @else
+                            <div class="placeholder-img">IMAGE PLACEHOLDER</div>
+                        @endif
+                        <div>
+                            <div class="news-meta">{{ $post->published_at?->locale('id')->translatedFormat('d F Y') }}</div>
+                            <h4 class="news-item-title">{{ $post->title }}</h4>
+                            <p class="news-item-desc">{{ \Illuminate\Support\Str::limit(strip_tags($post->content ?: ($post->excerpt ?? '')), 85) }}</p>
+                        </div>
+                    </a>
+                    @empty
+                    <p class="text-muted">Belum ada berita lainnya.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Peta Digital -->
     <section id="peta" class="section-padding map-section">
         <div class="container map-grid">
             <input type="checkbox" id="toggle-fasilitas-umum" class="modal-toggle" hidden>
             <input type="checkbox" id="toggle-umkm" class="modal-toggle" hidden>
-            <input type="checkbox" id="toggle-info-pelayanan" class="modal-toggle" hidden>
             <div class="map-info animate-on-scroll">
                 <h2 class="section-heading">Temukan Campago</h2>
                 <p class="potensi-desc text-justify" style="margin-bottom: 2rem;">Jelajahi fasilitas umum, sekolah, tempat ibadah, UMKM, layanan kesehatan, jam operasional, dan lokasi penting lainnya melalui peta digital Nagari Campago.</p>
                 <div class="map-filters">
                     <label class="filter-btn" for="toggle-fasilitas-umum">Fasilitas Umum</label>
                     <label class="filter-btn" for="toggle-umkm">UMKM</label>
-                    <label class="filter-btn" for="toggle-info-pelayanan">Jam &amp; Kontak Pelayanan</label>
                 </div>
-            </div>
-            
-            <div class="map-placeholder placeholder-img animate-on-scroll delay-1" id="mapPlaceholder">
-                Pilih kategori untuk melihat ringkasan lokasi.
             </div>
 
             @php
                 $umkmKategoriList = $umkms->pluck('category')->unique()->values();
             @endphp
+
+            <div class="map-placeholder animate-on-scroll delay-1" id="mapPlaceholder">
+                @if ($peta['foto_path'] ?? null)
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($peta['foto_path']) }}" alt="Temukan Campago" class="map-placeholder-img">
+                @else
+                <span class="map-placeholder-empty">Foto belum diunggah</span>
+                @endif
+            </div>
 
             <div class="modal-overlay modal-fasilitas-umum">
                 <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitle">
@@ -475,12 +386,6 @@
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="modal-quick-stats">
-                            <div class="modal-quick-stat">
-                                <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
-                                <div><span class="value">{{ $fasilitasUmumList->count() }}</span><span class="label">Lokasi tersebar</span></div>
-                            </div>
-                        </div>
                         <div class="modal-list">
                             <h3>Daftar Lokasi</h3>
                             <div class="location-grid">
@@ -553,81 +458,15 @@
 
             @php
                 $jamOperasional = [
-                    ['icon' => '🕗', 'nama' => 'Senin - Jumat', 'keterangan' => '08.00 - 16.00 WIB'],
-                    ['icon' => '☕', 'nama' => 'Istirahat', 'keterangan' => '12.00 - 13.00 WIB'],
-                    ['icon' => '🚫', 'nama' => 'Sabtu - Minggu', 'keterangan' => 'Libur'],
-                ];
-                $kontakPelayanan = [
-                    ['icon' => '📍', 'nama' => 'Alamat Kantor', 'keterangan' => $kontak['alamat']],
-                    ['icon' => '✉️', 'nama' => 'Email', 'keterangan' => $kontak['email']],
-                    ['icon' => '📞', 'nama' => 'Telepon', 'keterangan' => $kontak['telepon']],
+                    ['icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'nama' => 'Senin - Jumat', 'keterangan' => '08.00 - 16.00 WIB'],
+                    ['icon' => '<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>', 'nama' => 'Istirahat', 'keterangan' => '12.00 - 13.00 WIB'],
+                    ['icon' => '<circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>', 'nama' => 'Sabtu - Minggu', 'keterangan' => 'Libur'],
                 ];
             @endphp
-
-            <div class="modal-overlay modal-info-pelayanan">
-                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="categoryTitleInfo">
-                    <label class="modal-close" for="toggle-info-pelayanan" aria-label="Tutup informasi">×</label>
-                    <div class="modal-header modal-header-info">
-                        <div class="modal-icon-badge modal-icon-badge-sky">🕒</div>
-                        <div>
-                            <span class="small-label">Informasi Kategori</span>
-                            <h2 id="categoryTitleInfo">Jam &amp; Kontak Pelayanan</h2>
-                            <p>Informasi jam operasional dan kontak Kantor Wali Nagari Campago untuk keperluan administrasi masyarakat.</p>
-                        </div>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-quick-stats">
-                            <div class="modal-quick-stat">
-                                <span class="icon">📅</span>
-                                <div><span class="value">5 Hari</span><span class="label">Hari kerja</span></div>
-                            </div>
-                            <div class="modal-quick-stat">
-                                <span class="icon">🕗</span>
-                                <div><span class="value">08.00–16.00</span><span class="label">Jam operasional</span></div>
-                            </div>
-                        </div>
-                        <div class="modal-tags">
-                            <span class="modal-tag">Senin</span>
-                            <span class="modal-tag">Selasa</span>
-                            <span class="modal-tag">Rabu</span>
-                            <span class="modal-tag">Kamis</span>
-                            <span class="modal-tag">Jumat</span>
-                        </div>
-                        <div class="modal-list">
-                            <h3>Jam Operasional</h3>
-                            <div class="location-grid">
-                                @foreach ($jamOperasional as $jadwal)
-                                <div class="location-card">
-                                    <span class="icon">{{ $jadwal['icon'] }}</span>
-                                    <div>
-                                        <div class="name">{{ $jadwal['nama'] }}</div>
-                                        <div class="korong">{{ $jadwal['keterangan'] }}</div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        <div class="modal-list">
-                            <h3>Kontak Kantor Wali Nagari</h3>
-                            <div class="location-grid">
-                                @foreach ($kontakPelayanan as $kp)
-                                <div class="location-card">
-                                    <span class="icon">{{ $kp['icon'] }}</span>
-                                    <div>
-                                        <div class="name">{{ $kp['nama'] }}</div>
-                                        <div class="korong">{{ $kp['keterangan'] }}</div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- 10. Culture / Gallery -->
+    <!-- 9. Culture / Gallery -->
     <section id="galeri" class="section-padding">
         <div class="container gallery-split animate-on-scroll">
             <div class="gallery-text">
@@ -638,10 +477,25 @@
                 </div>
             </div>
 
+            @php
+                // Galeri Utama diutamakan, sisa slot kolase diisi foto produk UMKM
+                // supaya kolase tetap terasa penuh walau foto galeri masih sedikit.
+                $collagePhotos = $galleryImages->map(fn ($img) => [
+                        'url' => \Illuminate\Support\Facades\Storage::url($img->image_path),
+                        'alt' => $img->caption ?? 'Galeri Nagari Campago',
+                    ])
+                    ->concat(
+                        $umkms->whereNotNull('featured_image_path')->map(fn ($produk) => [
+                            'url' => \Illuminate\Support\Facades\Storage::url($produk->featured_image_path),
+                            'alt' => $produk->name,
+                        ])
+                    )
+                    ->take(5);
+            @endphp
             <div class="gallery-collage">
-                @forelse ($galleryImages->take(5) as $i => $image)
+                @forelse ($collagePhotos as $i => $photo)
                     <div class="collage-item collage-item-{{ $i + 1 }}">
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($image->image_path) }}" alt="{{ $image->caption ?? 'Galeri Nagari Campago' }}">
+                        <img src="{{ $photo['url'] }}" alt="{{ $photo['alt'] }}">
                     </div>
                 @empty
                     <div class="gallery-collage-empty">Belum ada foto galeri.<br>Nantikan cerita Nagari Campago selanjutnya.</div>
@@ -650,18 +504,26 @@
         </div>
     </section>
 
-    <!-- 11. Footer -->
+    <!-- 10. Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="nav-logo-placeholder">LOGO</div>
-                    <h3>Pemerintah Nagari Campago</h3>
-                    <p class="footer-tagline">{{ $kontak['deskripsi'] }}</p>
-                    <p class="footer-address">{{ $kontak['alamat'] }}</p>
-                    @if ($kontak['kode_wilayah'])
-                        <p class="footer-kode-wilayah"><strong>Kode Wilayah:</strong> {{ $kontak['kode_wilayah'] }}</p>
-                    @endif
+                    <div class="footer-brand-header">
+                        @if ($villageProfile->logo_path ?? null)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($villageProfile->logo_path) }}" alt="Logo Nagari Campago" class="nav-logo-img">
+                        @else
+                        <div class="nav-logo-placeholder">LOGO</div>
+                        @endif
+                        <h3>Pemerintah Nagari Campago</h3>
+                    </div>
+                    <div class="footer-brand-body">
+                        <p class="footer-tagline">{{ $kontak['deskripsi'] }}</p>
+                        <p class="footer-address">{{ $kontak['alamat'] }}</p>
+                        @if ($kontak['kode_wilayah'])
+                            <p class="footer-kode-wilayah"><strong>Kode Wilayah:</strong> {{ $kontak['kode_wilayah'] }}</p>
+                        @endif
+                    </div>
                 </div>
 
                 <div>
@@ -691,6 +553,18 @@
                         </div>
                     @endif
                 </div>
+
+                <div>
+                    <h4 class="footer-heading">Jam Pelayanan</h4>
+                    <ul class="footer-schedule">
+                        @foreach ($jamOperasional as $jadwal)
+                        <li>
+                            <span class="footer-schedule-day"><svg class="footer-schedule-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $jadwal['icon'] !!}</svg>{{ $jadwal['nama'] }}</span>
+                            <span class="footer-schedule-time">{{ $jadwal['keterangan'] }}</span>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
 
             <div class="footer-bottom">
@@ -702,6 +576,43 @@
     <!-- Scripts for simple interactions -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Slide foto hero -- foto berikutnya masuk dari kanan lalu bergeser ke kiri,
+            // berjalan otomatis selama ada lebih dari 1 foto di panel admin Foto Beranda.
+            const heroSlideTrack = document.getElementById('heroSlideTrack');
+            const heroSlideCaptionLabel = document.getElementById('heroSlideCaptionLabel');
+            const heroSlideCaptionTitle = document.getElementById('heroSlideCaptionTitle');
+            if (heroSlideTrack) {
+                const originalSlides = Array.from(heroSlideTrack.querySelectorAll('.hero-slide'));
+                if (originalSlides.length > 1) {
+                    // Klon slide pertama ditaruh di akhir supaya transisi dari slide terakhir
+                    // kembali ke yang pertama tetap terasa bergeser ke kiri, bukan meluncur mundur.
+                    heroSlideTrack.appendChild(originalSlides[0].cloneNode(true));
+                    const totalReal = originalSlides.length;
+                    let slideIndex = 0;
+
+                    setInterval(() => {
+                        slideIndex++;
+                        heroSlideTrack.style.transform = `translateX(-${slideIndex * 100}%)`;
+                        const captionSlide = originalSlides[slideIndex % totalReal];
+                        if (heroSlideCaptionTitle) {
+                            heroSlideCaptionTitle.textContent = captionSlide.dataset.title;
+                        }
+                        if (heroSlideCaptionLabel) {
+                            heroSlideCaptionLabel.textContent = captionSlide.dataset.label;
+                        }
+                        if (slideIndex === totalReal) {
+                            setTimeout(() => {
+                                heroSlideTrack.style.transition = 'none';
+                                slideIndex = 0;
+                                heroSlideTrack.style.transform = 'translateX(0)';
+                                heroSlideTrack.offsetHeight; // force reflow
+                                heroSlideTrack.style.transition = '';
+                            }, 720);
+                        }
+                    }, 4500);
+                }
+            }
+
             // Navbar Scroll Effect
             const navbar = document.getElementById('navbar');
             const mobileMenuButton = document.querySelector('.mobile-menu-btn');
@@ -744,7 +655,10 @@
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
                     const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
+                    if (targetId === '#') {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
                     smoothScrollToHash(targetId);
                 });
             });
@@ -873,7 +787,7 @@
                     }
                 });
             }, observerOptions);
-            
+
             document.querySelectorAll('.animate-on-scroll').forEach(el => {
                  el.style.animationName = 'none'; // reset initial
                  observerClean.observe(el);
@@ -896,7 +810,7 @@
                         if (entry.target.classList.contains('hero')) {
                             currentId = ''; // For Beranda (href="#")
                         }
-                        
+
                         navLinks.forEach(link => {
                             link.classList.remove('active');
                             const href = link.getAttribute('href');
@@ -915,7 +829,7 @@
                     scrollSpyObserver.observe(sec);
                 }
             });
-            
+
         });
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Formulir Pengajuan Surat Domisili - Nagari Campago</title>
+    <title>Formulir Pengajuan {{ $template->name }} - Nagari Campago</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -67,7 +67,7 @@
             width: 220px;
             height: 220px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(218, 191, 132, 0.35) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(185, 211, 207, 0.4) 0%, transparent 70%);
             pointer-events: none;
         }
 
@@ -137,11 +137,6 @@
             font-size: 0.88rem;
         }
         .form-label .required { color: var(--color-danger, #B3453D); }
-        .form-label .optional-tag {
-            font-weight: 500;
-            color: var(--color-text-muted);
-            font-size: 0.78rem;
-        }
 
         .form-input,
         .form-select,
@@ -289,8 +284,8 @@
         <div class="gform-topbar"></div>
         <div class="gform-card gform-header-card">
             <span class="small-label">Formulir Online</span>
-            <h1>Pengajuan Surat Keterangan Domisili</h1>
-            <p>Satu formulir ini berlaku untuk pengajuan Surat Keterangan Domisili perorangan maupun organisasi/kelompok. Pilih jenis permohonan, lalu isi data yang sesuai. Data yang dikirim akan diverifikasi oleh Kantor Wali Nagari Campago sebelum surat diterbitkan.</p>
+            <h1>Pengajuan {{ $template->name }}</h1>
+            <p>{{ $template->description ?: 'Isi data di bawah ini untuk mengajukan '.$template->name.'. Data yang dikirim akan diverifikasi oleh Kantor Wali Nagari Campago sebelum surat diterbitkan.' }}</p>
             <div class="gform-required-note">Kolom bertanda <span class="required">*</span> wajib diisi.</div>
         </div>
 
@@ -302,141 +297,65 @@
         <div class="gform-alert gform-alert-error">Formulir belum bisa dikirim, periksa kembali isian di bawah ini.</div>
         @endif
 
-        <form method="POST" action="{{ route('formulir.domisili.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('formulir.custom.store', $template) }}" enctype="multipart/form-data">
             @csrf
 
-            <!-- Jenis Permohonan -->
+            @if ($template->fields->isNotEmpty())
             <div class="gform-card">
-                <h2 class="gform-section-title"><span class="gform-section-badge">1</span> Jenis Permohonan</h2>
+                <h2 class="gform-section-title"><span class="gform-section-badge">1</span> Data Formulir</h2>
                 <div class="gform-grid">
-                    <div class="form-group full">
-                        <label class="form-label">Jenis Permohonan Domisili <span class="required">*</span></label>
-                        <div class="form-radio-group">
-                            <div class="form-radio-pill">
-                                <input type="radio" id="jenis_perorangan" name="jenis_permohonan" value="Perorangan" {{ old('jenis_permohonan') === 'Perorangan' ? 'checked' : '' }} required>
-                                <label for="jenis_perorangan">Perorangan</label>
-                            </div>
-                            <div class="form-radio-pill">
-                                <input type="radio" id="jenis_organisasi" name="jenis_permohonan" value="Organisasi atau Kelompok" {{ old('jenis_permohonan') === 'Organisasi atau Kelompok' ? 'checked' : '' }}>
-                                <label for="jenis_organisasi">Organisasi atau Kelompok</label>
-                            </div>
+                    @foreach ($template->fields as $field)
+                        @php
+                            $inputName = 'kolom_'.$field->field_key;
+                            $fullWidth = in_array($field->type, ['textarea', 'radio', 'file'], true);
+                        @endphp
+                        <div class="form-group {{ $fullWidth ? 'full' : '' }}">
+                            <label class="form-label">{{ $field->label }} @if($field->is_required)<span class="required">*</span>@endif</label>
+
+                            @if ($field->type === 'textarea')
+                                <textarea class="form-textarea" name="{{ $inputName }}" {{ $field->is_required ? 'required' : '' }}>{{ old($inputName) }}</textarea>
+                            @elseif ($field->type === 'select')
+                                <select class="form-select" name="{{ $inputName }}" {{ $field->is_required ? 'required' : '' }}>
+                                    <option value="">Pilih {{ $field->label }}</option>
+                                    @foreach ($field->optionList() as $opt)
+                                        <option {{ old($inputName) === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                    @endforeach
+                                </select>
+                            @elseif ($field->type === 'radio')
+                                <div class="form-radio-group">
+                                    @foreach ($field->optionList() as $i => $opt)
+                                        @php $radioId = $inputName.'_'.$i; @endphp
+                                        <div class="form-radio-pill">
+                                            <input type="radio" id="{{ $radioId }}" name="{{ $inputName }}" value="{{ $opt }}" {{ old($inputName) === $opt ? 'checked' : '' }} {{ $field->is_required ? 'required' : '' }}>
+                                            <label for="{{ $radioId }}">{{ $opt }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @elseif ($field->type === 'file')
+                                <div class="form-file">
+                                    <input type="file" name="{{ $inputName }}" accept="image/*,.pdf" {{ $field->is_required ? 'required' : '' }}>
+                                </div>
+                            @elseif ($field->type === 'number')
+                                <input type="number" class="form-input" name="{{ $inputName }}" value="{{ old($inputName) }}" {{ $field->is_required ? 'required' : '' }}>
+                            @elseif ($field->type === 'date')
+                                <input type="date" class="form-input" name="{{ $inputName }}" value="{{ old($inputName) }}" {{ $field->is_required ? 'required' : '' }}>
+                            @else
+                                <input type="text" class="form-input" name="{{ $inputName }}" value="{{ old($inputName) }}" {{ $field->is_required ? 'required' : '' }}>
+                            @endif
+
+                            @error($inputName)<span class="form-error">{{ $message }}</span>@enderror
                         </div>
-                        <span class="form-hint">Pilih "Organisasi atau Kelompok" jika surat diajukan atas nama komunitas/kegiatan, bukan pribadi.</span>
-                        @error('jenis_permohonan')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
+                    @endforeach
                 </div>
             </div>
+            @endif
 
-            <!-- Data Pemohon -->
             <div class="gform-card">
-                <h2 class="gform-section-title"><span class="gform-section-badge">2</span> Data Pemohon</h2>
-                <div class="gform-grid">
-                    <div class="form-group full">
-                        <label class="form-label">Nama Pemohon / Nama Organisasi <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Ade Irma Suryani, atau BKMT Kecamatan V Koto" required>
-                        @error('nama')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">NIK <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="nik" value="{{ old('nik') }}" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}">
-                        @error('nik')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nomor HP / WhatsApp <span class="required">*</span></label>
-                        <input type="tel" class="form-input" name="no_hp" value="{{ old('no_hp') }}" placeholder="Contoh: 08xxxxxxxxxx" required>
-                        @error('no_hp')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tempat Lahir <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="tempat_lahir" value="{{ old('tempat_lahir') }}" placeholder="Contoh: Kampung Dalam">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tanggal Lahir <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="date" class="form-input" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}">
-                    </div>
-                    <div class="form-group full">
-                        <label class="form-label">Jenis Kelamin <span class="optional-tag">(khusus perorangan)</span></label>
-                        <div class="form-radio-group">
-                            <div class="form-radio-pill">
-                                <input type="radio" id="jk_l" name="jenis_kelamin" value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'checked' : '' }}>
-                                <label for="jk_l">Laki-laki</label>
-                            </div>
-                            <div class="form-radio-pill">
-                                <input type="radio" id="jk_p" name="jenis_kelamin" value="Perempuan" {{ old('jenis_kelamin') === 'Perempuan' ? 'checked' : '' }}>
-                                <label for="jk_p">Perempuan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Suku / Agama <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="suku_agama" value="{{ old('suku_agama') }}" placeholder="Contoh: Chaniago / Islam">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Kewarganegaraan</label>
-                        <input type="text" class="form-input" name="kewarganegaraan" value="{{ old('kewarganegaraan', 'WNI') }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Pekerjaan <span class="optional-tag">(khusus perorangan)</span></label>
-                        <input type="text" class="form-input" name="pekerjaan" value="{{ old('pekerjaan') }}" placeholder="Contoh: Mengurus Rumah Tangga">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Bentuk Organisasi <span class="optional-tag">(khusus organisasi)</span></label>
-                        <input type="text" class="form-input" name="bentuk_organisasi" value="{{ old('bentuk_organisasi') }}" placeholder="Contoh: Organisasi Non Formal">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Jenis Kegiatan <span class="optional-tag">(khusus organisasi)</span></label>
-                        <input type="text" class="form-input" name="jenis_kegiatan" value="{{ old('jenis_kegiatan') }}" placeholder="Contoh: Keagamaan">
-                    </div>
-                    <div class="form-group full">
-                        <label class="form-label">Alamat Saat Ini <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="alamat_saat_ini" placeholder="Alamat tempat tinggal/kesekretariatan saat ini, boleh di luar Nagari Campago" required>{{ old('alamat_saat_ini') }}</textarea>
-                        @error('alamat_saat_ini')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group full">
-                        <label class="form-label">Korong Domisili di Nagari Campago <span class="required">*</span></label>
-                        <select class="form-select" name="korong_domisili" required>
-                            <option value="">Pilih korong</option>
-                            @foreach (['Korong Pasa', 'Korong Tarok', 'Korong Koto', 'Korong Mudik', 'Korong Ampang', 'Korong Balai', 'Korong Sawah', 'Korong Bukit'] as $korong)
-                            <option {{ old('korong_domisili') === $korong ? 'selected' : '' }}>{{ $korong }}</option>
-                            @endforeach
-                        </select>
-                        <span class="form-hint">Korong tempat pemohon/organisasi terdaftar berdomisili di Nagari Campago.</span>
-                        @error('korong_domisili')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Wali -->
-            <div class="gform-card">
-                <h2 class="gform-section-title"><span class="gform-section-badge">3</span> Data Wali <span class="optional-tag">(opsional)</span></h2>
-                <div class="gform-grid">
-                    <div class="form-group full">
-                        <span class="form-hint" style="margin-top: 0;">Isi bagian ini hanya jika pemohon belum menikah / masih di bawah perwalian.</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nama Wali</label>
-                        <input type="text" class="form-input" name="wali_nama" value="{{ old('wali_nama') }}" placeholder="Nama lengkap wali">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">NIK Wali</label>
-                        <input type="text" class="form-input" name="wali_nik" value="{{ old('wali_nik') }}" placeholder="16 digit sesuai KTP" maxlength="16" pattern="[0-9]{16}">
-                        @error('wali_nik')<span class="form-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nomor HP Wali</label>
-                        <input type="tel" class="form-input" name="wali_no_hp" value="{{ old('wali_no_hp') }}" placeholder="Contoh: 08xxxxxxxxxx">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Keperluan -->
-            <div class="gform-card">
-                <h2 class="gform-section-title"><span class="gform-section-badge">4</span> Keperluan Pengajuan</h2>
+                <h2 class="gform-section-title"><span class="gform-section-badge">{{ $template->fields->isNotEmpty() ? 2 : 1 }}</span> Keperluan Pengajuan</h2>
                 <div class="gform-grid">
                     <div class="form-group full">
                         <label class="form-label">Penjelasan Surat Ini Untuk Apa <span class="required">*</span></label>
-                        <textarea class="form-textarea" name="penjelasan_keperluan" style="min-height: 130px;" placeholder="Contoh: Surat ini digunakan untuk keperluan bekerja di luar negeri (Jepang)." required>{{ old('penjelasan_keperluan') }}</textarea>
-                        <span class="form-hint">Jelaskan sejelas-jelasnya, misalnya untuk keperluan pekerjaan, administrasi organisasi, atau keperluan lain yang membutuhkan bukti domisili.</span>
+                        <textarea class="form-textarea" name="penjelasan_keperluan" style="min-height: 130px;" placeholder="Jelaskan keperluan pengajuan surat ini." required>{{ old('penjelasan_keperluan') }}</textarea>
                         @error('penjelasan_keperluan')<span class="form-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">

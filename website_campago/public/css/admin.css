@@ -156,6 +156,12 @@ img {
     font-weight: 800;
 }
 
+.admin-brand-logo-img {
+    border-radius: 0;
+    background: transparent;
+    object-fit: contain;
+}
+
 .admin-brand-sub {
     display: block;
     font-family: var(--font-body);
@@ -804,6 +810,22 @@ img {
 .status-replied { background: rgba(47, 93, 80, 0.14); color: var(--color-green-dark); }
 .status-closed { background: rgba(107, 107, 101, 0.14); color: var(--color-text-muted); }
 
+.status-select {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    border-radius: 999px;
+    padding: 0.35rem 1.9rem 0.35rem 0.9rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.55rem center;
+    background-size: 13px;
+}
+
 .status-diajukan { background: rgba(179, 69, 61, 0.12); color: var(--color-danger); }
 .status-diproses { background: rgba(218, 191, 132, 0.28); color: #8a6d2f; }
 .status-selesai { background: rgba(47, 93, 80, 0.14); color: var(--color-green-dark); }
@@ -946,9 +968,23 @@ img {
 }
 
 .admin-table-wrap {
+    position: relative;
     overflow-x: auto;
     border: 1px solid rgba(47, 93, 80, 0.12);
     border-radius: 12px;
+}
+
+@media (max-width: 900px) {
+    .admin-table-wrap::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 28px;
+        background: linear-gradient(to right, transparent, rgba(31, 64, 55, 0.1));
+        pointer-events: none;
+    }
 }
 
 .admin-table {
@@ -999,10 +1035,82 @@ img {
     white-space: normal !important;
 }
 
+/* Tabel Pengaduan -- sedikit lebih besar & lega dari tabel admin lainnya supaya
+   nama, tanggal, dan status lebih mudah dibaca sekilas. */
+.pengaduan-table {
+    font-size: 0.98rem;
+}
+
+.pengaduan-table th {
+    padding: 1.05rem 1.3rem;
+    font-size: 0.82rem;
+}
+
+.pengaduan-table td {
+    padding: 1.05rem 1.3rem;
+}
+
+.pengaduan-table .status-select {
+    font-size: 0.82rem;
+    padding: 0.45rem 2.1rem 0.45rem 1rem;
+}
+
+.pengaduan-table .admin-table-edit-btn,
+.pengaduan-table .pengaduan-delete-btn {
+    width: 36px;
+    height: 36px;
+}
+
+.pengaduan-table .admin-table-edit-btn svg,
+.pengaduan-table .pengaduan-delete-btn svg {
+    width: 19px;
+    height: 19px;
+}
+
+.pengaduan-table tbody tr.status-new { background: rgba(179, 69, 61, 0.07); }
+.pengaduan-table tbody tr.status-new:hover { background: rgba(179, 69, 61, 0.13); }
+.pengaduan-table tbody tr.status-read { background: rgba(218, 191, 132, 0.18); }
+.pengaduan-table tbody tr.status-read:hover { background: rgba(218, 191, 132, 0.26); }
+.pengaduan-table tbody tr.status-replied { background: rgba(47, 93, 80, 0.08); }
+.pengaduan-table tbody tr.status-replied:hover { background: rgba(47, 93, 80, 0.14); }
+.pengaduan-table tbody tr.status-closed { background: rgba(107, 107, 101, 0.08); }
+.pengaduan-table tbody tr.status-closed:hover { background: rgba(107, 107, 101, 0.14); }
+
+/* Repeater kolom formulir (panel Jenis Surat) */
+.kolom-field-header,
+.kolom-field-item {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1.3fr auto auto;
+    gap: 0.75rem;
+    align-items: center;
+}
+
 @media (max-width: 640px) {
     .admin-card-header {
         flex-wrap: wrap;
     }
+
+    .kolom-field-header {
+        display: none;
+    }
+
+    .kolom-field-item {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "label label"
+            "type type"
+            "options options"
+            "wajib remove";
+        row-gap: 0.6rem;
+        border: 1px solid rgba(47, 93, 80, 0.1);
+        margin-bottom: 0.6rem;
+    }
+
+    .kolom-field-item .kolom-label { grid-area: label; }
+    .kolom-field-item .kolom-type { grid-area: type; }
+    .kolom-field-item .kolom-options { grid-area: options; }
+    .kolom-field-item .kolom-wajib-label { grid-area: wajib; }
+    .kolom-field-item .kolom-remove-btn { grid-area: remove; justify-self: end; }
 }
 
 /* Modal detail surat (checkbox-hack, sama pola dengan modal di public site) */
@@ -1174,4 +1282,86 @@ img {
 .btn-confirm-danger:hover {
     background: #96362f;
     transform: translateY(-2px);
+}
+
+/* Toast notifikasi (pengganti banner sukses statis di atas konten) */
+.toast-notification {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    width: min(100%, 380px);
+    background: linear-gradient(160deg, var(--color-white) 0%, var(--color-cream-light) 100%);
+    border: 1px solid rgba(47, 93, 80, 0.15);
+    border-radius: 14px;
+    box-shadow: 0 20px 45px rgba(31, 64, 55, 0.18);
+    padding: 1rem 1.1rem;
+    animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-notification.is-leaving {
+    animation: toastSlideOut 0.3s ease forwards;
+}
+
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastSlideOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(30px); }
+}
+
+.toast-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(47, 93, 80, 0.12);
+    color: var(--color-green-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.toast-close {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.toast-close:hover {
+    background: rgba(47, 93, 80, 0.08);
+    color: var(--color-green-dark);
+}
+
+@media (max-width: 640px) {
+    .toast-notification { left: 1rem; right: 1rem; top: 1rem; width: auto; }
 }

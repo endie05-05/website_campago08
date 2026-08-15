@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SuratRequest extends Model
 {
     protected $fillable = [
-        'type', 'applicant_name', 'keperluan', 'data', 'ktp_path', 'kk_path', 'status',
+        'type', 'surat_template_id', 'applicant_name', 'keperluan', 'data', 'ktp_path', 'kk_path', 'status',
     ];
 
     protected $casts = [
@@ -27,9 +27,14 @@ class SuratRequest extends Model
         'ditolak' => 'Ditolak',
     ];
 
+    public function suratTemplate()
+    {
+        return $this->belongsTo(SuratTemplate::class);
+    }
+
     public function typeLabel(): string
     {
-        return self::TYPES[$this->type] ?? $this->type;
+        return self::TYPES[$this->type] ?? $this->suratTemplate?->name ?? $this->type;
     }
 
     public function statusLabel(): string

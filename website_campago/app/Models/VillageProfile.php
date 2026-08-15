@@ -12,7 +12,7 @@ class VillageProfile extends Model
         'area_km2', 'population', 'population_year',
         'latitude', 'longitude',
         'phone', 'email',
-        'logo_path', 'hero_image_path',
+        'logo_path', 'logo_admin_path', 'hero_image_path',
     ];
 
     protected $casts = [

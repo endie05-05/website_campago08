@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BannerController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalleryController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\PotentialController;
 use App\Http\Controllers\ResidentAuthController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SuratRequestController;
+use App\Http\Controllers\SuratTemplateController;
 use App\Http\Controllers\UmkmController;
 use App\Http\Controllers\VillageProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,26 +20,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/layanan', function () {
-    return view('layanan');
+    return view('layanan', [
+        'suratTemplates' => \App\Models\SuratTemplate::where('is_active', true)->orderBy('sort_order')->get(),
+        'villageProfile' => \App\Models\VillageProfile::first(),
+        'kontak' => HomeController::kontakSettings(),
+    ]);
 });
 
 Route::get('/berita/{post:slug}', [PostController::class, 'show'])->name('berita.show');
 Route::get('/umkm/{umkm:slug}', [UmkmController::class, 'show'])->name('umkm.show');
 
-Route::get('/formulir/sktm', function () {
-    return view('formulir.sktm');
-})->name('formulir.sktm');
-Route::post('/formulir/sktm', [SuratRequestController::class, 'storeSktm'])->name('formulir.sktm.store');
-
-Route::get('/formulir/sku', function () {
-    return view('formulir.sku');
-})->name('formulir.sku');
-Route::post('/formulir/sku', [SuratRequestController::class, 'storeSku'])->name('formulir.sku.store');
-
-Route::get('/formulir/domisili', function () {
-    return view('formulir.domisili');
-})->name('formulir.domisili');
-Route::post('/formulir/domisili', [SuratRequestController::class, 'storeDomisili'])->name('formulir.domisili.store');
+Route::get('/formulir/custom/{suratTemplate:slug}', [SuratRequestController::class, 'showCustom'])->name('formulir.custom');
+Route::post('/formulir/custom/{suratTemplate:slug}', [SuratRequestController::class, 'storeCustom'])->name('formulir.custom.store');
 
 Route::get('/pengaduan', [ContactMessageController::class, 'create'])->name('pengaduan.form');
 Route::post('/pengaduan', [ContactMessageController::class, 'store'])->name('pengaduan.store');
@@ -64,9 +56,6 @@ Route::prefix('warga')->name('warga.')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::post('/admin/banner', [BannerController::class, 'store'])->name('admin.banner.store');
-    Route::post('/admin/banner/{banner}', [BannerController::class, 'update'])->name('admin.banner.update');
-    Route::post('/admin/banner/{banner}/hapus', [BannerController::class, 'destroy'])->name('admin.banner.destroy');
     Route::post('/admin/aparatur', [OfficialController::class, 'store'])->name('admin.aparatur.store');
     Route::post('/admin/aparatur/{official}', [OfficialController::class, 'update'])->name('admin.aparatur.update');
     Route::post('/admin/aparatur/{official}/hapus', [OfficialController::class, 'destroy'])->name('admin.aparatur.destroy');
@@ -84,9 +73,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/berita', [PostController::class, 'store'])->name('admin.berita.store');
     Route::post('/admin/berita/{post}', [PostController::class, 'update'])->name('admin.berita.update');
     Route::post('/admin/berita/{post}/hapus', [PostController::class, 'destroy'])->name('admin.berita.destroy');
-    Route::post('/admin/peta', [LocationController::class, 'update'])->name('admin.peta.update');
+    Route::post('/admin/fasum', [LocationController::class, 'update'])->name('admin.fasum.update');
     Route::post('/admin/pengaduan/{contactMessage}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.pengaduan.status');
     Route::post('/admin/pengaduan/{contactMessage}/hapus', [ContactMessageController::class, 'destroy'])->name('admin.pengaduan.destroy');
     Route::post('/admin/surat/{suratRequest}/status', [SuratRequestController::class, 'updateStatus'])->name('admin.surat.status');
     Route::post('/admin/surat/{suratRequest}/hapus', [SuratRequestController::class, 'destroy'])->name('admin.surat.destroy');
+
+    Route::post('/admin/surat-template', [SuratTemplateController::class, 'store'])->name('admin.surat-template.store');
+    Route::post('/admin/surat-template/{suratTemplate}', [SuratTemplateController::class, 'update'])->name('admin.surat-template.update');
+    Route::post('/admin/surat-template/{suratTemplate}/hapus', [SuratTemplateController::class, 'destroy'])->name('admin.surat-template.destroy');
 });

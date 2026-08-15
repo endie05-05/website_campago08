@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ValidatesForPanel;
 use App\Models\Setting;
+use App\Models\VillageProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -21,6 +23,7 @@ class SettingController extends Controller
             'facebook_url' => ['nullable', 'string', 'max:255'],
             'youtube_url' => ['nullable', 'string', 'max:255'],
             'copyright' => ['required', 'string', 'max:255'],
+            'logo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         Setting::set('kontak_deskripsi', $validated['deskripsi']);
@@ -32,6 +35,20 @@ class SettingController extends Controller
         Setting::set('kontak_youtube_url', $validated['youtube_url'] ?? '');
         Setting::set('kontak_copyright', $validated['copyright']);
 
-        return redirect('/admin?panel=kontak')->with('success', 'Footer & Kontak berhasil disimpan.');
+        if ($request->hasFile('logo')) {
+            $profile = VillageProfile::first();
+
+            if ($profile) {
+                $oldLogoPath = $profile->logo_path;
+                $profile->logo_path = $request->file('logo')->store('logo', 'public');
+                $profile->save();
+
+                if ($oldLogoPath) {
+                    Storage::disk('public')->delete($oldLogoPath);
+                }
+            }
+        }
+
+        return redirect('/admin?panel=kontak')->with('success', 'Footer, kontak, dan logo berhasil disimpan.');
     }
 }

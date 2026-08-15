@@ -18,7 +18,11 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-brand">
-                <div class="admin-brand-logo">LOGO</div>
+                @if ($villageProfile?->logo_path)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($villageProfile->logo_path) }}" alt="Logo Nagari Campago" class="admin-brand-logo admin-brand-logo-img">
+                @else
+                    <div class="admin-brand-logo">LOGO</div>
+                @endif
                 <div>
                     Panel Admin
                     <span class="admin-brand-sub">Nagari Campago</span>
@@ -32,13 +36,10 @@
                 </button>
 
                 <span class="admin-nav-group-label">Konten Beranda</span>
-                <button type="button" class="admin-nav-link" data-panel="banner" data-title="Foto Beranda" data-desc="Kelola foto yang bergantian tampil di bagian atas (hero) beranda.">
-                    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> Foto Beranda
-                </button>
                 <button type="button" class="admin-nav-link" data-panel="aparatur" data-title="Aparatur Nagari" data-desc="Kelola daftar perangkat/struktur Nagari Campago.">
                     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> Aparatur Nagari
                 </button>
-                <button type="button" class="admin-nav-link" data-panel="statistik" data-title="Statistik Nagari" data-desc="Kelola angka statistik yang ditampilkan di beranda.">
+                <button type="button" class="admin-nav-link" data-panel="statistik" data-title="Statistik Nagari" data-desc="Kelola angka statistik dan daftar nama korong yang ditampilkan di beranda.">
                     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span> Statistik Nagari
                 </button>
                 <button type="button" class="admin-nav-link" data-panel="potensi" data-title="Potensi Nagari" data-desc="Kelola kartu potensi (pertanian, UMKM, budaya, wisata).">
@@ -47,8 +48,8 @@
                 <button type="button" class="admin-nav-link" data-panel="berita" data-title="Berita &amp; Kegiatan" data-desc="Kelola berita utama dan daftar berita terbaru.">
                     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span> Berita
                 </button>
-                <button type="button" class="admin-nav-link" data-panel="peta" data-title="Peta Digital" data-desc="Kelola kategori dan daftar lokasi pada peta digital.">
-                    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg></span> Peta Digital
+                <button type="button" class="admin-nav-link" data-panel="fasum" data-title="Fasilitas Umum" data-desc="Kelola daftar fasilitas umum (balai, sekolah, pasar, dll) yang tampil di beranda.">
+                    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span> Fasilitas Umum
                 </button>
                 <button type="button" class="admin-nav-link" data-panel="umkm" data-title="UMKM Lokal" data-desc="Kelola daftar produk dan usaha masyarakat.">
                     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg></span> UMKM Lokal
@@ -58,6 +59,9 @@
                 </button>
 
                 <span class="admin-nav-group-label">Lainnya</span>
+                <button type="button" class="admin-nav-link" data-panel="surat-template" data-title="Jenis Surat" data-desc="Buat jenis surat pengantar baru beserta kolom formulirnya sendiri, tanpa perlu koding.">
+                    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span> Jenis Surat
+                </button>
                 <button type="button" class="admin-nav-link" data-panel="surat" data-title="Pengajuan Surat Pengantar" data-desc="Lihat dan proses pengajuan SKU, SKTM, dan Surat Domisili yang masih berjalan.">
                     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span> Surat Pengantar
                     @if ($newSuratRequestsCount > 0)
@@ -104,8 +108,12 @@
             <div class="admin-content">
 
                 @if (session('success'))
-                <div style="background: rgba(47, 93, 80, 0.12); border: 1px solid rgba(47, 93, 80, 0.3); color: var(--color-green-dark); padding: 0.9rem 1.25rem; border-radius: 10px; margin-bottom: 1.5rem; font-weight: 600;">
-                    ✓ {{ session('success') }}
+                <div class="toast-notification" id="successToast">
+                    <div class="toast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div class="toast-message">{{ session('success') }}</div>
+                    <button type="button" class="toast-close" id="successToastClose" aria-label="Tutup notifikasi">&times;</button>
                 </div>
                 @endif
 
@@ -158,101 +166,6 @@
                                 <div><div class="title">Pengaduan</div><div class="desc">Aduan dan aspirasi masyarakat masuk.</div></div>
                             </button>
                         </div>
-                    </div>
-                </section>
-
-                <!-- ================= FOTO BERANDA (BANNER) ================= -->
-                <section class="admin-panel" id="panel-banner">
-                    @php
-                        $bannerEditingId = old('_target_id');
-                        $bannerEditingItem = $bannerEditingId ? $heroSlides->firstWhere('id', (int) $bannerEditingId) : null;
-                        $bannerShowForm = $errors->any() && request()->query('panel') === 'banner';
-                    @endphp
-                    <div class="admin-card crud-list-view" style="display: {{ $bannerShowForm ? 'none' : 'block' }};">
-                        <div class="admin-card-header">
-                            <div><h2>Foto Beranda</h2><p>Foto yang bergantian tampil (slideshow) di bagian paling atas beranda. Tambahkan beberapa foto supaya bergantian otomatis.</p></div>
-                            <button type="button" class="btn-save btn-add-new">+ Tambah Foto</button>
-                        </div>
-                        <div class="admin-table-wrap">
-                            <table class="admin-table">
-                                <thead><tr><th>Foto</th><th>Judul</th><th>Aksi</th></tr></thead>
-                                <tbody>
-                                    @forelse ($heroSlides as $slide)
-                                    <tr>
-                                        <td>
-                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($slide->image_path) }}" alt="Foto beranda" style="width:64px; height:44px; object-fit:cover; border-radius:8px; display:block;">
-                                        </td>
-                                        <td>{{ $slide->title ?: '—' }}</td>
-                                        <td>
-                                            <div class="admin-table-actions">
-                                                <button type="button" class="admin-table-edit-btn btn-edit-item" aria-label="Edit foto"
-                                                    data-update-url="{{ route('admin.banner.update', $slide) }}"
-                                                    data-id="{{ $slide->id }}"
-                                                    data-preview="{{ \Illuminate\Support\Facades\Storage::url($slide->image_path) }}"
-                                                    data-item="{{ json_encode(['title' => $slide->title, 'subtitle' => $slide->subtitle, 'button_text' => $slide->button_text, 'button_url' => $slide->button_url]) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
-                                                <form method="POST" action="{{ route('admin.banner.destroy', $slide) }}" data-confirm="Hapus foto beranda ini?">
-                                                    @csrf
-                                                    <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr><td colspan="3" class="admin-table-empty">Belum ada foto beranda. Klik "+ Tambah Foto" untuk menambahkan.</td></tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="admin-card crud-form-view" style="display: {{ $bannerShowForm ? 'block' : 'none' }};">
-                        <form method="POST" action="{{ $bannerEditingItem ? route('admin.banner.update', $bannerEditingItem) : route('admin.banner.store') }}" enctype="multipart/form-data" class="crud-form" data-store-url="{{ route('admin.banner.store') }}">
-                            @csrf
-                            <input type="hidden" name="_target_id" value="{{ $bannerEditingId }}">
-                            <div class="admin-card-header">
-                                <div><h2 class="crud-form-title">{{ $bannerEditingItem ? 'Edit Foto Beranda' : 'Tambah Foto Beranda' }}</h2><p>Foto ini tampil sebagai kartu ringkas di beranda, lengkap dengan judul, deskripsi singkat, dan tombol.</p></div>
-                            </div>
-                            @if ($errors->any())
-                                <div style="background: rgba(200, 60, 60, 0.1); border: 1px solid rgba(200, 60, 60, 0.3); border-radius: 10px; padding: 0.85rem 1rem; color: #B3453D; font-weight:600; margin-bottom:1rem;">
-                                    @foreach ($errors->all() as $error)
-                                        <div>{{ $error }}</div>
-                                    @endforeach
-                                </div>
-                            @endif
-                            <div class="form-grid">
-                                <div class="form-group full">
-                                    <label class="form-label">Foto</label>
-                                    <div class="form-file">
-                                        <div class="preview-box crud-form-preview" @if($bannerEditingItem) style="background-image:url('{{ \Illuminate\Support\Facades\Storage::url($bannerEditingItem->image_path) }}'); background-size:cover; background-position:center;" @endif>@unless($bannerEditingItem)🖼️@endunless</div>
-                                        <input type="file" name="gambar" accept="image/*" data-required-on-add {{ $bannerEditingItem ? '' : 'required' }}>
-                                    </div>
-                                    <span class="form-hint crud-form-hint" style="display: {{ $bannerEditingItem ? 'inline' : 'none' }};">Biarkan kosong jika tidak ingin mengganti foto.</span>
-                                </div>
-                                <div class="form-group full">
-                                    <label class="form-label">Judul <span class="optional-tag">(opsional)</span></label>
-                                    <input type="text" class="form-input" name="title" maxlength="200" placeholder="Contoh: Panen Raya Padi Nagari Campago">
-                                </div>
-                                <div class="form-group full">
-                                    <label class="form-label">Deskripsi Singkat <span class="optional-tag">(opsional)</span></label>
-                                    <textarea class="form-textarea" name="subtitle" maxlength="255" placeholder="Satu-dua kalimat ringkas, tampil di kartu beranda."></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Teks Tombol <span class="optional-tag">(opsional)</span></label>
-                                    <input type="text" class="form-input" name="button_text" maxlength="100" placeholder="Contoh: Baca Selengkapnya">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Link Tombol <span class="optional-tag">(opsional)</span></label>
-                                    <input type="text" class="form-input" name="button_url" maxlength="500" placeholder="Contoh: #berita">
-                                </div>
-                                <div class="form-group full">
-                                    <span class="form-hint" style="margin-top: 0;">Kosongkan judul/deskripsi/tombol jika belum ada isinya — beranda akan otomatis memakai teks bawaan.</span>
-                                </div>
-                            </div>
-                            <div class="admin-card-actions">
-                                <button type="button" class="btn-ghost btn-cancel-form">Batal</button>
-                                <button type="submit" class="btn-save">Simpan</button>
-                            </div>
-                        </form>
                     </div>
                 </section>
 
@@ -347,7 +260,11 @@
 
                 <!-- ================= STATISTIK ================= -->
                 <section class="admin-panel" id="panel-statistik">
-                    <form class="admin-form" method="POST" action="{{ route('admin.statistik.update') }}">
+                    @php
+                        $korongAktifList = $korongs->where('is_active', true)->sortBy('sort_order')->values();
+                        $namaKorongCount = old('jumlah_korong') !== null ? (int) old('jumlah_korong') : $korongAktifList->count();
+                    @endphp
+                    <form class="admin-form" method="POST" action="{{ route('admin.statistik.update') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
@@ -363,10 +280,18 @@
                             @endif
 
                             <div class="form-grid">
+                                <div class="form-group full">
+                                    <label class="form-label">Logo Nagari</label>
+                                    <div class="form-file">
+                                        <div class="preview-box" style="{{ $villageProfile->logo_path ? "background-image:url('".\Illuminate\Support\Facades\Storage::url($villageProfile->logo_path)."'); background-size:cover; background-position:center;" : '' }}">@unless($villageProfile->logo_path)🖼️@endunless</div>
+                                        <input type="file" name="logo" accept="image/*">
+                                    </div>
+                                    <span class="form-hint">Tampil di navbar dan footer beranda. Biarkan kosong jika tidak ingin mengganti logo.</span>
+                                </div>
                                 <div class="form-group">
                                     <label class="form-label">Jumlah Korong</label>
-                                    <input type="text" class="form-input" value="{{ $korongCount }}" disabled>
-                                    <span class="form-hint">Dihitung otomatis dari data Korong, tidak bisa diubah di sini.</span>
+                                    <input type="number" class="form-input" id="jumlahKorongInput" name="jumlah_korong" value="{{ old('jumlah_korong', $korongAktifList->count()) }}" min="0">
+                                    <span class="form-hint">Setelah diubah, pop up akan muncul untuk mengisi nama korongnya.</span>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Luas Wilayah (km&sup2;)</label>
@@ -380,11 +305,34 @@
                                     <label class="form-label">Kecamatan</label>
                                     <input type="text" class="form-input" name="district" value="{{ $villageProfile->district }}">
                                 </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Nama-nama Korong</label>
+                                    <button type="button" id="btnAturNamaKorong" class="btn-ghost" style="width:auto;">✎ Atur Nama Korong (<span id="namaKorongSummaryCount">{{ $namaKorongCount }}</span> nama)</button>
+                                    <span class="form-hint" style="display:block; margin-top:0.5rem;">Nama-nama ini akan tampil di daftar korong pada beranda.</span>
+                                </div>
                             </div>
 
                             <div class="admin-card-actions">
                                 <button type="reset" class="btn-ghost">Batalkan</button>
                                 <button type="submit" class="btn-save">Simpan Perubahan</button>
+                            </div>
+                        </div>
+
+                        <div class="admin-modal-overlay" id="namaKorongModalOverlay" @if ($errors->any() && request()->query('panel') === 'statistik') style="display:flex;" @endif>
+                            <div class="admin-modal-content" style="max-width:520px;">
+                                <span class="admin-modal-close" id="namaKorongModalClose" role="button" aria-label="Tutup">&times;</span>
+                                <div class="admin-modal-body">
+                                    <h3 style="font-family:var(--font-heading); color:var(--color-green-dark); margin-bottom:0.4rem;">Nama-nama Korong</h3>
+                                    <p class="form-hint" style="margin-bottom:1.1rem;">Isi nama tiap korong sesuai jumlah yang diinput (<span id="namaKorongModalCount">{{ $namaKorongCount }}</span> korong).</p>
+                                    <div id="namaKorongList" style="display:flex; flex-direction:column; gap:0.6rem;">
+                                        @for ($i = 0; $i < $namaKorongCount; $i++)
+                                        <input type="text" class="form-input nama-korong-input" name="nama_korong[]" value="{{ old('nama_korong.'.$i, optional($korongAktifList->get($i))->name) }}" placeholder="Nama korong ke-{{ $i + 1 }}" required>
+                                        @endfor
+                                    </div>
+                                    <div class="admin-modal-footer" style="display:flex; justify-content:flex-end;">
+                                        <button type="button" class="btn-save" id="namaKorongModalDone">Selesai</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -608,12 +556,12 @@
                 </section>
 
                 <!-- ================= PETA DIGITAL ================= -->
-                <section class="admin-panel" id="panel-peta">
-                    <form class="admin-form" method="POST" action="{{ route('admin.peta.update') }}">
+                <section class="admin-panel" id="panel-fasum">
+                    <form class="admin-form" method="POST" action="{{ route('admin.fasum.update') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
-                                <div><h2>Peta Digital</h2><p>Kategori Fasilitas Umum yang tampil pada peta digital beranda. Untuk kategori UMKM, kelola lewat menu "UMKM Lokal".</p></div>
+                                <div><h2>Fasilitas Umum</h2><p>Daftar fasilitas umum (balai, sekolah, pasar, dll) yang tampil di beranda. Untuk kategori UMKM, kelola lewat menu "UMKM Lokal".</p></div>
                             </div>
 
                             @if ($errors->any())
@@ -626,26 +574,29 @@
 
                             <div class="form-grid" style="margin-bottom:1.5rem;">
                                 <div class="form-group full">
-                                    <label class="form-label">Deskripsi Kategori Fasilitas Umum</label>
-                                    <textarea class="form-textarea" name="deskripsi">{{ $peta['fasum_deskripsi'] }}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Jumlah Lokasi</label>
-                                    <input type="text" class="form-input" value="{{ $fasilitasUmumList->count() }}" disabled>
-                                    <span class="form-hint">Dihitung otomatis dari daftar lokasi di bawah.</span>
+                                    <label class="form-label">Foto Kartu "Temukan Campago"</label>
+                                    <div class="form-file">
+                                        <div class="preview-box" style="width:160px; height:100px; border-radius:12px; font-size:1.8rem; {{ ($peta['foto_path'] ?? null) ? "background-image:url('".\Illuminate\Support\Facades\Storage::url($peta['foto_path'])."'); background-size:cover; background-position:center;" : '' }}">@unless($peta['foto_path'] ?? null)🖼️@endunless</div>
+                                        <input type="file" name="foto" accept="image/*">
+                                    </div>
+                                    <span class="form-hint">Foto ini tampil di kartu sebelah "Temukan Campago" pada beranda. Biarkan kosong jika tidak ingin mengganti foto.</span>
                                 </div>
                                 <div class="form-group full">
-                                    <label class="form-label">Daftar Lokasi</label>
+                                    <label class="form-label">Deskripsi Fasilitas Umum</label>
+                                    <textarea class="form-textarea" name="deskripsi">{{ $peta['fasum_deskripsi'] }}</textarea>
+                                </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Daftar Fasilitas Umum</label>
                                     <span class="form-hint" style="display:block; margin-bottom:0.75rem;">Cukup nama umum lokasinya saja, tidak perlu dirinci per korong.</span>
                                     <div class="repeater-list" id="list-fasum">
                                         @foreach ($fasilitasUmumList as $lokasi)
                                         <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
-                                            <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
-                                            <input type="text" class="form-input" name="lokasi[]" value="{{ $lokasi->name }}" placeholder="Nama lokasi">
+                                            <button type="button" class="repeater-remove" aria-label="Hapus fasilitas">&times;</button>
+                                            <input type="text" class="form-input" name="lokasi[]" value="{{ $lokasi->name }}" placeholder="Nama fasilitas">
                                         </div>
                                         @endforeach
                                     </div>
-                                    <button type="button" class="btn-add" data-repeater="list-fasum">+ Tambah Lokasi</button>
+                                    <button type="button" class="btn-add" data-repeater="list-fasum">+ Tambah Fasilitas</button>
                                 </div>
                             </div>
 
@@ -659,8 +610,8 @@
 
                 <template id="list-fasum-template">
                     <div class="repeater-item" style="padding: 0.75rem 3rem 0.75rem 1rem;">
-                        <button type="button" class="repeater-remove" aria-label="Hapus lokasi">&times;</button>
-                        <input type="text" class="form-input" name="lokasi[]" placeholder="Nama lokasi">
+                        <button type="button" class="repeater-remove" aria-label="Hapus fasilitas">&times;</button>
+                        <input type="text" class="form-input" name="lokasi[]" placeholder="Nama fasilitas">
                     </div>
                 </template>
 
@@ -861,6 +812,145 @@
                     </div>
                 </section>
 
+                <!-- ================= JENIS SURAT (TEMPLATE) ================= -->
+                <section class="admin-panel" id="panel-surat-template">
+                    @php
+                        $suratCommonFields = [
+                            ['label' => 'Nama Lengkap', 'type' => 'text', 'options' => '', 'wajib' => true],
+                            ['label' => 'NIK', 'type' => 'text', 'options' => '', 'wajib' => true],
+                            ['label' => 'Tempat Lahir', 'type' => 'text', 'options' => '', 'wajib' => true],
+                            ['label' => 'Tanggal Lahir', 'type' => 'date', 'options' => '', 'wajib' => true],
+                            ['label' => 'Jenis Kelamin', 'type' => 'radio', 'options' => 'Laki-laki,Perempuan', 'wajib' => true],
+                            ['label' => 'Agama', 'type' => 'select', 'options' => 'Islam,Kristen Protestan,Katolik,Hindu,Buddha,Konghucu,Lainnya', 'wajib' => true],
+                            ['label' => 'Kewarganegaraan', 'type' => 'text', 'options' => '', 'wajib' => false],
+                            ['label' => 'Pekerjaan', 'type' => 'text', 'options' => '', 'wajib' => true],
+                            ['label' => 'Korong', 'type' => 'select', 'options' => 'Korong Pasa,Korong Tarok,Korong Koto,Korong Mudik,Korong Ampang,Korong Balai,Korong Sawah,Korong Bukit', 'wajib' => true],
+                            ['label' => 'Alamat', 'type' => 'textarea', 'options' => '', 'wajib' => true],
+                            ['label' => 'No. HP', 'type' => 'text', 'options' => '', 'wajib' => false],
+                        ];
+                    @endphp
+                    <div class="admin-card crud-list-view">
+                        <div class="admin-card-header">
+                            <div><h2>Jenis Surat</h2><p>Buat jenis surat pengantar baru beserta kolom formulirnya sendiri, tanpa perlu koding. Jenis surat aktif akan muncul sebagai pilihan tambahan di halaman Layanan.</p></div>
+                            <button type="button" class="btn-save btn-add-new">+ Tambah Jenis Surat</button>
+                        </div>
+                        <div class="admin-table-wrap">
+                            <table class="admin-table">
+                                <thead><tr><th>Nama Jenis Surat</th><th>Jumlah Kolom</th><th>Status</th><th>Aksi</th></tr></thead>
+                                <tbody>
+                                    @forelse ($suratTemplates as $template)
+                                    <tr>
+                                        <td>
+                                            {{ $template->name }}
+                                            @if ($template->is_builtin)
+                                                <span class="status-pill status-closed" style="margin-left:0.5rem;">Bawaan Sistem</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $template->fields_count }} kolom</td>
+                                        <td>
+                                            <span class="status-pill {{ $template->is_active ? 'status-replied' : 'status-closed' }}">{{ $template->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                        </td>
+                                        <td>
+                                            @if ($template->is_builtin)
+                                                <span class="form-hint">Formulirnya sudah dikoding khusus, tidak bisa diubah di sini.</span>
+                                            @else
+                                                <div class="admin-table-actions">
+                                                    <button type="button" class="admin-table-edit-btn btn-edit-surat-template" aria-label="Edit jenis surat"
+                                                        data-update-url="{{ route('admin.surat-template.update', $template) }}"
+                                                        data-id="{{ $template->id }}"
+                                                        data-item="{{ json_encode([
+                                                            'nama' => $template->name,
+                                                            'deskripsi' => $template->description,
+                                                            'aktif' => $template->is_active,
+                                                            'kolom' => $template->fields->map(fn ($f) => [
+                                                                'label' => $f->label,
+                                                                'type' => $f->type,
+                                                                'options' => $f->options,
+                                                                'wajib' => $f->is_required,
+                                                            ]),
+                                                        ]) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
+                                                    <form method="POST" action="{{ route('admin.surat-template.destroy', $template) }}" data-confirm="Hapus jenis surat {{ $template->name }}? Semua pengajuan lama dengan jenis surat ini tetap tersimpan.">
+                                                        @csrf
+                                                        <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus jenis surat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+                                                    </form>
+                                                </div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr><td colspan="4" class="admin-table-empty">Belum ada jenis surat. Klik "+ Tambah Jenis Surat" untuk membuat yang pertama.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="admin-card crud-form-view" style="display: none;">
+                        <form method="POST" action="{{ route('admin.surat-template.store') }}" class="crud-form" id="suratTemplateForm" data-store-url="{{ route('admin.surat-template.store') }}">
+                            @csrf
+                            <input type="hidden" name="_target_id" value="">
+                            <div class="admin-card-header">
+                                <div><h2 class="crud-form-title">Tambah Jenis Surat</h2><p>Isi nama & deskripsi, lalu pilih kolom-kolom yang harus diisi masyarakat saat mengajukan surat ini. Bagian "Keperluan Pengajuan" serta upload KTP/KK sudah otomatis ada di setiap formulir.</p></div>
+                            </div>
+                            <div class="form-grid" style="margin-bottom: 1.5rem;">
+                                <div class="form-group full">
+                                    <label class="form-label">Nama Jenis Surat</label>
+                                    <input type="text" class="form-input" name="nama" placeholder="Contoh: Surat Keterangan Kelahiran" required>
+                                </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Deskripsi Singkat <span class="optional-tag">(opsional)</span></label>
+                                    <textarea class="form-textarea" name="deskripsi" placeholder="Tampil sebagai penjelasan singkat pada kartu pilihan surat dan formulir online."></textarea>
+                                </div>
+                                <div class="form-group full">
+                                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:600; color: var(--color-green-dark); font-size:0.9rem;">
+                                        <input type="checkbox" name="aktif" value="1" checked>
+                                        Aktifkan (tampilkan di halaman Layanan untuk masyarakat)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group full" style="margin-bottom: 1rem;">
+                                <label class="form-label">Kolom Formulir</label>
+                                <span class="form-hint" style="display:block; margin-bottom:0.75rem;">Klik kolom umum di bawah untuk menambahkannya langsung (contoh dari formulir SKU/SKTM/Domisili yang sudah ada), atau buat kolom kustom sendiri.</span>
+                                <div id="suratCommonFieldChips" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.25rem;">
+                                    @foreach ($suratCommonFields as $cf)
+                                    <button type="button" class="btn-ghost btn-common-field" style="padding:0.5rem 1rem; font-size:0.82rem;" data-field="{{ json_encode($cf) }}">+ {{ $cf['label'] }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="kolom-field-header" style="padding: 0 0.25rem 0.5rem; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color: var(--color-text-muted); border-bottom: 1px solid rgba(47,93,80,0.15);">
+                                <span>Label Kolom</span>
+                                <span>Tipe Isian</span>
+                                <span>Pilihan</span>
+                                <span>Wajib</span>
+                                <span></span>
+                            </div>
+                            <div id="suratKolomList"></div>
+                            <button type="button" class="btn-add" id="btnAddSuratKolom" style="margin: 0.75rem 0 1.5rem;">+ Tambah Kolom Kustom</button>
+
+                            <div class="admin-card-actions">
+                                <button type="button" class="btn-ghost btn-cancel-form">Batal</button>
+                                <button type="submit" class="btn-save">Simpan Jenis Surat</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <template id="suratKolomItemTemplate">
+                    <div class="kolom-field-item" style="padding:0.65rem 0.75rem; border-radius:8px;">
+                        <input type="text" class="form-input kolom-label" name="kolom[__INDEX__][label]" placeholder="Contoh: Nama Lengkap" required style="padding:0.55rem 0.75rem; font-size:0.85rem;">
+                        <select class="form-select kolom-type" name="kolom[__INDEX__][type]" style="padding:0.55rem 0.75rem; font-size:0.85rem;">
+                            @foreach (\App\Models\SuratTemplateField::TYPES as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <input type="text" class="form-input kolom-options kolom-options-input" name="kolom[__INDEX__][options]" placeholder="Pisahkan dengan koma" style="padding:0.55rem 0.75rem; font-size:0.85rem; visibility:hidden;">
+                        <label class="kolom-wajib-label" style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; font-weight:500; cursor:pointer; white-space:nowrap;"><input type="checkbox" class="kolom-wajib" name="kolom[__INDEX__][wajib]" value="1" checked> Wajib</label>
+                        <button type="button" class="pengaduan-delete-btn kolom-remove-btn" aria-label="Hapus kolom">&times;</button>
+                    </div>
+                </template>
+
                 <!-- ================= SURAT PENGANTAR (AKTIF) ================= -->
                 <section class="admin-panel" id="panel-surat">
                     <div class="admin-card">
@@ -870,8 +960,8 @@
                                 <label class="form-label" for="filterJenisSuratAktif" style="margin: 0;">Jenis Surat</label>
                                 <select id="filterJenisSuratAktif" class="form-select">
                                     <option value="">Semua Jenis</option>
-                                    @foreach (\App\Models\SuratRequest::TYPES as $value => $label)
-                                    <option value="{{ $value }}">{{ $label }}</option>
+                                    @foreach ($suratTemplates as $template)
+                                    <option value="{{ $template->slug }}">{{ $template->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -909,8 +999,8 @@
                                 <label class="form-label" for="filterJenisSuratRiwayat" style="margin: 0;">Jenis Surat</label>
                                 <select id="filterJenisSuratRiwayat" class="form-select">
                                     <option value="">Semua Jenis</option>
-                                    @foreach (\App\Models\SuratRequest::TYPES as $value => $label)
-                                    <option value="{{ $value }}">{{ $label }}</option>
+                                    @foreach ($suratTemplates as $template)
+                                    <option value="{{ $template->slug }}">{{ $template->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -946,63 +1036,97 @@
                             <div><h2>Pengaduan Masyarakat</h2><p>Daftar pengaduan/aspirasi yang dikirim masyarakat lewat formulir online, terbaru di atas.</p></div>
                         </div>
 
-                        <div class="repeater-list pengaduan-list">
-                            @forelse ($contactMessages as $pesan)
-                            <div class="repeater-item">
-                                <div class="pengaduan-item-head">
-                                    <div>
-                                        <strong>{{ $pesan->name }}</strong>
-                                        <span class="status-pill status-{{ $pesan->status }}">
-                                            @switch($pesan->status)
-                                                @case('new') Baru @break
-                                                @case('read') Dibaca @break
-                                                @case('replied') Ditindaklanjuti @break
-                                                @case('closed') Selesai @break
-                                            @endswitch
-                                        </span>
-                                    </div>
-                                    <span class="pengaduan-date">{{ $pesan->created_at->translatedFormat('d M Y, H:i') }}</span>
-                                </div>
-                                <div class="pengaduan-contact">
-                                    <span>📞 {{ $pesan->phone }}</span>
-                                    @if ($pesan->email)
-                                        <span>✉️ {{ $pesan->email }}</span>
-                                    @endif
-                                </div>
-                                <p class="pengaduan-subject">{{ $pesan->subject }}</p>
-                                <p class="pengaduan-message">{{ $pesan->message }}</p>
-                                @if ($pesan->photo_path)
-                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($pesan->photo_path) }}" target="_blank" rel="noopener">
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($pesan->photo_path) }}" alt="Foto pendukung dari {{ $pesan->name }}" class="pengaduan-photo">
-                                    </a>
-                                @endif
+                        <div class="admin-table-wrap">
+                            <table class="admin-table pengaduan-table">
+                                <thead><tr><th>Nama</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+                                <tbody>
+                                    @forelse ($contactMessages as $pesan)
+                                    <tr class="status-{{ $pesan->status }}">
+                                        <td>
+                                            <div style="font-weight:700; color:var(--color-green-dark);">{{ $pesan->name }}</div>
+                                        </td>
+                                        <td style="color:var(--color-text-muted); white-space:nowrap;">{{ $pesan->created_at->translatedFormat('d M Y, H:i') }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ route('admin.pengaduan.status', $pesan) }}">
+                                                @csrf
+                                                <select name="status" class="status-select status-{{ $pesan->status }}" onchange="this.className = 'status-select status-' + this.value; this.closest('tr').className = 'status-' + this.value; this.form.submit()">
+                                                    <option value="new" {{ $pesan->status === 'new' ? 'selected' : '' }}>Baru</option>
+                                                    <option value="read" {{ $pesan->status === 'read' ? 'selected' : '' }}>Dibaca</option>
+                                                    <option value="replied" {{ $pesan->status === 'replied' ? 'selected' : '' }}>Ditindaklanjuti</option>
+                                                    <option value="closed" {{ $pesan->status === 'closed' ? 'selected' : '' }}>Selesai</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <div class="admin-table-actions">
+                                                <button type="button" class="admin-table-edit-btn btn-detail-pengaduan" aria-label="Lihat detail pengaduan"
+                                                    data-detail="{{ json_encode([
+                                                        'name' => $pesan->name,
+                                                        'phone' => $pesan->phone,
+                                                        'email' => $pesan->email,
+                                                        'date' => $pesan->created_at->translatedFormat('d M Y, H:i'),
+                                                        'status' => $pesan->status,
+                                                        'statusLabel' => ['new' => 'Baru', 'read' => 'Dibaca', 'replied' => 'Ditindaklanjuti', 'closed' => 'Selesai'][$pesan->status] ?? $pesan->status,
+                                                        'subject' => $pesan->subject,
+                                                        'message' => $pesan->message,
+                                                        'photoUrl' => $pesan->photo_path ? \Illuminate\Support\Facades\Storage::url($pesan->photo_path) : null,
+                                                    ]) }}">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="7" x2="12" y2="13"></line><line x1="12" y1="16.5" x2="12.01" y2="16.5"></line></svg>
+                                                </button>
+                                                <form method="POST" action="{{ route('admin.pengaduan.destroy', $pesan) }}" data-confirm="Hapus pengaduan dari {{ $pesan->name }}?">
+                                                    @csrf
+                                                    <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus pengaduan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr><td colspan="4" class="admin-table-empty">Belum ada pengaduan yang masuk.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                                <div class="pengaduan-actions">
-                                    <form method="POST" action="{{ route('admin.pengaduan.status', $pesan) }}">
-                                        @csrf
-                                        <select name="status" class="form-select" onchange="this.form.submit()">
-                                            <option value="new" {{ $pesan->status === 'new' ? 'selected' : '' }}>Baru</option>
-                                            <option value="read" {{ $pesan->status === 'read' ? 'selected' : '' }}>Dibaca</option>
-                                            <option value="replied" {{ $pesan->status === 'replied' ? 'selected' : '' }}>Ditindaklanjuti</option>
-                                            <option value="closed" {{ $pesan->status === 'closed' ? 'selected' : '' }}>Selesai</option>
-                                        </select>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.pengaduan.destroy', $pesan) }}" data-confirm="Hapus pengaduan dari {{ $pesan->name }}?">
-                                        @csrf
-                                        <button type="submit" class="pengaduan-delete-btn" aria-label="Hapus pengaduan">&times;</button>
-                                    </form>
+                    <div class="admin-modal-overlay" id="pengaduanDetailOverlay">
+                        <div class="admin-modal-content" style="max-width:600px;">
+                            <span class="admin-modal-close" id="pengaduanDetailClose" role="button" aria-label="Tutup">&times;</span>
+                            <div class="admin-modal-body">
+                                <span class="status-pill" id="pengaduanDetailStatus" style="margin-bottom:0.6rem;"></span>
+                                <h3 id="pengaduanDetailName" style="font-family:var(--font-heading); color:var(--color-green-dark); font-size:1.3rem; margin-bottom:0.25rem;"></h3>
+                                <p id="pengaduanDetailDate" style="font-size:0.82rem; color:var(--color-text-muted); margin-bottom:1.25rem;"></p>
+
+                                <div style="display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:1.25rem; padding-bottom:1.25rem; border-bottom:1px solid rgba(47,93,80,0.1);">
+                                    <div>
+                                        <span class="form-label" style="display:block; margin-bottom:0.2rem;">Telepon</span>
+                                        <span id="pengaduanDetailPhone"></span>
+                                    </div>
+                                    <div id="pengaduanDetailEmailWrap">
+                                        <span class="form-label" style="display:block; margin-bottom:0.2rem;">Email</span>
+                                        <span id="pengaduanDetailEmail"></span>
+                                    </div>
+                                </div>
+
+                                <span class="form-label" style="display:block; margin-bottom:0.35rem;">Subjek</span>
+                                <p id="pengaduanDetailSubject" style="font-weight:700; margin-bottom:1.25rem;"></p>
+
+                                <span class="form-label" style="display:block; margin-bottom:0.35rem;">Isi Pengaduan</span>
+                                <p id="pengaduanDetailMessage" style="white-space:pre-line; line-height:1.7; margin-bottom:1.25rem;"></p>
+
+                                <div id="pengaduanDetailPhotoWrap" style="display:none;">
+                                    <span class="form-label" style="display:block; margin-bottom:0.5rem;">Foto Pendukung</span>
+                                    <a id="pengaduanDetailPhotoLink" target="_blank" rel="noopener">
+                                        <img id="pengaduanDetailPhotoImg" style="max-width:100%; border-radius:10px; display:block;" alt="Foto pendukung pengaduan">
+                                    </a>
                                 </div>
                             </div>
-                            @empty
-                            <p style="color: var(--color-text-muted);">Belum ada pengaduan yang masuk.</p>
-                            @endforelse
                         </div>
                     </div>
                 </section>
 
                 <!-- ================= KONTAK / FOOTER ================= -->
                 <section class="admin-panel" id="panel-kontak">
-                    <form class="admin-form" method="POST" action="{{ route('admin.kontak.update') }}">
+                    <form class="admin-form" method="POST" action="{{ route('admin.kontak.update') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="admin-card">
                             <div class="admin-card-header">
@@ -1018,6 +1142,14 @@
                             @endif
 
                             <div class="form-grid">
+                                <div class="form-group full">
+                                    <label class="form-label">Logo Nagari</label>
+                                    <div class="form-file">
+                                        <div class="preview-box" style="{{ ($villageProfile?->logo_path) ? "background-image:url('".\Illuminate\Support\Facades\Storage::url($villageProfile->logo_path)."'); background-size:cover; background-position:center;" : '' }}">@unless($villageProfile?->logo_path)🖼️@endunless</div>
+                                        <input type="file" name="logo" accept="image/*">
+                                    </div>
+                                    <span class="form-hint">Logo akan tampil di footer dan pada topbar, di sebelah kiri tulisan “Nagari Campago”. Biarkan kosong jika tidak ingin mengganti logo.</span>
+                                </div>
                                 <div class="form-group full">
                                     <label class="form-label">Deskripsi Singkat Nagari</label>
                                     <textarea class="form-textarea" name="deskripsi">{{ $kontak['deskripsi'] }}</textarea>
@@ -1278,7 +1410,12 @@
                         const data = JSON.parse(btn.dataset.item || '{}');
                         Object.entries(data).forEach(([name, value]) => {
                             const field = form.querySelector(`[name="${name}"]`);
-                            if (field && field.type !== 'file') field.value = value ?? '';
+                            if (!field) return;
+                            if (field.type === 'checkbox') {
+                                field.checked = !!value;
+                            } else if (field.type !== 'file') {
+                                field.value = value ?? '';
+                            }
                         });
                         if (previewBox) {
                             const previewUrl = btn.dataset.preview;
@@ -1305,7 +1442,238 @@
             initCrudPanel('potensi', { add: 'Tambah Kartu Potensi', edit: 'Edit Kartu Potensi' });
             initCrudPanel('berita', { add: 'Tambah Berita', edit: 'Edit Berita' });
             initCrudPanel('galeri', { add: 'Tambah Foto Galeri', edit: 'Edit Foto Galeri' });
-            initCrudPanel('banner', { add: 'Tambah Foto Beranda', edit: 'Edit Foto Beranda' });
+
+            // Panel "Statistik Nagari" -- begitu admin selesai mengetik "Jumlah Korong",
+            // muncul pop up berisi kolom nama korong sesuai jumlah tersebut (wajib diisi).
+            (function initNamaKorongModal() {
+                const countInput = document.getElementById('jumlahKorongInput');
+                const list = document.getElementById('namaKorongList');
+                const overlay = document.getElementById('namaKorongModalOverlay');
+                if (!countInput || !list || !overlay) return;
+
+                const openBtn = document.getElementById('btnAturNamaKorong');
+                const closeBtn = document.getElementById('namaKorongModalClose');
+                const doneBtn = document.getElementById('namaKorongModalDone');
+                const summaryCount = document.getElementById('namaKorongSummaryCount');
+                const modalCount = document.getElementById('namaKorongModalCount');
+
+                function openModal() { overlay.style.display = 'flex'; }
+                function closeModal() { overlay.style.display = 'none'; }
+
+                function syncRows() {
+                    let target = parseInt(countInput.value, 10);
+                    if (isNaN(target) || target < 0) target = 0;
+                    const rows = list.querySelectorAll('.nama-korong-input');
+                    if (rows.length < target) {
+                        for (let i = rows.length; i < target; i++) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'form-input nama-korong-input';
+                            input.name = 'nama_korong[]';
+                            input.placeholder = 'Nama korong ke-' + (i + 1);
+                            input.required = true;
+                            list.appendChild(input);
+                        }
+                    } else if (rows.length > target) {
+                        for (let i = rows.length - 1; i >= target; i--) {
+                            rows[i].remove();
+                        }
+                    }
+                    const count = list.querySelectorAll('.nama-korong-input').length;
+                    if (summaryCount) summaryCount.textContent = count;
+                    if (modalCount) modalCount.textContent = count;
+                }
+
+                countInput.addEventListener('change', () => { syncRows(); openModal(); });
+                if (openBtn) openBtn.addEventListener('click', () => { syncRows(); openModal(); });
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                if (doneBtn) doneBtn.addEventListener('click', () => { syncRows(); closeModal(); });
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+            })();
+
+            // Panel "Jenis Surat" -- beda dari initCrudPanel biasa karena punya repeater
+            // kolom formulir bersarang (dengan checkbox) yang perlu diisi ulang manual saat Edit.
+            (function initSuratTemplatePanel() {
+                const panel = document.getElementById('panel-surat-template');
+                if (!panel) return;
+                const listView = panel.querySelector('.crud-list-view');
+                const formView = panel.querySelector('.crud-form-view');
+                const form = document.getElementById('suratTemplateForm');
+                const titleEl = formView.querySelector('.crud-form-title');
+                const targetIdField = form.querySelector('input[name="_target_id"]');
+                const storeUrl = form.dataset.storeUrl;
+                const kolomList = document.getElementById('suratKolomList');
+                const kolomItemTemplate = document.getElementById('suratKolomItemTemplate');
+
+                function showForm() { listView.style.display = 'none'; formView.style.display = 'block'; }
+                function showList() { formView.style.display = 'none'; listView.style.display = 'block'; }
+
+                const kolomRowColors = [
+                    'rgba(47,93,80,0.1)',
+                    'rgba(218,191,132,0.22)',
+                    'rgba(185,211,207,0.4)',
+                    'rgba(168,193,165,0.28)',
+                ];
+
+                function reindexKolom() {
+                    kolomList.querySelectorAll(':scope > .kolom-field-item').forEach((item, idx) => {
+                        item.querySelectorAll('[name^="kolom["]').forEach(input => {
+                            input.name = input.name.replace(/^kolom\[[^\]]*\]/, `kolom[${idx}]`);
+                        });
+                        item.style.background = kolomRowColors[idx % kolomRowColors.length];
+                    });
+                }
+
+                function bindKolomRow(item) {
+                    const typeSelect = item.querySelector('.kolom-type');
+                    const optionsGroup = item.querySelector('.kolom-options');
+                    const toggleOptions = () => {
+                        optionsGroup.style.visibility = ['select', 'radio'].includes(typeSelect.value) ? 'visible' : 'hidden';
+                    };
+                    typeSelect.addEventListener('change', toggleOptions);
+                    toggleOptions();
+
+                    item.querySelector('.kolom-remove-btn').addEventListener('click', () => {
+                        item.remove();
+                        reindexKolom();
+                    });
+                }
+
+                function addKolomRow(data) {
+                    const fragment = kolomItemTemplate.content.cloneNode(true);
+                    kolomList.appendChild(fragment);
+                    const item = kolomList.lastElementChild;
+                    if (data) {
+                        item.querySelector('.kolom-label').value = data.label || '';
+                        item.querySelector('.kolom-type').value = data.type || 'text';
+                        item.querySelector('.kolom-options-input').value = data.options || '';
+                        item.querySelector('.kolom-wajib').checked = !!data.wajib;
+                    }
+                    bindKolomRow(item);
+                    reindexKolom();
+                    return item;
+                }
+
+                function resetForm() {
+                    form.reset();
+                    form.action = storeUrl;
+                    if (targetIdField) targetIdField.value = '';
+                    titleEl.textContent = 'Tambah Jenis Surat';
+                    kolomList.innerHTML = '';
+                }
+
+                const addBtn = panel.querySelector('.btn-add-new');
+                if (addBtn) {
+                    addBtn.addEventListener('click', () => {
+                        resetForm();
+                        showForm();
+                    });
+                }
+
+                document.getElementById('btnAddSuratKolom').addEventListener('click', () => addKolomRow(null));
+
+                document.querySelectorAll('#suratCommonFieldChips .btn-common-field').forEach(chip => {
+                    chip.addEventListener('click', () => {
+                        const data = JSON.parse(chip.dataset.field || '{}');
+                        addKolomRow(data);
+                    });
+                });
+
+                panel.querySelectorAll('.btn-edit-surat-template').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        resetForm();
+                        const data = JSON.parse(btn.dataset.item || '{}');
+                        form.action = btn.dataset.updateUrl;
+                        if (targetIdField) targetIdField.value = btn.dataset.id;
+                        titleEl.textContent = 'Edit Jenis Surat';
+                        form.querySelector('[name="nama"]').value = data.nama || '';
+                        form.querySelector('[name="deskripsi"]').value = data.deskripsi || '';
+                        form.querySelector('[name="aktif"]').checked = !!data.aktif;
+                        (data.kolom || []).forEach(kolom => addKolomRow(kolom));
+                        showForm();
+                    });
+                });
+
+                const cancelBtn = formView.querySelector('.btn-cancel-form');
+                if (cancelBtn) cancelBtn.addEventListener('click', showList);
+            })();
+
+            // Toast notifikasi sukses -- satu mekanisme session('success') ini dipakai
+            // bersama oleh semua panel admin, jadi cukup diubah di satu tempat ini saja.
+            (function initSuccessToast() {
+                const toast = document.getElementById('successToast');
+                if (!toast) return;
+                const closeBtn = document.getElementById('successToastClose');
+
+                function dismiss() {
+                    toast.classList.add('is-leaving');
+                    setTimeout(() => toast.remove(), 300);
+                }
+
+                const timer = setTimeout(dismiss, 4500);
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        clearTimeout(timer);
+                        dismiss();
+                    });
+                }
+            })();
+
+            // Modal detail pengaduan -- satu modal dipakai bersama untuk semua baris,
+            // diisi ulang lewat data-detail (JSON) milik tombol yang diklik.
+            (function initPengaduanDetailModal() {
+                const overlay = document.getElementById('pengaduanDetailOverlay');
+                if (!overlay) return;
+                const closeBtn = document.getElementById('pengaduanDetailClose');
+                const nameEl = document.getElementById('pengaduanDetailName');
+                const dateEl = document.getElementById('pengaduanDetailDate');
+                const statusEl = document.getElementById('pengaduanDetailStatus');
+                const phoneEl = document.getElementById('pengaduanDetailPhone');
+                const emailWrap = document.getElementById('pengaduanDetailEmailWrap');
+                const emailEl = document.getElementById('pengaduanDetailEmail');
+                const subjectEl = document.getElementById('pengaduanDetailSubject');
+                const messageEl = document.getElementById('pengaduanDetailMessage');
+                const photoWrap = document.getElementById('pengaduanDetailPhotoWrap');
+                const photoLink = document.getElementById('pengaduanDetailPhotoLink');
+                const photoImg = document.getElementById('pengaduanDetailPhotoImg');
+
+                function openModal(data) {
+                    nameEl.textContent = data.name;
+                    dateEl.textContent = data.date;
+                    statusEl.textContent = data.statusLabel;
+                    statusEl.className = 'status-pill status-' + data.status;
+                    phoneEl.textContent = data.phone;
+                    if (data.email) {
+                        emailEl.textContent = data.email;
+                        emailWrap.style.display = '';
+                    } else {
+                        emailWrap.style.display = 'none';
+                    }
+                    subjectEl.textContent = data.subject;
+                    messageEl.textContent = data.message;
+                    if (data.photoUrl) {
+                        photoLink.href = data.photoUrl;
+                        photoImg.src = data.photoUrl;
+                        photoWrap.style.display = 'block';
+                    } else {
+                        photoWrap.style.display = 'none';
+                    }
+                    overlay.style.display = 'flex';
+                }
+
+                function closeModal() {
+                    overlay.style.display = 'none';
+                }
+
+                document.querySelectorAll('.btn-detail-pengaduan').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        openModal(JSON.parse(btn.dataset.detail));
+                    });
+                });
+
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+            })();
 
             // Modal konfirmasi kustom, pengganti window.confirm() bawaan browser.
             // Form yang butuh konfirmasi cukup diberi atribut data-confirm="pesannya"
